@@ -1,4 +1,4 @@
-package com.github.ekvedaras.intellijilluminatequerybuilderintegration
+package dev.ekvedaras.intellijilluminatequerybuilderintegration
 
 import com.intellij.AbstractBundle
 import org.jetbrains.annotations.NonNls

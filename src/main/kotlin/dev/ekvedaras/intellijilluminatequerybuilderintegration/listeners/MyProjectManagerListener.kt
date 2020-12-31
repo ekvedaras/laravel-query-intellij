@@ -1,9 +1,9 @@
-package com.github.ekvedaras.intellijilluminatequerybuilderintegration.listeners
+package dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import com.github.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService
 
 internal class MyProjectManagerListener : ProjectManagerListener {
 

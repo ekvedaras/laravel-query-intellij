@@ -1,7 +1,7 @@
-package com.github.ekvedaras.intellijilluminatequerybuilderintegration.services
+package dev.ekvedaras.intellijilluminatequerybuilderintegration.services
 
 import com.intellij.openapi.project.Project
-import com.github.ekvedaras.intellijilluminatequerybuilderintegration.MyBundle
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.MyBundle
 
 class MyProjectService(project: Project) {
 

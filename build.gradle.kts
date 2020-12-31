@@ -113,10 +113,6 @@ tasks {
         )
     }
 
-    runPluginVerifier {
-        ideVersions(pluginVerifierIdeVersions)
-    }
-
     publishPlugin {
         dependsOn("patchChangelog")
         token(System.getenv("PUBLISH_TOKEN"))

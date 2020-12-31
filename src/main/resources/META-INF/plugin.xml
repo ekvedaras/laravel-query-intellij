@@ -1,19 +1,21 @@
 <idea-plugin>
-    <id>com.github.ekvedaras.intellijilluminatequerybuilderintegration</id>
-    <name>intellij-illuminate-query-builder-integration</name>
-    <vendor>ekvedaras</vendor>
+    <id>dev.ekvedaras.intellijilluminatequerybuilderintegration</id>
+    <name>Illuminate Query Builder Integration</name>
+    <vendor email="kvedarasernestas@gmail.com" url="https://ekvedaras.github.io">Ernestas Kvedaras</vendor>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.jetbrains.php</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
+        <applicationService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
+        <projectService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
     </extensions>
 
+
     <applicationListeners>
-        <listener class="com.github.ekvedaras.intellijilluminatequerybuilderintegration.listeners.MyProjectManagerListener"
+        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
 </idea-plugin>
