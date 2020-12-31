@@ -7,15 +7,19 @@
     <!-- https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.jetbrains.php</depends>
+    <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
         <projectService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
+
+        <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>
     </extensions>
 
 
     <applicationListeners>
-        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+<!--        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.TableOrViewCompletionContributortributor"-->
+<!--                  topic="com.intellij.database.model.basic.BasicTableOrView"/>-->
     </applicationListeners>
 </idea-plugin>
