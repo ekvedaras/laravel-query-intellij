@@ -14,8 +14,9 @@
         <projectService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
-                                order="last"
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>
+        <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.ColumnCompletionContributor"/>
     </extensions>
 
 

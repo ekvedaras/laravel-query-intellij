@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.database.model.DasColumn
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
@@ -12,12 +13,14 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 
 import com.intellij.database.psi.DbNamespaceImpl
+import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import com.jetbrains.rd.util.addUnique
+import com.jetbrains.rd.util.lifetime.Lifetime
 
-import com.intellij.database.model.DasTable
 import icons.DatabaseIcons
 
 
-class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
+class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
     companion object {
         @JvmStatic
         val BUILDERS: List<String> = listOf(
@@ -27,14 +30,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
         @JvmStatic
         val METHODS: List<String> = listOf(
-            "from",
-            "join",
-            "joinWhere",
-            "leftJoin",
-            "leftJoinWhere",
-            "rightJoin",
-            "rightJoinWhere",
-            "crossJoin",
+            "where",
         )
     }
 
@@ -76,20 +72,31 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             return
         }
 
+        // TODO should traverse nested and not just loop
+        val tableNames = mutableListOf<String>();
+        for (child in identifier.parent.children) {
+            if(child is MethodReference && TableOrViewCompletionProvider.METHODS.contains(child.name)) {
+                tableNames.addUnique(Lifetime.Eternal, (child.getParameter(0) as StringLiteralExpressionImpl).contents)
+            }
+        }
+
         DbUtil.getDataSources(ref.project).forEach { dataSource ->
             DasUtil.getTables(dataSource.dataSource)
-                .forEach {
-                    if (!it.isSystem) {
-                        result.addElement(buildLookup(it))
+                .forEach { table ->
+                    if (!table.isSystem && (tableNames.isEmpty() || tableNames.contains(table.name))) {
+                        DasUtil.getColumns(table)
+                            .forEach {
+                                result.addElement(buildLookup(it))
+                            }
                     }
                 }
         }
     }
 
-    private fun buildLookup(table: DasTable): LookupElementBuilder {
-        var builder = LookupElementBuilder.create(table, table.name).withIcon(DatabaseIcons.Table)
+    private fun buildLookup(column: DasColumn): LookupElementBuilder {
+        var builder = LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
 
-        val tableSchema = table.dasParent
+        val tableSchema = column.dasParent
         if (tableSchema != null) {
             if (tableSchema is DbNamespaceImpl) {
                 builder = builder.withTypeText(
@@ -101,7 +108,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
         if (tableSchema != null) {
             builder = builder.withTailText(
-                " (" + table.dasParent?.name + ")",
+                " (" + column.dasParent?.name + ")",
                 true
             )
         }

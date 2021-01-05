@@ -5,17 +5,17 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.patterns.PlatformPatterns
 import com.jetbrains.php.lang.lexer.PhpTokenTypes
 
-class TableOrViewCompletionContributor : CompletionContributor() {
+class ColumnCompletionContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,
             PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
-            TableOrViewCompletionProvider()
+            ColumnCompletionProvider()
         );
         extend(
             CompletionType.BASIC,
             PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
-            TableOrViewCompletionProvider()
+            ColumnCompletionProvider()
         );
     }
 }
