@@ -14,6 +14,8 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.intellij.database.psi.DbNamespaceImpl
 
 import com.intellij.database.model.DasTable
+import com.intellij.sql.slicer.toSqlElement
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils
 import icons.DatabaseIcons
 
 
@@ -43,40 +45,17 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val identifier: PsiElement = parameters.position.parent?.parent?.prevSibling?.prevSibling ?: return
-
-        var found = false
-        for (method in METHODS) {
-            if (identifier.text == method) {
-                found = true
-                break
-            }
-        }
-
-        if (!found) {
+        val method = ClassUtils.resolveMethodReference(parameters.position) ?: return
+        if (!METHODS.contains(method.name)) {
             return
         }
 
-        val ref: MethodReference = identifier.prevSibling?.prevSibling as MethodReference? ?: return
-        val types: Set<String> =
-            PhpIndex
-                .getInstance(ref.project)
-                .completeType(ref.project, ref.inferredType, null)
-                .types
-
-        found = false
-        for (builder in BUILDERS) {
-            if (types.contains(builder)) {
-                found = true
-                break
-            }
-        }
-
-        if (!found) {
+        val classes: List<String> = ClassUtils.resolveMethodClasses(method)
+        if (BUILDERS.none { classes.contains(it) }) {
             return
         }
 
-        DbUtil.getDataSources(ref.project).forEach { dataSource ->
+        DbUtil.getDataSources(method.project).forEach { dataSource ->
             DasUtil.getTables(dataSource.dataSource)
                 .forEach {
                     if (!it.isSystem) {
@@ -101,7 +80,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
         if (tableSchema != null) {
             builder = builder.withTailText(
-                " (" + table.dasParent?.name + ")",
+                " (" + tableSchema.name + ")",
                 true
             )
         }

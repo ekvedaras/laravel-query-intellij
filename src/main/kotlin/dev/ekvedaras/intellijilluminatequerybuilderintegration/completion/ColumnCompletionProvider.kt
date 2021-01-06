@@ -7,15 +7,16 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
-import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 
 import com.intellij.database.psi.DbNamespaceImpl
+import com.intellij.database.psi.DbTableImpl
+import com.intellij.sql.slicer.toSqlElement
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils
 
 import icons.DatabaseIcons
 
@@ -39,80 +40,53 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val identifier: PsiElement = parameters.position.parent?.parent?.prevSibling?.prevSibling ?: return
-
-        var found = false
-        for (method in METHODS) {
-            if (identifier.text == method) {
-                found = true
-                break
-            }
-        }
-
-        if (!found) {
+        val method = ClassUtils.resolveMethodReference(parameters.position) ?: return
+        if (!METHODS.contains(method.name)) {
             return
         }
 
-        val ref: MethodReference = identifier.prevSibling?.prevSibling as MethodReference? ?: return
-        val types: Set<String> =
-            PhpIndex
-                .getInstance(ref.project)
-                .completeType(ref.project, ref.inferredType, null)
-                .types
-
-        found = false
-        for (builder in BUILDERS) {
-            if (types.contains(builder)) {
-                found = true
-                break
-            }
-        }
-
-        if (!found) {
+        val classes: List<String> = ClassUtils.resolveMethodClasses(method)
+        if (BUILDERS.none { classes.contains(it) }) {
             return
         }
 
-        // TODO should traverse nested and not just loop
         val tableNames = mutableListOf<String>();
-        for (child in identifier.parent.children) {
-            if(child is MethodReference && TableOrViewCompletionProvider.METHODS.contains(child.name)) {
-                tableNames.addUnique(Lifetime.Eternal, (child.getParameter(0) as StringLiteralExpressionImpl).contents)
+        val treeMethods = ClassUtils.findMethodsInTree(method)
+        for (treeMethod in treeMethods) {
+            if (TableOrViewCompletionProvider.METHODS.contains(treeMethod.name)) {
+                tableNames.addUnique(
+                    Lifetime.Eternal,
+                    (treeMethod.getParameter(0) as StringLiteralExpressionImpl).contents
+                )
             }
         }
 
-        DbUtil.getDataSources(ref.project).forEach { dataSource ->
+        val completion = mutableListOf<LookupElementBuilder>()
+        DbUtil.getDataSources(method.project).forEach { dataSource ->
             DasUtil.getTables(dataSource.dataSource)
                 .forEach { table ->
                     if (!table.isSystem && (tableNames.isEmpty() || tableNames.contains(table.name))) {
                         DasUtil.getColumns(table)
                             .forEach {
-                                result.addElement(buildLookup(it))
+                                completion.add(buildLookup(it, tableNames.size > 1))
                             }
                     }
                 }
         }
+
+        result.addAllElements(completion.distinctBy { it.lookupString })
     }
 
-    private fun buildLookup(column: DasColumn): LookupElementBuilder {
-        var builder = LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
-
+    private fun buildLookup(column: DasColumn, prependTable : Boolean): LookupElementBuilder {
         val tableSchema = column.dasParent
-        if (tableSchema != null) {
-            if (tableSchema is DbNamespaceImpl) {
-                builder = builder.withTypeText(
-                    tableSchema.parent?.name,
-                    true
-                )
-            }
+            ?: return LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
+
+        if (!prependTable) { // TODO there should probably be a setting to always force table prepend
+            return LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
         }
 
-        if (tableSchema != null) {
-            builder = builder.withTailText(
-                " (" + column.dasParent?.name + ")",
-                true
-            )
-        }
-
-        return builder
+        return LookupElementBuilder.create(column, tableSchema.name + "." + column.name)
+            .withIcon(DatabaseIcons.Col)
+            .withTypeText(tableSchema.dasParent?.name, true)
     }
 }
