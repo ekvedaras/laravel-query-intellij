@@ -9,13 +9,11 @@ class TableOrViewCompletionContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,
-            PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+            ),
             TableOrViewCompletionProvider()
-        );
-        extend(
-            CompletionType.BASIC,
-            PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
-            TableOrViewCompletionProvider()
-        );
+        )
     }
 }

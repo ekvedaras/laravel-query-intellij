@@ -1,8 +1,10 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.psi.PsiElement
+import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.ParameterList
 
 class ClassUtils {
     companion object {
@@ -19,11 +21,22 @@ class ClassUtils {
         }
 
         fun resolveMethodClasses(method: MethodReference): List<String> {
+            if (method.classReference == null) {
+                return listOf()
+            }
+
             return PhpIndex
                 .getInstance(method.project)
-                .completeType(method.project, method.inferredType, null)
+                .completeType(method.project, method.classReference!!.declaredType, null)
                 .types
                 .toList()
+        }
+
+        fun findParameterIndex(psiElement: PsiElement): Int {
+            val parent = psiElement.parent ?: return -1
+            return if (parent is ParameterList) {
+                ArrayUtil.indexOf(parent.parameters, psiElement)
+            } else findParameterIndex(parent)
         }
 
         fun findMethodsInTree(root: PsiElement): List<MethodReference> {
