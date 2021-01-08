@@ -11,6 +11,7 @@ import com.intellij.util.ProcessingContext
 import com.intellij.database.psi.DbNamespaceImpl
 
 import com.intellij.database.model.DasTable
+import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import icons.DatabaseIcons
@@ -22,44 +23,37 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         result: CompletionResultSet
     ) {
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
-        if (!LaravelUtils.BuilderTableMethods.contains(method.name) || MethodUtils.findParameterIndex(parameters.position) != 0) {
+
+        if (shouldNotCompleteCurrentParam(method, parameters)) {
             return
         }
 
-        val classes: List<String> = MethodUtils.resolveMethodClasses(method)
-        if (LaravelUtils.DatabaseBuilderClasses.none { classes.contains(it) }) {
+        if (LaravelUtils.isQueryBuilderMethod(method)) {
             return
         }
 
         DbUtil.getDataSources(method.project).forEach { dataSource ->
-            DasUtil.getTables(dataSource.dataSource).forEach {
-                if (!it.isSystem) {
-                    result.addElement(buildLookup(it))
-                }
-            }
+            DasUtil.getTables(dataSource.dataSource)
+                .filter { !it.isSystem }
+                .forEach { result.addElement(buildLookup(it)) }
         }
     }
 
+    private fun shouldNotCompleteCurrentParam(method: MethodReference, parameters: CompletionParameters) =
+        !LaravelUtils.BuilderTableMethods.contains(method.name)
+                || MethodUtils.findParameterIndex(parameters.position) != 0
+
     private fun buildLookup(table: DasTable): LookupElementBuilder {
-        var builder = LookupElementBuilder.create(table, table.name).withIcon(DatabaseIcons.Table)
+        var builder = LookupElementBuilder
+            .create(table, table.name)
+            .withIcon(DatabaseIcons.Table)
 
-        val tableSchema = table.dasParent
-        if (tableSchema != null) {
-            if (tableSchema is DbNamespaceImpl) {
-                builder = builder.withTypeText(
-                    tableSchema.parent?.name,
-                    true
-                )
-            }
+        val tableSchema = table.dasParent ?: return builder
+
+        if (tableSchema is DbNamespaceImpl) {
+            builder = builder.withTypeText(tableSchema.parent?.name, true)
         }
 
-        if (tableSchema != null) {
-            builder = builder.withTailText(
-                " (" + tableSchema.name + ")",
-                true
-            )
-        }
-
-        return builder
+        return builder.withTailText(" (" + tableSchema.name + ")", true)
     }
 }

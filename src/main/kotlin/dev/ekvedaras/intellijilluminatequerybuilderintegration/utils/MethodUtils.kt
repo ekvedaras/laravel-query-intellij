@@ -50,7 +50,7 @@ class MethodUtils {
 
         /**
          * Resolve all child method references in given element and return the list.
-         * Usually the root element should be a PSI Statement
+         * Usually the root element should be a first child of PSI Statement
          */
         fun findMethodsInTree(root: PsiElement): List<MethodReference> {
             val list = mutableListOf<MethodReference>()

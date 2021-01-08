@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasTable
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.psi.util.elementType
@@ -26,6 +27,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         result: CompletionResultSet
     ) {
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
+
         if (shouldNotCompleteCurrentParameter(method, parameters)) {
             return
         }
@@ -34,87 +36,106 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
             return
         }
 
-        val classes: List<String> = MethodUtils.resolveMethodClasses(method)
-        if (LaravelUtils.DatabaseBuilderClasses.none { classes.contains(it) }) {
+        if (!LaravelUtils.isQueryBuilderMethod(method)) {
             return
         }
 
+        result.addAllElements(
+            buildCompletionList(method).distinctBy { it.lookupString }
+        )
+    }
+
+    private fun shouldNotCompleteCurrentParameter(method: MethodReference, parameters: CompletionParameters) =
+        LaravelUtils.BuilderTableColumnsParams[method.name]?.contains(
+            MethodUtils.findParameterIndex(parameters.position)
+        ) != true
+
+    private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
+        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
+                && parameters.position.parent.parent.elementType?.index?.toInt() == 1889
+
+    private fun buildCompletionList(method: MethodReference): MutableList<LookupElementBuilder> {
+        val tablesAndAliases = collectTablesAndAliases(method)
+        val completionList = mutableListOf<LookupElementBuilder>()
+
+        DbUtil.getDataSources(method.project).forEach { dataSource ->
+            DasUtil.getTables(dataSource.dataSource)
+                .filter { !it.isSystem && (tablesAndAliases.isEmpty() || tablesAndAliases.containsValue(it.name)) }
+                .forEach { addTableToCompletion(tablesAndAliases, it, completionList) }
+        }
+
+        return completionList
+    }
+
+    private fun collectTablesAndAliases(method: MethodReference): MutableMap<String, String> {
         val aliases = mutableMapOf<String, String>();
-        val treeMethods = MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
-        for (treeMethod in treeMethods) {
-            if (LaravelUtils.BuilderTableMethods.contains(treeMethod.name)) {
-                val tableName = (treeMethod.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
+
+        MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
+            .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
+            .forEach loop@{
+                val tableName = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
 
                 if (tableName.contains(" as ")) {
                     aliases[tableName.substringAfter("as").trim()] = tableName.substringBefore("as").trim()
-                    continue
+                    return@loop
                 }
 
-                if (!LaravelUtils.BuilderTableAliasParams.containsKey(treeMethod.name)) {
+                if (!LaravelUtils.BuilderTableAliasParams.containsKey(it.name)) {
                     aliases[tableName] = tableName
-                    continue
+                    return@loop
                 }
 
-                val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[treeMethod.name] ?: continue
-                val alias: String? =
-                    (treeMethod.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
+                val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[it.name] ?: return@loop
+                val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
 
                 aliases[alias ?: tableName] = tableName
             }
-        }
 
-        val completion = mutableListOf<LookupElementBuilder>()
-        DbUtil.getDataSources(method.project).forEach { dataSource ->
-            DasUtil.getTables(dataSource.dataSource).forEach { table ->
-                if (!table.isSystem && (aliases.isEmpty() || aliases.containsValue(table.name))) {
-                    aliases.filter {
-                        it.value == table.name
-                    }.forEach { alias ->
-                        if (alias.key == alias.value) {
-                            DasUtil.getColumns(table).forEach {
-                                completion.add(buildLookup(it, aliases.size > 1))
-                            }
-                        } else {
-                            DasUtil.getColumns(table).forEach {
-                                completion.add(buildLookup(it, aliases.size > 1, alias.key))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        result.addAllElements(completion.distinctBy { it.lookupString })
+        return aliases
     }
 
-    private fun shouldNotCompleteCurrentParameter(
-        method: MethodReference,
-        parameters: CompletionParameters
-    ) =
-        LaravelUtils.BuilderTableColumnsParams[method.name]?.contains(MethodUtils.findParameterIndex(parameters.position)) != true
-
-    private fun shouldNotCompleteArrayValue(
-        method: MethodReference,
-        parameters: CompletionParameters
-    ) = (!LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-            && parameters.position.parent.parent.elementType?.index?.toInt() == 1889)
+    private fun addTableToCompletion(
+        aliases: MutableMap<String, String>,
+        table: DasTable,
+        completion: MutableList<LookupElementBuilder>
+    ) {
+        aliases
+            .filter { it.value == table.name }
+            .forEach { alias ->
+                DasUtil.getColumns(table).forEach {
+                    completion.add(
+                        buildLookup(
+                            it,
+                            aliases.size > 1,
+                            if (alias.key != alias.value) alias.key else null
+                        )
+                    )
+                }
+            }
+    }
 
     private fun buildLookup(column: DasColumn, prependTable: Boolean, alias: String? = null): LookupElementBuilder {
         val tableSchema = column.dasParent
-            ?: return LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
+            ?: return LookupElementBuilder
+                .create(column, column.name)
+                .withIcon(DatabaseIcons.Col)
 
-        if (!prependTable) { // TODO there should probably be a setting to always force table prepend
-            return LookupElementBuilder.create(column, column.name).withIcon(DatabaseIcons.Col)
+        if (!prependTable) {
+            return LookupElementBuilder
+                .create(column, column.name)
+                .withIcon(DatabaseIcons.Col)
         }
 
         if (alias != null && alias != tableSchema.name) {
-            return LookupElementBuilder.create(column, alias + "." + column.name)
+            return LookupElementBuilder
+                .create(column, alias + "." + column.name)
                 .withIcon(DatabaseIcons.Col)
                 .withTailText(" (" + tableSchema.name + ")", true)
                 .withTypeText(tableSchema.dasParent?.name, true)
         }
 
-        return LookupElementBuilder.create(column, (alias ?: tableSchema.name) + "." + column.name)
+        return LookupElementBuilder
+            .create(column, (alias ?: tableSchema.name) + "." + column.name)
             .withIcon(DatabaseIcons.Col)
             .withTypeText(tableSchema.dasParent?.name, true)
     }

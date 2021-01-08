@@ -1,5 +1,7 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.jetbrains.php.lang.psi.elements.MethodReference
+
 class LaravelUtils {
     companion object {
         //<editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
@@ -130,5 +132,11 @@ class LaravelUtils {
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
         )
         //</editor-fold>
+
+        fun isQueryBuilderMethod(method: MethodReference): Boolean {
+            val classes = MethodUtils.resolveMethodClasses(method)
+            return DatabaseBuilderClasses.any { classes.contains(it) }
+        }
     }
+
 }
