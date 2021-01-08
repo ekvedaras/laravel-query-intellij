@@ -148,7 +148,12 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         val treeMethods = ClassUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
         for (treeMethod in treeMethods) {
             if (TableOrViewCompletionProvider.Methods.contains(treeMethod.name)) {
-                val tableName = (treeMethod.getParameter(0) as StringLiteralExpressionImpl).contents
+                val tableName = (treeMethod.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
+
+                if (tableName.contains(" as ")) {
+                    aliases[tableName.substringAfter("as").trim()] = tableName.substringBefore("as").trim()
+                    continue
+                }
 
                 if (!TableOrViewCompletionProvider.Aliases.containsKey(treeMethod.name)) {
                     aliases[tableName] = tableName
@@ -156,11 +161,10 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                 }
 
                 val aliasParam: Int = TableOrViewCompletionProvider.Aliases[treeMethod.name] ?: continue
-                val alias: String =
-                    (treeMethod.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents ?: continue
+                val alias: String? =
+                    (treeMethod.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
 
-
-                aliases[alias] = tableName
+                aliases[alias ?: tableName] = tableName
             }
         }
 
