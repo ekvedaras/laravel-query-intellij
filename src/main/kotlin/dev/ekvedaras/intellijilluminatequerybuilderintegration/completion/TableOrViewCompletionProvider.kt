@@ -11,50 +11,23 @@ import com.intellij.util.ProcessingContext
 import com.intellij.database.psi.DbNamespaceImpl
 
 import com.intellij.database.model.DasTable
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import icons.DatabaseIcons
 
-
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
-    companion object {
-        @JvmStatic
-        val BuilderClasses = listOf(
-            "\\Illuminate\\Database\\Query\\Builder",
-            "\\Illuminate\\Database\\Eloquent\\Builder",
-        )
-
-        @JvmStatic
-        val Methods = listOf(
-            "from",
-            "join",
-            "joinWhere",
-            "leftJoin",
-            "leftJoinWhere",
-            "rightJoin",
-            "rightJoinWhere",
-            "crossJoin",
-        )
-
-        @JvmStatic
-        val Aliases = hashMapOf(
-            "from" to 1,
-            "fromSub" to 1,
-            "selectSub" to 1,
-        )
-    }
-
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
-        val method = ClassUtils.resolveMethodReference(parameters.position) ?: return
-        if (!Methods.contains(method.name) || ClassUtils.findParameterIndex(parameters.position) != 0) {
+        val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
+        if (!LaravelUtils.BuilderTableMethods.contains(method.name) || MethodUtils.findParameterIndex(parameters.position) != 0) {
             return
         }
 
-        val classes: List<String> = ClassUtils.resolveMethodClasses(method)
-        if (BuilderClasses.none { classes.contains(it) }) {
+        val classes: List<String> = MethodUtils.resolveMethodClasses(method)
+        if (LaravelUtils.DatabaseBuilderClasses.none { classes.contains(it) }) {
             return
         }
 
