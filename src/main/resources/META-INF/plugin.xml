@@ -10,22 +10,44 @@
     <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
-        <projectService serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
+        <applicationService
+                serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
+        <projectService
+                serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.ColumnCompletionContributor"/>
+
         <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.TableOrViewReferenceContributor"/>
         <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.ColumnReferenceContributor"/>
+
+        <localInspection language="PHP"
+                         groupPath="PHP"
+                         groupKey="databaseGroupName"
+                         shortName="UnknownTableOrViewInspection"
+                         enabledByDefault="true"
+                         bundle="messages.MyBundle"
+                         key="unknownTableOrViewDisplayName"
+                         implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownTableOrViewInspection"
+        />
+        <localInspection language="PHP"
+                         groupPath="PHP"
+                         groupKey="databaseGroupName"
+                         shortName="UnknownColumnInspection"
+                         enabledByDefault="true"
+                         bundle="messages.MyBundle"
+                         key="unknownColumnDisplayName"
+                         implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownColumnInspection"
+        />
     </extensions>
 
 
     <applicationListeners>
-<!--        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.TableOrViewCompletionContributortributor"-->
-<!--                  topic="com.intellij.database.model.basic.BasicTableOrView"/>-->
+        <!--        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.TableOrViewCompletionContributortributor"-->
+        <!--                  topic="com.intellij.database.model.basic.BasicTableOrView"/>-->
     </applicationListeners>
 </idea-plugin>
