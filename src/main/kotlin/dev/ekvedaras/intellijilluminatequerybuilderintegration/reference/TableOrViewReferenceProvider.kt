@@ -2,7 +2,6 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
-import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
@@ -13,10 +12,6 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
 class TableOrViewReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        if (DumbService.isDumb(element.project)) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
 
         if (shouldNotCompleteCurrentParam(method, element)) {
