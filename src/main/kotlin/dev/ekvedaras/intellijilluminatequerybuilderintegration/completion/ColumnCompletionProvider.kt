@@ -6,10 +6,15 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasTable
+import com.intellij.database.symbols.DasPsiWrappingSymbol
+import com.intellij.database.symbols.DasSymbolUtil
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
+import com.intellij.openapi.project.Project
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
+import com.intellij.sql.psi.SqlReference
+import com.intellij.sql.slicer.toSqlElement
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
@@ -61,7 +66,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         DbUtil.getDataSources(method.project).forEach { dataSource ->
             DasUtil.getTables(dataSource.dataSource)
                 .filter { !it.isSystem && (tablesAndAliases.isEmpty() || tablesAndAliases.containsValue(it.name)) }
-                .forEach { addTableToCompletion(tablesAndAliases, it, completionList) }
+                .forEach { addTableToCompletion(method.project, tablesAndAliases, it, completionList) }
         }
 
         return completionList
@@ -95,6 +100,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
     }
 
     private fun addTableToCompletion(
+        project: Project,
         aliases: MutableMap<String, String>,
         table: DasTable,
         completion: MutableList<LookupElementBuilder>
@@ -105,6 +111,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                 DasUtil.getColumns(table).forEach {
                     completion.add(
                         buildLookup(
+                            project,
                             it,
                             aliases.size > 1,
                             if (alias.key != alias.value) alias.key else null
@@ -114,29 +121,32 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
             }
     }
 
-    private fun buildLookup(column: DasColumn, prependTable: Boolean, alias: String? = null): LookupElementBuilder {
+    private fun buildLookup(project: Project, column: DasColumn, prependTable: Boolean, alias: String? = null): LookupElementBuilder {
+        // DasSymbolUtil.getInlineSymbol(column.toSqlElement<SqlReference>())
+        // ^ potential way of getting a reference?
+        val icon = DasPsiWrappingSymbol(column, project).getIcon(false)
         val tableSchema = column.dasParent
             ?: return LookupElementBuilder
                 .create(column, column.name)
-                .withIcon(DatabaseIcons.Col)
+                .withIcon(icon)
 
         if (!prependTable) {
             return LookupElementBuilder
                 .create(column, column.name)
-                .withIcon(DatabaseIcons.Col)
+                .withIcon(icon)
         }
 
         if (alias != null && alias != tableSchema.name) {
             return LookupElementBuilder
                 .create(column, alias + "." + column.name)
-                .withIcon(DatabaseIcons.Col)
+                .withIcon(icon)
                 .withTailText(" (" + tableSchema.name + ")", true)
                 .withTypeText(tableSchema.dasParent?.name, true)
         }
 
         return LookupElementBuilder
             .create(column, (alias ?: tableSchema.name) + "." + column.name)
-            .withIcon(DatabaseIcons.Col)
+            .withIcon(icon)
             .withTypeText(tableSchema.dasParent?.name, true)
     }
 }

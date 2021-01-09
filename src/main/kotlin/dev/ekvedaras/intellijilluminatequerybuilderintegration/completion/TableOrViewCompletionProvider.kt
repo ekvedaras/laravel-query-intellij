@@ -11,6 +11,8 @@ import com.intellij.util.ProcessingContext
 import com.intellij.database.psi.DbNamespaceImpl
 
 import com.intellij.database.model.DasTable
+import com.intellij.database.symbols.DasPsiWrappingSymbol
+import com.intellij.openapi.project.Project
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
@@ -28,14 +30,14 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             return
         }
 
-        if (LaravelUtils.isQueryBuilderMethod(method)) {
+        if (!LaravelUtils.isQueryBuilderMethod(method)) {
             return
         }
 
         DbUtil.getDataSources(method.project).forEach { dataSource ->
             DasUtil.getTables(dataSource.dataSource)
                 .filter { !it.isSystem }
-                .forEach { result.addElement(buildLookup(it)) }
+                .forEach { result.addElement(buildLookup(it, method.project)) }
         }
     }
 
@@ -43,10 +45,10 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !LaravelUtils.BuilderTableMethods.contains(method.name)
                 || MethodUtils.findParameterIndex(parameters.position) != 0
 
-    private fun buildLookup(table: DasTable): LookupElementBuilder {
+    private fun buildLookup(table: DasTable, project: Project): LookupElementBuilder {
         var builder = LookupElementBuilder
             .create(table, table.name)
-            .withIcon(DatabaseIcons.Table)
+            .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
 
         val tableSchema = table.dasParent ?: return builder
 
