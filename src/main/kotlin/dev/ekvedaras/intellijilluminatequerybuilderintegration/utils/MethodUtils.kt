@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
@@ -27,7 +28,7 @@ class MethodUtils {
          * Resolve in which classes given method may be defined
          */
         fun resolveMethodClasses(method: MethodReference): List<String> {
-            if (method.classReference == null) {
+            if (DumbService.isDumb(method.project) || method.classReference == null) {
                 return listOf()
             }
 

@@ -17,8 +17,8 @@
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.ColumnCompletionContributor"/>
-<!--        <psi.referenceContributor language="PHP"-->
-<!--                                  implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.TableOrViewReferenceContributor"/>-->
+        <psi.referenceContributor language="PHP"
+                                  implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.TableOrViewReferenceContributor"/>
     </extensions>
 
 
