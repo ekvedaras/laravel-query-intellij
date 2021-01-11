@@ -7,7 +7,6 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -30,8 +29,18 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     var column: DasColumn? = null
     var alias: String? = null
 
+    val parts = mutableListOf<String>()
+
 
     init {
+        parts.addAll(
+            expression.text
+                .trim('"')
+                .trim('\'')
+                .split(".")
+                .map { it.replace("IntellijIdeaRulezzz", "").trim() }
+        )
+
         if (type == Type.Column) collectTablesAndAliases()
         resolveSchemasAndTables()
         findExpressionReferences()
@@ -90,9 +99,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     }
 
     private fun findExpressionReferences() {
-        for (expressionPart in expression.text.trim('"').trim('\'').split(".")) {
-            val part = expressionPart.replace("IntellijIdeaRulezzz", "").trim()
-
+        for (part in parts) {
             if (schema == null && findSchema(part)) continue
             if (table == null && findTable(part)) continue
             if (column == null && type == Type.Column && findColumn(part)) continue

@@ -11,6 +11,7 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
@@ -30,21 +31,35 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
+        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column)
         var references = arrayOf<PsiReference>()
-        val tablesAndAliases = collectTablesAndAliases(method)
 
-        // TODO optimize so we don't need to loop all tables and if possible all columns and filter. Try to use find()
-        DbUtil.getDataSources(element.project).forEach { dataSource ->
-            DasUtil.getTables(dataSource.dataSource).forEach { table ->
-                val tableOrAlias = element.text.substringBefore(".").trim('"').trim('\'')
-
-                if (!table.isSystem && table.name == tablesAndAliases[tableOrAlias]) {
-                    DasUtil.getColumns(table)
-                        .filter { it.name == element.text.substringAfter(".").substringBefore(" as ").trim('"').trim('\'') }
-                        .forEach { references += ColumnPsiReference(element, it) }
-                }
-            }
+        if (target.schema != null && (element.text.split(".").size > 2 || (target.column == null && target.parts[0] == target.schema?.name))) {
+            references += SchemaPsiReference(element, target.schema!!)
         }
+
+        if (target.table != null) {
+            references += TableOrViewPsiReference(element, target.table!!, true)
+        }
+
+        if (target.column != null) {
+            references += ColumnPsiReference(element, target.column!!)
+        }
+
+//        val tablesAndAliases = collectTablesAndAliases(method)
+//
+//        // TODO optimize so we don't need to loop all tables and if possible all columns and filter. Try to use find()
+//        DbUtil.getDataSources(element.project).forEach { dataSource ->
+//            DasUtil.getTables(dataSource.dataSource).forEach { table ->
+//                val tableOrAlias = element.text.substringBefore(".").trim('"').trim('\'')
+//
+//                if (!table.isSystem && table.name == tablesAndAliases[tableOrAlias]) {
+//                    DasUtil.getColumns(table)
+//                        .filter { it.name == element.text.substringAfter(".").substringBefore(" as ").trim('"').trim('\'') }
+//                        .forEach { references += ColumnPsiReference(element, it) }
+//                }
+//            }
+//        }
 
         return references
     }

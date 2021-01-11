@@ -1,21 +1,16 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection
 
-import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.database.util.DasUtil
-import com.intellij.database.util.DbUtil
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.elementType
-import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.inspections.PhpInspection
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.MyBundle
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.ColumnPsiReference
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
@@ -41,32 +36,47 @@ class UnknownColumnInspection : PhpInspection() {
                     return
                 }
 
-                val tablesAndAliases = collectTablesAndAliases(method)
-                var found = false
-                DbUtil.getDataSources(method.project).forEach loop@{ dataSource ->
-                    DasUtil.getTables(dataSource.dataSource).forEach { table ->
-                        val tableOrAlias = expression.text.substringBefore(".").trim('"').trim('\'')
+                val target = DbReferenceExpression(expression, DbReferenceExpression.Companion.Type.Column)
+                if ((target.schema == null || target.schema?.name != target.parts[0]) && expression.text.split(".").size > 2) {
+                    val length = expression.text.substringAfter(".").length
+                    holder.registerProblem(
+                        expression,
+                        MyBundle.message("unknownSchemaDescription"),
+                        ProblemHighlightType.WARNING,
+                        TextRange.allOf(expression.text).shiftRight(1).grown(-length - 2)
+                    )
+                }
 
-                        if (!table.isSystem && table.name == tablesAndAliases[tableOrAlias]) {
-                            found = DasUtil.getColumns(table)
-                                .filter {
-                                    it.name == expression.text.substringAfter(".").substringBefore(" as ").trim('"')
-                                        .trim('\'')
-                                }
-                                .isNotEmpty
-
-                            if (found) {
-                                return@loop
-                            }
-                        }
+                if (target.table == null || target.table?.name != target.parts[expression.text.split(".").size - 2]) {
+                    if (expression.text.split(".").size > 2) {
+                        val length = expression.text.substringAfterLast(".").length
+                        val schemaLength = expression.text.substringBefore(".").length
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            TextRange.allOf(expression.text)
+                                .shiftRight(schemaLength + 1)
+                                .grown(-schemaLength - length - 2)
+                        )
+                    } else {
+                        val length = expression.text.substringAfter(".").length
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownSchemaDescription"),
+                            ProblemHighlightType.WARNING,
+                            TextRange.allOf(expression.text).shiftRight(1).grown(-length - 2)
+                        )
                     }
                 }
 
-                if (!found) {
+                if (target.column == null) {
+                    val length = expression.text.substringBeforeLast(".").length + 1
                     holder.registerProblem(
                         expression,
                         MyBundle.message("unknownColumnDescription"),
-                        ProblemHighlightType.WARNING
+                        ProblemHighlightType.WARNING,
+                        TextRange.allOf(expression.text).shiftRight(length).grown(-length - 1)
                     )
                 }
             }
@@ -82,33 +92,6 @@ class UnknownColumnInspection : PhpInspection() {
             private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
                         && expression.parent.parent.elementType?.index?.toInt() == 1889
-
-            private fun collectTablesAndAliases(method: MethodReference): MutableMap<String, String> {
-                val aliases = mutableMapOf<String, String>();
-
-                MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
-                    .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
-                    .forEach loop@{
-                        val tableName = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
-
-                        if (tableName.contains(" as ")) {
-                            aliases[tableName.substringAfter("as").trim()] = tableName.substringBefore("as").trim()
-                            return@loop
-                        }
-
-                        if (!LaravelUtils.BuilderTableAliasParams.containsKey(it.name)) {
-                            aliases[tableName] = tableName
-                            return@loop
-                        }
-
-                        val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[it.name] ?: return@loop
-                        val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
-
-                        aliases[alias ?: tableName] = tableName
-                    }
-
-                return aliases
-            }
         }
     }
 }
