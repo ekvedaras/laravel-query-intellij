@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 
+import com.intellij.codeInsight.AutoPopupControllerImpl
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -7,23 +8,18 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasTable
 import com.intellij.database.symbols.DasPsiWrappingSymbol
-import com.intellij.database.symbols.DasSymbolUtil
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
-import com.intellij.sql.psi.SqlReference
-import com.intellij.sql.slicer.toSqlElement
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
-
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
-
-import icons.DatabaseIcons
 
 class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
@@ -45,8 +41,9 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
             return
         }
 
+        val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
         result.addAllElements(
-            buildCompletionList(method).distinctBy { it.lookupString }
+            buildCompletionList(method, parameters, target).distinctBy { it.lookupString }
         )
     }
 
@@ -59,53 +56,68 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
                 && parameters.position.parent.parent.elementType?.index?.toInt() == 1889
 
-    private fun buildCompletionList(method: MethodReference): MutableList<LookupElementBuilder> {
-        val tablesAndAliases = collectTablesAndAliases(method)
+    private fun buildCompletionList(
+        method: MethodReference,
+        parameters: CompletionParameters,
+        target: DbReferenceExpression
+    ): MutableList<LookupElementBuilder> {
         val completionList = mutableListOf<LookupElementBuilder>()
 
         DbUtil.getDataSources(method.project).forEach { dataSource ->
+            if (target.schema == null) {
+                DasUtil.getSchemas(dataSource)
+                    .filter { schema ->
+                        val tables = target.allTables[schema.name]
+                        tables != null && target.tablesAndAliases.keys.any {
+                            tables.containsKey(it)
+                        }
+                    }
+                    .forEach schemas@ {
+                    completionList.add(
+                        LookupElementBuilder
+                            .create(it, it.name + ".")
+                            .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                            .withInsertHandler { _, _ ->
+                                AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
+                            }
+                    )
+                }
+            }
+
+            if (target.table == null) {
+                DasUtil.getTables(dataSource)
+                    .filter { !it.isSystem && target.tablesAndAliases.containsValue(it.name) }
+                    .forEach {
+                        completionList.add(
+                            TableOrViewCompletionProvider
+                                .buildLookup(it, target.schema != null, ".", method.project) // TODO pass alias as well
+                                .withInsertHandler { _, _ ->
+                                    AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
+                                }
+                        )
+                    }
+            }
+
             DasUtil.getTables(dataSource.dataSource)
-                .filter { !it.isSystem && (tablesAndAliases.isEmpty() || tablesAndAliases.containsValue(it.name)) }
-                .forEach { addTableToCompletion(method.project, tablesAndAliases, it, completionList) }
+                .filter {
+                    !it.isSystem
+                            && (target.schema == null || it.dasParent?.name == target.schema?.name)
+                            && (target.table == null || it.name == target.table?.name || it.dasParent?.name == target.table?.name)
+                            && (target.tablesAndAliases.isEmpty() || target.tablesAndAliases.containsValue(it.name))
+                }
+                .forEach { addTableToCompletion(method.project, target, it, completionList) }
         }
 
         return completionList
     }
 
-    private fun collectTablesAndAliases(method: MethodReference): MutableMap<String, String> {
-        val aliases = mutableMapOf<String, String>();
-
-        MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
-            .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
-            .forEach loop@{
-                val tableName = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
-
-                if (tableName.contains(" as ")) {
-                    aliases[tableName.substringAfter("as").trim()] = tableName.substringBefore("as").trim()
-                    return@loop
-                }
-
-                if (!LaravelUtils.BuilderTableAliasParams.containsKey(it.name)) {
-                    aliases[tableName] = tableName
-                    return@loop
-                }
-
-                val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[it.name] ?: return@loop
-                val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
-
-                aliases[alias ?: tableName] = tableName
-            }
-
-        return aliases
-    }
-
     private fun addTableToCompletion(
         project: Project,
-        aliases: MutableMap<String, String>,
+        target: DbReferenceExpression,
         table: DasTable,
         completion: MutableList<LookupElementBuilder>
     ) {
-        aliases
+        target.tablesAndAliases
             .filter { it.value == table.name }
             .forEach { alias ->
                 DasUtil.getColumns(table).forEach {
@@ -113,26 +125,41 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                         buildLookup(
                             project,
                             it,
-                            aliases.size > 1,
-                            if (alias.key != alias.value) alias.key else null
+                            target.tablesAndAliases.size > 1,
+                            if (alias.key != alias.value) alias.key else null,
+                            target,
                         )
                     )
                 }
             }
     }
 
-    private fun buildLookup(project: Project, column: DasColumn, prependTable: Boolean, alias: String? = null): LookupElementBuilder {
-        // DasSymbolUtil.getInlineSymbol(column.toSqlElement<SqlReference>())
-        // ^ potential way of getting a reference?
+    private fun buildLookup(
+        project: Project,
+        column: DasColumn,
+        prependTable: Boolean,
+        alias: String? = null,
+        target: DbReferenceExpression
+    ): LookupElementBuilder {
         val icon = DasPsiWrappingSymbol(column, project).getIcon(false)
+        var name = column.name
+
+        if (target.table != null) {
+            name = target.table?.name + "." + name
+        }
+
+        if (target.schema != null) {
+            name = target.schema?.name + "." + name
+        }
+
         val tableSchema = column.dasParent
             ?: return LookupElementBuilder
-                .create(column, column.name)
+                .create(column, name)
                 .withIcon(icon)
 
         if (!prependTable) {
             return LookupElementBuilder
-                .create(column, column.name)
+                .create(column, name)
                 .withIcon(icon)
         }
 
@@ -146,6 +173,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
 
         return LookupElementBuilder
             .create(column, (alias ?: tableSchema.name) + "." + column.name)
+//            .create(column, name)
             .withIcon(icon)
             .withTypeText(tableSchema.dasParent?.name, true)
     }

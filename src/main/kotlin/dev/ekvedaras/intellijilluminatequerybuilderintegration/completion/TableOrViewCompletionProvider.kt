@@ -12,6 +12,7 @@ import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
@@ -31,13 +32,10 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             return
         }
 
-        var schema: String? = null
-        if (parameters.position.text.contains(".")) {
-            schema = parameters.position.text.substringBefore(".")
-        }
+        val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
 
         DbUtil.getDataSources(method.project).forEach { dataSource ->
-            if (schema == null) {
+            if (target.schema == null) {
                 DasUtil.getSchemas(dataSource).forEach {
                     result.addElement(
                         LookupElementBuilder
@@ -52,9 +50,9 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
             DasUtil.getTables(dataSource.dataSource)
                 .filter {
-                    !it.isSystem && (schema == null || it.dasParent?.name == schema)
+                    !it.isSystem && (target.schema == null || it.dasParent?.name == target.schema?.name)
                 }
-                .forEach { result.addElement(buildLookup(it, schema != null, method.project)) }
+                .forEach { result.addElement(buildLookup(it, target.schema != null, "", method.project)) }
         }
     }
 
@@ -62,21 +60,24 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !LaravelUtils.BuilderTableMethods.contains(method.name)
                 || MethodUtils.findParameterIndex(parameters.position) != 0
 
-    private fun buildLookup(table: DasTable, prependSchema: Boolean, project: Project): LookupElementBuilder {
-        val tableSchema = table.dasParent ?: return LookupElementBuilder
-            .create(table.name)
-            .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-
-        if (prependSchema) {
-            return LookupElementBuilder
-                .create(table, tableSchema.name + "." + table.name)
+    companion object {
+        @JvmStatic
+        fun buildLookup(table: DasTable, prependSchema: Boolean, suffix: String = "", project: Project): LookupElementBuilder {
+            val tableSchema = table.dasParent ?: return LookupElementBuilder
+                .create(table.name + suffix)
                 .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-        }
 
-        return LookupElementBuilder
-            .create(table.name)
-            .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-            .withTailText(" (" + tableSchema.name + ")", true)
-            .withLookupString(tableSchema.name + "." + table.name)
+            if (prependSchema) {
+                return LookupElementBuilder
+                    .create(table, tableSchema.name + "." + table.name + suffix)
+                    .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
+            }
+
+            return LookupElementBuilder
+                .create(table.name + suffix)
+                .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
+                .withTailText(" (" + tableSchema.name + ")", true)
+                .withLookupString(tableSchema.name + "." + table.name)
+        }
     }
 }
