@@ -1,15 +1,15 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 
-import com.intellij.codeInsight.AutoPopupControllerImpl
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasTable
+import com.intellij.database.model.ObjectKind
 import com.intellij.database.symbols.DasPsiWrappingSymbol
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
-import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
@@ -34,50 +34,68 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
 
-        DbUtil.getDataSources(method.project).forEach { dataSource ->
-            if (target.schema.isEmpty()) {
-                DasUtil.getSchemas(dataSource).forEach {
-                    result.addElement(
+        if (target.parts.size == 1) {
+            DbUtil.getDataSources(method.project).forEach { dataSource ->
+                result.addAllElements(
+                    DasUtil.getSchemas(dataSource).map {
                         LookupElementBuilder
-                            .create(it, it.name + ".")
+                            .create(it, it.name)
                             .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
-                            .withInsertHandler { _, _ ->
-                                AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
-                            }
-                    )
-                }
-            }
+                            .withTypeText(dataSource.name, true)
+                            .withInsertHandler(
+                                DeclarativeInsertHandler.Builder()
+                                    .disableOnCompletionChars(".")
+                                    .insertOrMove(".")
+                                    .triggerAutoPopup()
+                                    .build()
+                            )
+                    }
+                )
 
-//            DasUtil.getTables(dataSource.dataSource)
-//                .filter {
-//                    !it.isSystem && (target.schema == null || it.dasParent?.name == target.schema?.name)
-//                }
-//                .forEach { result.addElement(buildLookup(it, target.schema != null, "", method.project)) }
+                result.addAllElements(
+                    DasUtil.getTables(dataSource)
+                        .filter { !it.isSystem }
+                        .map {
+                            LookupElementBuilder
+                                .create(it, it.name)
+                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withTailText(" (" + it.dasParent?.name + ")", true)
+                                .withTypeText(dataSource.name, true)
+                                .withInsertHandler(
+                                    DeclarativeInsertHandler.Builder().build()
+                                )
+                        }
+                )
+            }
+        } else if (target.parts.size == 2) {
+            target.schema.forEach { schema ->
+                result.addAllElements(
+                    schema.getDasChildren(ObjectKind.TABLE)
+                        .filter { !(it as DasTable).isSystem && target.schema.contains(it.dasParent) }
+                        .map {
+                            val lookup = it.dasParent?.name + "." + it.name
+                            LookupElementBuilder
+                                .create(it, it.name)
+                                .withLookupString(lookup)
+                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withInsertHandler { context, _ ->
+                                    context.document.deleteString(context.startOffset, context.tailOffset)
+                                    context.document.insertString(context.startOffset, lookup)
+                                    context.editor.caretModel.moveCaretRelatively(
+                                        lookup.length,
+                                        0,
+                                        false,
+                                        false,
+                                        true
+                                    )
+                                }
+                        }
+                )
+            }
         }
     }
 
     private fun shouldNotCompleteCurrentParam(method: MethodReference, parameters: CompletionParameters) =
         !LaravelUtils.BuilderTableMethods.contains(method.name)
                 || MethodUtils.findParameterIndex(parameters.position) != 0
-
-    companion object {
-        @JvmStatic
-        fun buildLookup(table: DasTable, prependSchema: Boolean, suffix: String = "", project: Project): LookupElementBuilder {
-            val tableSchema = table.dasParent ?: return LookupElementBuilder
-                .create(table.name + suffix)
-                .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-
-            if (prependSchema) {
-                return LookupElementBuilder
-                    .create(table, tableSchema.name + "." + table.name + suffix)
-                    .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-            }
-
-            return LookupElementBuilder
-                .create(table.name + suffix)
-                .withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
-                .withTailText(" (" + tableSchema.name + ")", true)
-                .withLookupString(tableSchema.name + "." + table.name)
-        }
-    }
 }
