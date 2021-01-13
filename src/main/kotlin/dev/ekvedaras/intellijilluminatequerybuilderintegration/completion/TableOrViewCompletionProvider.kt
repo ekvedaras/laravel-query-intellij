@@ -35,7 +35,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
 
         DbUtil.getDataSources(method.project).forEach { dataSource ->
-            if (target.schema == null) {
+            if (target.schema.isEmpty()) {
                 DasUtil.getSchemas(dataSource).forEach {
                     result.addElement(
                         LookupElementBuilder
@@ -48,11 +48,11 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
                 }
             }
 
-            DasUtil.getTables(dataSource.dataSource)
-                .filter {
-                    !it.isSystem && (target.schema == null || it.dasParent?.name == target.schema?.name)
-                }
-                .forEach { result.addElement(buildLookup(it, target.schema != null, "", method.project)) }
+//            DasUtil.getTables(dataSource.dataSource)
+//                .filter {
+//                    !it.isSystem && (target.schema == null || it.dasParent?.name == target.schema?.name)
+//                }
+//                .forEach { result.addElement(buildLookup(it, target.schema != null, "", method.project)) }
         }
     }
 

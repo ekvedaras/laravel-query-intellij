@@ -31,12 +31,33 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 }
 
                 val target = DbReferenceExpression(expression, DbReferenceExpression.Companion.Type.Table)
-                if (target.table == null) {
-                    holder.registerProblem(
-                        expression,
-                        MyBundle.message("unknownTableOrViewDescription"),
-                        ProblemHighlightType.WARNING
-                    )
+                if (target.parts.size == 1) {
+                    if (target.table.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    }
+                } else if (target.parts.size == 2) {
+                    if (target.schema.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownSchemaDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.first()
+                        )
+                    }
+
+                    if (target.table.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    }
                 }
             }
 

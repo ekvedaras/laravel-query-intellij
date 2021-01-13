@@ -63,50 +63,50 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
     ): MutableList<LookupElementBuilder> {
         val completionList = mutableListOf<LookupElementBuilder>()
 
-        DbUtil.getDataSources(method.project).forEach { dataSource ->
-            if (target.schema == null) {
-                DasUtil.getSchemas(dataSource)
-                    .filter { schema ->
-                        val tables = target.allTables[schema.name]
-                        tables != null && target.tablesAndAliases.keys.any {
-                            tables.containsKey(it)
-                        }
-                    }
-                    .forEach schemas@ {
-                    completionList.add(
-                        LookupElementBuilder
-                            .create(it, it.name + ".")
-                            .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
-                            .withInsertHandler { _, _ ->
-                                AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
-                            }
-                    )
-                }
-            }
-
-            if (target.table == null) {
-                DasUtil.getTables(dataSource)
-                    .filter { !it.isSystem && target.tablesAndAliases.containsValue(it.name) }
-                    .forEach {
-                        completionList.add(
-                            TableOrViewCompletionProvider
-                                .buildLookup(it, target.schema != null, ".", method.project) // TODO pass alias as well
-                                .withInsertHandler { _, _ ->
-                                    AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
-                                }
-                        )
-                    }
-            }
-
-            DasUtil.getTables(dataSource.dataSource)
-                .filter {
-                    !it.isSystem
-                            && (target.schema == null || it.dasParent?.name == target.schema?.name)
-                            && (target.table == null || it.name == target.table?.name || it.dasParent?.name == target.table?.name)
-                            && (target.tablesAndAliases.isEmpty() || target.tablesAndAliases.containsValue(it.name))
-                }
-                .forEach { addTableToCompletion(method.project, target, it, completionList) }
-        }
+//        DbUtil.getDataSources(method.project).forEach { dataSource ->
+//            if (target.schema.isEmpty()) {
+//                DasUtil.getSchemas(dataSource)
+//                    .filter { schema ->
+//                        val tables = target.table
+//                        tables != null && target.tablesAndAliases.keys.any {
+//                            tables.containsKey(it)
+//                        }
+//                    }
+//                    .forEach schemas@ {
+//                    completionList.add(
+//                        LookupElementBuilder
+//                            .create(it, it.name + ".")
+//                            .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+//                            .withInsertHandler { _, _ ->
+//                                AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
+//                            }
+//                    )
+//                }
+//            }
+//
+//            if (target.table == null) {
+//                DasUtil.getTables(dataSource)
+//                    .filter { !it.isSystem && target.tablesAndAliases.containsValue(it.name) }
+//                    .forEach {
+//                        completionList.add(
+//                            TableOrViewCompletionProvider
+//                                .buildLookup(it, target.schema != null, ".", method.project) // TODO pass alias as well
+//                                .withInsertHandler { _, _ ->
+//                                    AutoPopupControllerImpl.getInstance(method.project).scheduleAutoPopup(parameters.editor)
+//                                }
+//                        )
+//                    }
+//            }
+//
+//            DasUtil.getTables(dataSource.dataSource)
+//                .filter {
+//                    !it.isSystem
+//                            && (target.schema == null || it.dasParent?.name == target.schema?.name)
+//                            && (target.table == null || it.name == target.table?.name || it.dasParent?.name == target.table?.name)
+//                            && (target.tablesAndAliases.isEmpty() || target.tablesAndAliases.containsValue(it.name))
+//                }
+//                .forEach { addTableToCompletion(method.project, target, it, completionList) }
+//        }
 
         return completionList
     }
@@ -144,13 +144,13 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
         val icon = DasPsiWrappingSymbol(column, project).getIcon(false)
         var name = column.name
 
-        if (target.table != null) {
-            name = target.table?.name + "." + name
-        }
-
-        if (target.schema != null) {
-            name = target.schema?.name + "." + name
-        }
+//        if (target.table != null) {
+//            name = target.table?.name + "." + name
+//        }
+//
+//        if (target.schema != null) {
+//            name = target.schema?.name + "." + name
+//        }
 
         val tableSchema = column.dasParent
             ?: return LookupElementBuilder

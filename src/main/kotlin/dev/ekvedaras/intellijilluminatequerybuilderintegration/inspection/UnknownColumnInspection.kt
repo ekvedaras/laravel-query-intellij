@@ -2,7 +2,6 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.elementType
 import com.jetbrains.php.lang.inspections.PhpInspection
@@ -37,47 +36,87 @@ class UnknownColumnInspection : PhpInspection() {
                 }
 
                 val target = DbReferenceExpression(expression, DbReferenceExpression.Companion.Type.Column)
-                if ((target.schema == null || target.schema?.name != target.parts[0]) && expression.text.split(".").size > 2) {
-                    val length = expression.text.substringAfter(".").length
-                    holder.registerProblem(
-                        expression,
-                        MyBundle.message("unknownSchemaDescription"),
-                        ProblemHighlightType.WARNING,
-                        TextRange.allOf(expression.text).shiftRight(1).grown(-length - 2)
-                    )
-                }
 
-                if (target.table == null || target.table?.name != target.parts[expression.text.split(".").size - 2]) {
-                    if (expression.text.split(".").size > 2) {
-                        val length = expression.text.substringAfterLast(".").length
-                        val schemaLength = expression.text.substringBefore(".").length
+                if (target.parts.size == 1) {
+                    if (target.column.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownColumnDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.first()
+                        )
+                    }
+                } else if (target.parts.size == 2) {
+                    if (target.schema.isEmpty() && target.table.isEmpty() && target.column.isEmpty()) {
                         holder.registerProblem(
                             expression,
                             MyBundle.message("unknownTableOrViewDescription"),
                             ProblemHighlightType.WARNING,
-                            TextRange.allOf(expression.text)
-                                .shiftRight(schemaLength + 1)
-                                .grown(-schemaLength - length - 2)
+                            target.ranges.first()
                         )
-                    } else {
-                        val length = expression.text.substringAfter(".").length
+
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownColumnDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    } else if (target.schema.isEmpty() && target.table.isEmpty() && target.column.isNotEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.first()
+                        )
+                    } else if (target.schema.isEmpty() && target.table.isNotEmpty() && target.column.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownColumnDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    } else if (target.schema.isNotEmpty() && target.table.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    } else if (target.schema.isEmpty() && target.column.isEmpty()) {
                         holder.registerProblem(
                             expression,
                             MyBundle.message("unknownSchemaDescription"),
                             ProblemHighlightType.WARNING,
-                            TextRange.allOf(expression.text).shiftRight(1).grown(-length - 2)
+                            target.ranges.first()
                         )
                     }
-                }
+                } else if (target.parts.size == 3) {
+                    if (target.schema.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownSchemaDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.first()
+                        )
+                    }
 
-                if (target.column == null) {
-                    val length = expression.text.substringBeforeLast(".").length + 1
-                    holder.registerProblem(
-                        expression,
-                        MyBundle.message("unknownColumnDescription"),
-                        ProblemHighlightType.WARNING,
-                        TextRange.allOf(expression.text).shiftRight(length).grown(-length - 1)
-                    )
+                    if (target.table.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownTableOrViewDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges[1]
+                        )
+                    }
+
+                    if (target.column.isEmpty()) {
+                        holder.registerProblem(
+                            expression,
+                            MyBundle.message("unknownColumnDescription"),
+                            ProblemHighlightType.WARNING,
+                            target.ranges.last()
+                        )
+                    }
                 }
             }
 

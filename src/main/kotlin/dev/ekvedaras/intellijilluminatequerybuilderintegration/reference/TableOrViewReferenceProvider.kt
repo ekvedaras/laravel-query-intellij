@@ -26,21 +26,8 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Table)
         var references = arrayOf<PsiReference>()
 
-        if (target.schema != null && (element.text.split(".").size == 2 || target.schema!!.name == target.parts[0])) {
-            references += SchemaPsiReference(element, target.schema!!)
-        }
-
-        if (target.table != null) {
-            references += TableOrViewPsiReference(element, target.table!!)
-        }
-
-//        DbUtil.getDataSources(element.project).forEach { dataSource ->
-//            DasUtil.getTables(dataSource.dataSource).forEach {
-//                if (!it.isSystem && it.name == element.text.substringBefore(" as ").trim('"').trim('\'')) {
-//                    references += TableOrViewPsiReference(element, it)
-//                }
-//            }
-//        }
+        target.schema.forEach { references += SchemaPsiReference(target, it) }
+        target.table.forEach { references += TableOrViewPsiReference(target, it) }
 
         return references
     }

@@ -5,6 +5,7 @@ import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.Statement
@@ -20,17 +21,15 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
         }
     }
 
-    val allSchemas = mutableMapOf<String, DasNamespace>()
-    val allTables = mutableMapOf<String, MutableMap<String, DasTable>>()
     val tablesAndAliases = mutableMapOf<String, String>()
 
-    var schema: DasNamespace? = null
-    var table: DasTable? = null
-    var column: DasColumn? = null
+    var schema = mutableListOf<DasNamespace>()
+    var table = mutableListOf<DasTable>()
+    var column = mutableListOf<DasColumn>()
     var alias: String? = null
 
     val parts = mutableListOf<String>()
-
+    val ranges = mutableListOf<TextRange>()
 
     init {
         parts.addAll(
@@ -38,11 +37,14 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 .trim('"')
                 .trim('\'')
                 .split(".")
-                .map { it.replace("IntellijIdeaRulezzz", "").trim() }
+                .map { it.replace("IntellijIdeaRulezzz", "").substringBefore(" as").trim() }
         )
 
+        for (part in parts) {
+            ranges.add(TextRange.from(if (ranges.isNotEmpty()) ranges.last().endOffset + 1 else 1, part.length))
+        }
+
         if (type == Type.Column) collectTablesAndAliases()
-        resolveSchemasAndTables()
         findExpressionReferences()
     }
 
@@ -84,94 +86,131 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             }
     }
 
-    private fun resolveSchemasAndTables() {
-        DbUtil.getDataSources(expression.project).forEach { dataSource ->
-            DasUtil.getSchemas(dataSource).forEach {
-                allSchemas[it.name] = it
-            }
-
-            DasUtil.getTables(dataSource)
-                .filter { !it.isSystem && it.dasParent != null }
-                .forEach {
-                    allTables.getOrPut(it.dasParent!!.name, { mutableMapOf() })[it.name] = it
-                }
-        }
-    }
-
     private fun findExpressionReferences() {
-        for (part in parts) {
-            if (schema == null && findSchema(part)) continue
-            if (table == null && findTable(part)) continue
-            if (column == null && type == Type.Column && findColumn(part)) continue
-        }
-    }
-
-    private fun findSchema(part: String): Boolean {
-        if (allSchemas.containsKey(part)) {
-            schema = allSchemas[part]
-            return true
-        }
-
-        return false
-    }
-
-    private fun findTable(part: String): Boolean {
-        if (schema != null) {
-            if (allTables[schema!!.name]!!.containsKey(part)) {
-                table = allTables[schema!!.name]!![part]
-                return true
+        /**
+         * For table
+         */
+        if (type == Type.Table) {
+            // 1. 'schema' or 'schema.table'
+            DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                schema.addAll(
+                    DasUtil.getSchemas(dataSource)
+                        .filter { it.name == parts.first() }
+                        .toMutableList()
+                )
             }
-        } else {
-            for ((schemaName, schemaTables) in allTables) {
-                if (schemaTables.containsKey(part)) {
-                    schema = allSchemas[schemaName]
-                    table = schemaTables[part]
-                    return true
-                }
-            }
-        }
 
-        return false
-    }
+            if (parts.size == 1) {
+                // 2. 'table'
 
-    private fun findColumn(part: String): Boolean {
-        if (table == null) {
-            if (schema != null) {
-                allTables[schema!!.name]!!.values.forEach { dasTable ->
-                    val dasColumn = DasUtil.getColumns(dasTable).find { it.name == part }
-                    if (dasColumn != null) {
-                        schema = allSchemas[dasTable.dasParent!!.name]
-                        table = dasTable
-                        column = dasColumn
-                        return true
-                    }
-                }
-            } else {
-                for ((schemaName, schemaTables) in allTables) {
-                    schemaTables.values.forEach { dasTable ->
-                        val dasColumn = DasUtil.getColumns(dasTable).find { it.name == part }
-                        if (dasColumn != null) {
-                            schema = allSchemas[schemaName]
-                            table = dasTable
-                            column = dasColumn
-                            return true
+                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                    DasUtil.getTables(dataSource).forEach {
+                        if (it.name == parts.last()) {
+                            table.add(it)
+                        } else if (tablesAndAliases[parts.last()] == it.name) {
+                            table.add(it)
+                            alias = it.name
                         }
                     }
                 }
-            }
-        } else {
-            val dasColumn = DasUtil.getColumns(table!!).find { it.name == part }
-            if (dasColumn != null) {
-                column = dasColumn
+            } else if (parts.size == 2) {
+                // 3. 'schema.table'
 
-                if (schema == null) {
-                    schema = allSchemas[table!!.name]
+                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                    DasUtil.getSchemas(dataSource).filter { schema.contains(it) }.forEach { namespace ->
+                        table.addAll(
+                            DasUtil.getTables(dataSource)
+                                .filter { it.dasParent?.name == namespace.name }
+                                .filter { it.name == parts.last() }
+                        )
+                    }
+                }
+            }
+        } else if (type == Type.Column) {
+            /**
+             * For column
+             */
+            if (parts.size == 1) {
+                // 1. 'column'
+                // 2. 'table'
+                // 3. 'schema'
+                // 4. 'alias' <-- what if alias was defined with a schema?
+                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                    schema.addAll(
+                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
+                    )
+
+                    DasUtil.getTables(dataSource).forEach { dasTable ->
+                        if (dasTable.name == parts.first()) {
+                            table.add(dasTable)
+                        } else if (tablesAndAliases[parts.first()] == dasTable.name) {
+                            table.add(dasTable)
+                            alias = dasTable.name
+                        }
+
+                        column.addAll(
+                            DasUtil.getColumns(dasTable).filter { it.name == parts.first() }
+                        )
+                    }
                 }
 
-                return true
+                // 4. 'alias'
+
+            } else if (parts.size == 2) {
+                // 5. 'table.column'
+                // 6. 'schema.table'
+                // 7. 'alias.column'
+                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                    schema.addAll(
+                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
+                    )
+
+                    DasUtil.getTables(dataSource).forEach { dasTable ->
+                        if (schema.isEmpty() || schema.contains(dasTable.dasParent)) {
+                            if (dasTable.name == parts.first() || dasTable.name == parts.last()) {
+                                table.add(dasTable)
+
+                                column.addAll(
+                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
+                                )
+                            } else if (schema.isEmpty() && (tablesAndAliases[parts.first()] == dasTable.name || tablesAndAliases[parts.last()] == dasTable.name)) {
+                                table.add(dasTable)
+                                alias = dasTable.name
+
+                                column.addAll(
+                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
+                                )
+                            }
+                        }
+                    }
+                }
+            } else if (parts.size == 3) {
+                // 8. 'schema.table.column
+                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                    schema.addAll(
+                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
+                    )
+
+                    DasUtil.getTables(dataSource)
+                        .filter { schema.contains(it.dasParent) }
+                        .forEach { dasTable ->
+                            if (dasTable.name == parts[1]) {
+                                table.add(dasTable)
+
+                                column.addAll(
+                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
+                                )
+                            } else if (tablesAndAliases[parts[1]] == dasTable.name) {
+                                table.add(dasTable)
+                                alias = dasTable.name
+
+                                column.addAll(
+                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
+                                )
+                            }
+                        }
+                }
             }
         }
-
-        return false
     }
 }
