@@ -21,7 +21,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
         }
     }
 
-    val tablesAndAliases = mutableMapOf<String, String>()
+    val tablesAndAliases = mutableMapOf<String, Pair<String, String?>>()
 
     var schema = mutableListOf<DasNamespace>()
     var table = mutableListOf<DasTable>()
@@ -70,19 +70,19 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 }
 
                 if (_table.contains(" as ")) {
-                    tablesAndAliases[_table.substringAfter("as").trim()] = _table.substringBefore("as").trim()
+                    tablesAndAliases[_table.substringAfter("as").trim()] = _table.substringBefore("as").trim() to _schema
                     return@loop
                 }
 
                 if (!LaravelUtils.BuilderTableAliasParams.containsKey(it.name)) {
-                    tablesAndAliases[_table] = _table
+                    tablesAndAliases[_table] = _table to _schema
                     return@loop
                 }
 
                 val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[it.name] ?: return@loop
                 val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
 
-                tablesAndAliases[alias ?: _table] = _table
+                tablesAndAliases[alias ?: _table] = _table to _schema
             }
     }
 
@@ -107,7 +107,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                     DasUtil.getTables(dataSource).forEach {
                         if (it.name == parts.last()) {
                             table.add(it)
-                        } else if (tablesAndAliases[parts.last()] == it.name) {
+                        } else if (tablesAndAliases[parts.last()]?.first == it.name) {
                             table.add(it)
                             alias = it.name
                         }
@@ -134,7 +134,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 // 1. 'column'
                 // 2. 'table'
                 // 3. 'schema'
-                // 4. 'alias' <-- what if alias was defined with a schema?
+                // 4. 'alias'
                 DbUtil.getDataSources(expression.project).forEach { dataSource ->
                     schema.addAll(
                         DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
@@ -143,7 +143,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                     DasUtil.getTables(dataSource).forEach { dasTable ->
                         if (dasTable.name == parts.first()) {
                             table.add(dasTable)
-                        } else if (tablesAndAliases[parts.first()] == dasTable.name) {
+                        } else if (tablesAndAliases[parts.first()]?.first == dasTable.name) {
                             table.add(dasTable)
                             alias = dasTable.name
                         }
@@ -173,7 +173,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                                 column.addAll(
                                     DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
                                 )
-                            } else if (schema.isEmpty() && (tablesAndAliases[parts.first()] == dasTable.name || tablesAndAliases[parts.last()] == dasTable.name)) {
+                            } else if (schema.isEmpty() && (tablesAndAliases[parts.first()]?.first == dasTable.name || tablesAndAliases[parts.last()]?.first == dasTable.name)) {
                                 table.add(dasTable)
                                 alias = dasTable.name
 
@@ -200,7 +200,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                                 column.addAll(
                                     DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
                                 )
-                            } else if (tablesAndAliases[parts[1]] == dasTable.name) {
+                            } else if (tablesAndAliases[parts[1]]?.first == dasTable.name) {
                                 table.add(dasTable)
                                 alias = dasTable.name
 
