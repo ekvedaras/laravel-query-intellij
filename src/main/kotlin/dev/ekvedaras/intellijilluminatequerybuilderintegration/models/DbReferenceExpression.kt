@@ -22,6 +22,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     }
 
     val tablesAndAliases = mutableMapOf<String, Pair<String, String?>>()
+    val aliases = mutableMapOf<String, Pair<String, PsiElement>>()
 
     var schema = mutableListOf<DasNamespace>()
     var table = mutableListOf<DasTable>()
@@ -70,7 +71,10 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 }
 
                 if (_table.contains(" as ")) {
-                    tablesAndAliases[_table.substringAfter("as").trim()] = _table.substringBefore("as").trim() to _schema
+                    val alias = _table.substringAfter("as").trim()
+                    val table = _table.substringBefore("as").trim()
+                    tablesAndAliases[alias] = table to _schema
+                    aliases[table] = alias to it.getParameter(0)!!
                     return@loop
                 }
 
@@ -83,6 +87,10 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
 
                 tablesAndAliases[alias ?: _table] = _table to _schema
+
+                if (alias != null && it.getParameter(aliasParam) != null) {
+                    aliases[_table] = alias to it.getParameter(aliasParam)!!
+                }
             }
     }
 

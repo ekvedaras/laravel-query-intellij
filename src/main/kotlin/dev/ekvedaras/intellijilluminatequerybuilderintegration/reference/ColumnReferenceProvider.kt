@@ -1,16 +1,11 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 
-import com.intellij.database.util.DasUtil
-import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.util.elementType
-import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.Statement
-import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
@@ -35,7 +30,17 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         var references = arrayOf<PsiReference>()
 
         target.schema.forEach { references += SchemaPsiReference(target, it) }
-        target.table.forEach { references += TableOrViewPsiReference(target, it) }
+        target.table.forEach {
+            references += TableOrViewPsiReference(target, it)
+
+            if (target.aliases.containsKey(it.name)) {
+                references += TableAliasPsiReference(
+                    element,
+                    if (target.ranges.size >= 2 && target.schema.isNotEmpty()) target.ranges[1] else target.ranges.first(),
+                    target.aliases[it.name]!!.second
+                )
+            }
+        }
         target.column.forEach { references += ColumnPsiReference(target, it) }
 
         return references
