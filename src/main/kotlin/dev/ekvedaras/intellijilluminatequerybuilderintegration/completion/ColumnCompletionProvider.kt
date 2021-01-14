@@ -61,34 +61,45 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                         }
                 )
 
-                result.addAllElements(
-                    target.tablesAndAliases.map {
-                        var lookup = LookupElementBuilder
-                            .create(it.key)
-                            .withTailText(if (it.value.second != null) " (" + it.value.second + ")" else "", true)
-                            .withTypeText(dataSource.name, true)
-                            .withInsertHandler(
-                                DeclarativeInsertHandler.Builder()
-                                    .disableOnCompletionChars(".")
-                                    .insertOrMove(".")
-                                    .triggerAutoPopup()
-                                    .build()
-                            )
+                target.tablesAndAliases.forEach {
+                    var lookup = LookupElementBuilder
+                        .create(it.key)
+                        .withTailText(if (it.value.second != null) " (" + it.value.second + ")" else "", true)
+                        .withTypeText(dataSource.name, true)
+                        .withInsertHandler(
+                            DeclarativeInsertHandler.Builder()
+                                .disableOnCompletionChars(".")
+                                .insertOrMove(".")
+                                .triggerAutoPopup()
+                                .build()
+                        )
 
-                        val table = DasUtil.getTables(dataSource)
-                            .find { table ->
-                                table.name == it.value.first && (it.value.second == null || table.dasParent?.name == it.value.second)
-                            }
-
-                        if (table != null) {
-                            lookup = lookup.withIcon(
-                                DasPsiWrappingSymbol(table, method.project).getIcon(false)
-                            )
+                    val table = DasUtil.getTables(dataSource)
+                        .find { table ->
+                            table.name == it.value.first && (it.value.second == null || table.dasParent?.name == it.value.second)
                         }
 
-                        lookup
+                    if (table != null) {
+                        lookup = lookup.withIcon(
+                            DasPsiWrappingSymbol(table, method.project).getIcon(false)
+                        )
+
+                        result.addAllElements(
+                            table.getDasChildren(ObjectKind.COLUMN)
+                                .map { column ->
+                                    LookupElementBuilder
+                                        .create(column, column.name)
+                                        .withIcon(DasPsiWrappingSymbol(column, method.project).getIcon(false))
+                                        .withTypeText(table.name)
+                                        .withInsertHandler(
+                                            DeclarativeInsertHandler.Builder().build()
+                                        )
+                                }
+                        )
                     }
-                )
+
+                    result.addElement(lookup)
+                }
             }
         } else if (target.parts.size == 2) {
             val schemaNames = target.schema.map { it.name }
