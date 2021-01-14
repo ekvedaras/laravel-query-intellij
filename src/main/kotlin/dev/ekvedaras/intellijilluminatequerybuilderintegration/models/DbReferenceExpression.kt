@@ -8,8 +8,11 @@ import com.intellij.database.util.DbUtil
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
+import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.Statement
+import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
@@ -51,8 +54,37 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
 
     private fun collectTablesAndAliases() {
         val method = MethodUtils.resolveMethodReference(expression) ?: return
+        val methods = MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
 
-        MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
+        //<editor-fold desc="Resolve model and table from static call like User::query()">
+        val modelReference = methods.find {
+            it.firstChild is ClassReferenceImpl &&
+                    PhpIndex.getInstance(method.project)
+                        .getClassesByFQN(
+                            (it.firstChild as ClassReferenceImpl).declaredType.types.first()
+                        )
+                        .first()
+                        .isChildOf(
+                            PhpIndex.getInstance(method.project)
+                                .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                                .first()
+                        )
+        }?.firstChild as? ClassReferenceImpl
+
+        if (modelReference != null) {
+            val model = PhpIndex.getInstance(method.project)
+                .getClassesByFQN(modelReference.declaredType.types.first())
+                .first()
+
+            val tableName = model.fields.find { it.name == "table" }
+            if (tableName != null && tableName.defaultValue != null) {
+                val name = tableName.defaultValue!!.text.trim('\'').trim('"')
+                tablesAndAliases[name] = name to null
+            }
+        }
+        //</editor-fold>
+
+        methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
             .forEach loop@{
                 val definition = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
