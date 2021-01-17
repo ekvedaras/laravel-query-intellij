@@ -10,6 +10,7 @@ class LaravelUtils {
         val DatabaseBuilderClasses = listOf(
             "\\Illuminate\\Database\\Query\\Builder",
             "\\Illuminate\\Database\\Eloquent\\Builder",
+            "\\Illuminate\\Database\\Eloquent\\Relations\\Relation",
         )
         //</editor-fold>
 
