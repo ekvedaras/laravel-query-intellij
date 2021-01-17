@@ -47,7 +47,5 @@
 
 
     <applicationListeners>
-        <!--        <listener class="dev.ekvedaras.intellijilluminatequerybuilderintegration.listeners.TableOrViewCompletionContributortributor"-->
-        <!--                  topic="com.intellij.database.model.basic.BasicTableOrView"/>-->
     </applicationListeners>
 </idea-plugin>
