@@ -9,10 +9,9 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
-import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
-import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
-import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import com.jetbrains.php.lang.psi.elements.impl.*
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -59,19 +58,40 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
         val methods = MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
 
         //<editor-fold desc="Resolve model and table from static call like User::query()">
-        val modelReference = methods.find {
-            it.firstChild is ClassReferenceImpl &&
-                    (PhpIndex.getInstance(method.project)
-                        .getClassesByFQN(
-                            (it.firstChild as ClassReferenceImpl).declaredType.types.first()
-                        )
-                        .first() as PhpClassImpl)
-                        .isChildOf(
-                            PhpIndex.getInstance(method.project)
-                                .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
-                                .first()
-                        )
-        }?.firstChild as? ClassReferenceImpl
+        var modelReference = methods.find {
+            (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(method.project)
+                .getClassesByFQN(
+                    (it.firstChild as ClassReferenceImpl).declaredType.types.first()
+                )
+                .first() as PhpClassImpl)
+                .isChildOf(
+                    PhpIndex.getInstance(method.project)
+                        .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                        .first()
+                ))
+                    || (it.firstChild is VariableImpl && (PhpIndex.getInstance(method.project)
+                .getClassesByFQN(
+                    (it.firstChild as VariableImpl).declaredType.types.first()
+                )
+                .first() as PhpClassImpl)
+                .isChildOf(
+                    PhpIndex.getInstance(method.project)
+                        .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                        .first()
+                ))
+        }?.firstChild as? PhpTypedElement
+
+        if (modelReference == null) {
+            modelReference = methods.find {
+                it.firstChild is ParenthesizedExpressionImpl &&
+                        (PhpIndex.getInstance(method.project)
+                            .getClassesByFQN(
+                                (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
+                            )
+                            .first() as PhpClassImpl)
+                            .isChildOf("\\Illuminate\\Database\\Eloquent\\Model")
+            }?.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? PhpTypedElement
+        }
 
         if (modelReference != null) {
             val model = PhpIndex.getInstance(method.project)
