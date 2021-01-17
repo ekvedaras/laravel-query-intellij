@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
@@ -80,6 +81,9 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             val tableName = model.fields.find { it.name == "table" }
             if (tableName != null && tableName.defaultValue != null) {
                 val name = tableName.defaultValue!!.text.trim('\'').trim('"')
+                tablesAndAliases[name] = name to null
+            } else {
+                val name = model.asTableName()
                 tablesAndAliases[name] = name to null
             }
         }

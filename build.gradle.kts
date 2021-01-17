@@ -40,9 +40,11 @@ version = pluginVersion
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://jitpack.io")
 }
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
+    compile("com.github.cesarferreira:kotlin-pluralizer:0.2.9")
 }
 
 // Configure gradle-intellij-plugin plugin.
