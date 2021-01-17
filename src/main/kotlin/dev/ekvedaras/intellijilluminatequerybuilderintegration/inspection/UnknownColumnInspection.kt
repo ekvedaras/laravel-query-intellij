@@ -124,9 +124,10 @@ class UnknownColumnInspection : PhpInspection() {
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
-                LaravelUtils.BuilderTableColumnsParams[method.name]?.contains(
-                    MethodUtils.findParameterIndex(expression)
-                ) != true
+                expression.textContains('$')
+                        || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
+                        || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(expression))
+                        && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
 
             private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)

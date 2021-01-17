@@ -1,6 +1,7 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 
 class LaravelUtils {
     companion object {
@@ -35,8 +36,8 @@ class LaravelUtils {
         //<editor-fold desc="Query builder methods and params where columns should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableColumnsParams = mapOf(
-            "select" to listOf(1),
-            "addSelect" to listOf(1),
+            "select" to listOf(-1),
+            "addSelect" to listOf(0),
             "join" to listOf(1, 2, 3),
             "joinWhere" to listOf(1),
             "joinSub" to listOf(2, 3, 4),
@@ -88,7 +89,7 @@ class LaravelUtils {
             "orWhereJsonDoesntContain" to listOf(0),
             "whereJsonLength" to listOf(0),
             "orWhereJsonLength" to listOf(0),
-            "groupBy" to listOf(0..50),
+            "groupBy" to listOf(-1),
             "having" to listOf(0),
             "orHaving" to listOf(0),
             "havingBetween" to listOf(0),
@@ -101,7 +102,7 @@ class LaravelUtils {
             "reorder" to listOf(0),
             "find" to listOf(1),
             "value" to listOf(0),
-            "get" to listOf(0),
+            "get" to listOf(-1),
             "paginate" to listOf(1),
             "simplePaginate" to listOf(1),
             "getCountForPagination" to listOf(0),
@@ -134,8 +135,11 @@ class LaravelUtils {
         //</editor-fold>
 
         fun isQueryBuilderMethod(method: MethodReference): Boolean {
-            val classes = MethodUtils.resolveMethodClasses(method)
-            return DatabaseBuilderClasses.any { classes.contains(it) }
+            return MethodUtils.resolveMethodClasses(method).any { clazz ->
+                DatabaseBuilderClasses.any {
+                    clazz.isChildOf(it)
+                }
+            }
         }
     }
 

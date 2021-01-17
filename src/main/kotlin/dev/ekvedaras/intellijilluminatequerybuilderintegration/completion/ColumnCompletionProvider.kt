@@ -187,9 +187,10 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
     }
 
     private fun shouldNotCompleteCurrentParameter(method: MethodReference, parameters: CompletionParameters) =
-        LaravelUtils.BuilderTableColumnsParams[method.name]?.contains(
-            MethodUtils.findParameterIndex(parameters.position)
-        ) != true
+        parameters.position.textContains('$')
+                || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
+                || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(parameters.position))
+                && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)

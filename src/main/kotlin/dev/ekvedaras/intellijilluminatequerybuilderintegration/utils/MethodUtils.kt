@@ -6,6 +6,8 @@ import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
+import com.jetbrains.php.lang.psi.elements.PhpClass
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 
 class MethodUtils {
     companion object {
@@ -27,16 +29,25 @@ class MethodUtils {
         /**
          * Resolve in which classes given method may be defined
          */
-        fun resolveMethodClasses(method: MethodReference): List<String> {
+        fun resolveMethodClasses(method: MethodReference): List<PhpClassImpl> {
             if (DumbService.isDumb(method.project) || method.classReference == null) {
                 return listOf()
             }
 
-            return PhpIndex
+            val classes = mutableListOf<PhpClassImpl>()
+
+            PhpIndex
                 .getInstance(method.project)
                 .completeType(method.project, method.classReference!!.declaredType, null)
                 .types
                 .toList()
+                .forEach {
+                    PhpIndex.getInstance(method.project)
+                        .getClassesByFQN(it)
+                        .forEach { clazz -> classes.add(clazz as PhpClassImpl) }
+                }
+
+            return classes
         }
 
         /**
@@ -54,6 +65,10 @@ class MethodUtils {
          * Usually the root element should be a first child of PSI Statement
          */
         fun findMethodsInTree(root: PsiElement): List<MethodReference> {
+            if (root.text == "return" || root.text == " ") {
+                return findMethodsInTree(root.nextSibling)
+            }
+
             val list = mutableListOf<MethodReference>()
             findMethodsInTree(root, list)
             return list

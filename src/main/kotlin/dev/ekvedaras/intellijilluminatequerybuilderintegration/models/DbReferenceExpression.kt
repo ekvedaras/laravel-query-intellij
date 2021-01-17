@@ -11,6 +11,7 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -59,11 +60,11 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
         //<editor-fold desc="Resolve model and table from static call like User::query()">
         val modelReference = methods.find {
             it.firstChild is ClassReferenceImpl &&
-                    PhpIndex.getInstance(method.project)
+                    (PhpIndex.getInstance(method.project)
                         .getClassesByFQN(
                             (it.firstChild as ClassReferenceImpl).declaredType.types.first()
                         )
-                        .first()
+                        .first() as PhpClassImpl)
                         .isChildOf(
                             PhpIndex.getInstance(method.project)
                                 .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")

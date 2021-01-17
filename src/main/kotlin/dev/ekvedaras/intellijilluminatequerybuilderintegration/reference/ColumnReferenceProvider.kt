@@ -47,9 +47,10 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotCompleteCurrentParameter(method: MethodReference, element: PsiElement) =
-        LaravelUtils.BuilderTableColumnsParams[method.name]?.contains(
-            MethodUtils.findParameterIndex(element)
-        ) != true
+        element.textContains('$')
+                || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
+                || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(element))
+                && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, element: PsiElement) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
