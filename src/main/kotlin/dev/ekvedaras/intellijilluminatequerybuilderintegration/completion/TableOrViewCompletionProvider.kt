@@ -7,7 +7,7 @@ import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
-import com.intellij.database.symbols.DasPsiWrappingSymbol
+import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.util.ProcessingContext
@@ -77,6 +77,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
                             LookupElementBuilder
                                 .create(it, it.name)
                                 .withLookupString(lookup)
+                                .withTypeText(schema.name)
                                 .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
                                 .withInsertHandler { context, _ ->
                                     context.document.deleteString(context.startOffset, context.tailOffset)

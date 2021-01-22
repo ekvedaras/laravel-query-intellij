@@ -8,10 +8,10 @@ import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
-import com.intellij.database.symbols.DasPsiWrappingSymbol
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.psi.util.elementType
+import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression

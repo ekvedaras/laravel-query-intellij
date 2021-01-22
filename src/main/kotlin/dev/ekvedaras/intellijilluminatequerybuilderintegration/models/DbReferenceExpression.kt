@@ -73,12 +73,12 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 .getClassesByFQN(
                     (it.firstChild as VariableImpl).declaredType.types.first()
                 )
-                .first() as PhpClassImpl)
-                .isChildOf(
+                .first() as? PhpClassImpl)
+                ?.isChildOf(
                     PhpIndex.getInstance(method.project)
                         .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
                         .first()
-                ))
+                ) == true)
         }?.firstChild as? PhpTypedElement
 
         if (modelReference == null) {
@@ -112,6 +112,10 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
         methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
             .forEach loop@{
+                if (it.getParameter(0) !is StringLiteralExpressionImpl) {
+                    return@loop
+                }
+
                 val definition = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
 
                 var _table: String = definition
