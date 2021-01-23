@@ -5,6 +5,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.util.elementType
 import com.intellij.util.ProcessingContext
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -51,6 +52,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
                 || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
                 || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(element))
                 && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
+                || (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, element: PsiElement) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)

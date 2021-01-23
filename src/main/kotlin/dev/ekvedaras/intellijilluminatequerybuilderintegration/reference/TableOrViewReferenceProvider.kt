@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -35,4 +36,5 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
     private fun shouldNotCompleteCurrentParam(method: MethodReference, element: PsiElement) =
         !LaravelUtils.BuilderTableMethods.contains(method.name)
                 || MethodUtils.findParameterIndex(element) != 0
+                || (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
 }

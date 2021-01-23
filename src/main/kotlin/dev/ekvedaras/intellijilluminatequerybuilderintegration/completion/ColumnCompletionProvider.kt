@@ -13,6 +13,7 @@ import com.intellij.database.util.DbUtil
 import com.intellij.psi.util.elementType
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.util.ProcessingContext
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -191,6 +192,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                 || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
                 || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(parameters.position))
                 && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
+                || (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)

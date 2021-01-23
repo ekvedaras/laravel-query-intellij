@@ -4,6 +4,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
@@ -64,6 +65,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
             private fun shouldNotCompleteCurrentParam(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderTableMethods.contains(method.name)
                         || MethodUtils.findParameterIndex(expression) != 0
+                        || (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference)
         }
     }
 }

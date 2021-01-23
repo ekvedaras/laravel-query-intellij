@@ -11,6 +11,7 @@ import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.util.ProcessingContext
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -99,4 +100,5 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     private fun shouldNotCompleteCurrentParam(method: MethodReference, parameters: CompletionParameters) =
         !LaravelUtils.BuilderTableMethods.contains(method.name)
                 || MethodUtils.findParameterIndex(parameters.position) != 0
+                || (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
 }

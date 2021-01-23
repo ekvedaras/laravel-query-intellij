@@ -17,7 +17,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
-class DbReferenceExpression(val expression: PsiElement, val type: Type) {
+class DbReferenceExpression(val expression: PsiElement, private val type: Type) {
     companion object {
         enum class Type {
             Table,

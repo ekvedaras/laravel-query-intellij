@@ -5,6 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.elementType
 import com.jetbrains.php.lang.inspections.PhpInspection
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
@@ -125,9 +126,11 @@ class UnknownColumnInspection : PhpInspection() {
                 expression: StringLiteralExpression
             ) =
                 expression.textContains('$')
+                        || expression.textContains('*')
                         || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
                         || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(expression))
                         && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
+                        || (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference)
 
             private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
