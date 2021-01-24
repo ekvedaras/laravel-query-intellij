@@ -20,5 +20,13 @@ class ColumnCompletionContributor : CompletionContributor() {
             ),
             ColumnCompletionProvider()
         )
+        extend(
+            CompletionType.SMART,
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE)
+            ),
+            ColumnCompletionProvider(true)
+        )
     }
 }

@@ -19,7 +19,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenc
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
-class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
+class ColumnCompletionProvider(private val completeFullList: Boolean = false) : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
@@ -46,9 +46,9 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
             DbUtil.getDataSources(method.project).forEach { dataSource ->
                 result.addAllElements(
                     DasUtil.getSchemas(dataSource)
-                        .filter { schemas.isEmpty() || schemas.contains(it.name) }
+                        .filter { completeFullList || schemas.isEmpty() || schemas.contains(it.name) }
                         .map {
-                            if (target.tablesAndAliases.isEmpty()) {
+                            if (target.tablesAndAliases.isEmpty() || completeFullList) {
                                 result.addAllElements(
                                     it.getDasChildren(ObjectKind.TABLE).map { dasTable ->
                                         LookupElementBuilder
@@ -84,6 +84,7 @@ class ColumnCompletionProvider : CompletionProvider<CompletionParameters>() {
                 )
 
                 if (target.tablesAndAliases.isNotEmpty()) {
+                    result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
                     target.tablesAndAliases.forEach {
                         var lookup = LookupElementBuilder
                             .create(it.key)
