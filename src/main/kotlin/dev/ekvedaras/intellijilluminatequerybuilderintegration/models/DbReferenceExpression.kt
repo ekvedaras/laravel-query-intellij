@@ -73,7 +73,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 .getClassesByFQN(
                     (it.firstChild as VariableImpl).declaredType.types.first()
                 )
-                .first() as? PhpClassImpl)
+                .firstOrNull() as? PhpClassImpl)
                 ?.isChildOf(
                     PhpIndex.getInstance(method.project)
                         .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")

@@ -6,7 +6,6 @@ import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
-import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 
 class MethodUtils {
@@ -58,6 +57,15 @@ class MethodUtils {
             return if (parent is ParameterList) {
                 ArrayUtil.indexOf(parent.parameters, psiElement)
             } else findParameterIndex(parent)
+        }
+
+        /**
+         * Resolve parent ParameterList PSI element
+         */
+        fun findParameters(psiElement: PsiElement?): ParameterList? {
+            return if (psiElement == null || psiElement is ParameterList)
+                psiElement as ParameterList?
+            else findParameters(psiElement.parent)
         }
 
         /**
