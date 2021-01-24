@@ -55,7 +55,12 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
     private fun collectTablesAndAliases() {
         val method = MethodUtils.resolveMethodReference(expression) ?: return
-        val methods = MethodUtils.findMethodsInTree(method.parentOfType<Statement>()!!.firstChild)
+        val methods = MethodUtils.findMethodsInTree(
+            if (MethodUtils.resolveMethodClasses(method).any { it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" })
+                method.parentOfType<Statement>()!!.parentOfType<Statement>()!!.parentOfType<Statement>()!!.firstChild
+            else
+                method.parentOfType<Statement>()!!.firstChild
+        )
 
         //<editor-fold desc="Resolve model and table from static call like User::query()">
         var modelReference = methods.find {

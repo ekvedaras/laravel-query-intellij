@@ -10,6 +10,7 @@ class LaravelUtils {
         val DatabaseBuilderClasses = listOf(
             "\\Illuminate\\Database\\Query\\Builder",
             "\\Illuminate\\Database\\Eloquent\\Builder",
+            "\\Illuminate\\Database\\Query\\JoinClause",
             "\\Illuminate\\Database\\Eloquent\\Relations\\Relation",
         )
         //</editor-fold>
@@ -123,6 +124,7 @@ class LaravelUtils {
             "decrement" to listOf(0),
             "updateOrInsert" to listOf(0, 1),
             "update" to listOf(0),
+            "on" to listOf(0, 1, 2),
         )
         //</editor-fold>
 
