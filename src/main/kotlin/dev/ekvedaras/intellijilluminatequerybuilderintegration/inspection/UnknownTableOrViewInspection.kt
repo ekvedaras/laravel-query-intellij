@@ -66,6 +66,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 !LaravelUtils.BuilderTableMethods.contains(method.name)
                         || MethodUtils.findParameterIndex(expression) != 0
                         || (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference)
+                        || (expression.parent?.parent is FunctionReference && expression.parent?.parent !is MethodReference)
         }
     }
 }

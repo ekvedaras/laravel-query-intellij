@@ -132,6 +132,7 @@ class UnknownColumnInspection : PhpInspection() {
                         || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(expression)) // argument index must be in preconfigured list for the method
                         && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)) // -1 means any argument should auto complete
                         || (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference) // ->where(DB::raw('column')), etc.
+                        || (expression.parent?.parent is FunctionReference && expression.parent?.parent !is MethodReference) // ->whereIn('column', explode(' ' , 'string')), etc. todo: make this check and above work together and be more flexible
 
             private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
