@@ -8,7 +8,7 @@ import com.jetbrains.php.lang.lexer.PhpTokenTypes
 
 class TableOrViewCompletionContributor : CompletionContributor() {
     override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
-        return typeChar == '\'' || typeChar == '"' || super.invokeAutoPopup(position, typeChar)
+        return typeChar == '\'' || typeChar == '"'
     }
 
     init {

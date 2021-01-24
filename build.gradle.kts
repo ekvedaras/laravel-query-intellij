@@ -44,7 +44,7 @@ repositories {
 }
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
-    compile("com.github.cesarferreira:kotlin-pluralizer:0.2.9")
+    compile("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
 }
 
 // Configure gradle-intellij-plugin plugin.

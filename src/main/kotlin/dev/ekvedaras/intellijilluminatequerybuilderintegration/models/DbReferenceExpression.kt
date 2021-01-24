@@ -74,7 +74,13 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 } else {
                     methods.addAll(
                         MethodUtils.findMethodsInTree(
-                            tree.parent
+                            if (MethodUtils.resolveMethodClasses(tree as MethodReference).any {
+                                    it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
+                                            || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+                                })
+                                tree.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
+                            else
+                                tree.parent
                         )
                     )
                 }
@@ -82,7 +88,10 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         } else {
             methods.addAll(
                 MethodUtils.findMethodsInTree(
-                    if (MethodUtils.resolveMethodClasses(method).any { it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" })
+                    if (MethodUtils.resolveMethodClasses(method).any {
+                            it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
+                                    || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+                    })
                         method.parentOfType<Statement>()!!.parentOfType<Statement>()!!.parentOfType<Statement>()!!.firstChild
                     else
                         method.parentOfType<Statement>()!!.firstChild
@@ -138,6 +147,39 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             } else {
                 val name = model.asTableName()
                 tablesAndAliases[name] = name to null
+            }
+
+            val deepParent = method.parent?.parent?.parent?.parent?.parent?.parent;
+            if (deepParent is ArrayHashElementImpl && deepParent.parentOfType<MethodReferenceImpl>()?.name == "with") {
+                val relationName = deepParent.firstChild.text.replace("'", "").replace("\"", "")
+                val relationMethod = model.methods.firstOrNull { it.name == relationName }
+
+                if (relationMethod != null) {
+                    val returnStatement = MethodUtils.firstChildOfType((relationMethod as MethodImpl).lastChild as GroupStatementImpl, PhpReturnImpl::class.java.name)
+
+                    if (returnStatement != null) {
+                        val firstParam = (MethodUtils.firstChildOfType(returnStatement, ParameterListImpl::class.java.name) as? ParameterListImpl)?.getParameter(0)
+
+                        if (firstParam != null) {
+                            if (firstParam is ClassConstantReferenceImpl) {
+                                val relationModel = PhpIndex.getInstance(method.project)
+                                    .getClassesByFQN(firstParam.classReference?.declaredType?.types?.first())
+                                    .first()
+
+                                val relationTableName = relationModel.fields.find { it.name == "table" }
+                                if (relationTableName != null && relationTableName.defaultValue != null) {
+                                    val name = relationTableName.defaultValue!!.text.trim('\'').trim('"')
+                                    tablesAndAliases[name] = name to null
+                                } else {
+                                    val name = relationModel.asTableName()
+                                    tablesAndAliases[name] = name to null
+                                }
+                            } else if (firstParam is StringLiteralExpressionImpl) {
+                                tablesAndAliases[firstParam.contents] = firstParam.contents to null
+                            }
+                        }
+                    }
+                }
             }
         }
         //</editor-fold>

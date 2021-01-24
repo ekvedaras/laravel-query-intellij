@@ -52,18 +52,12 @@ class ClassUtils {
 
             val parts = table.split("_");
 
-            /**
-             * TOOD there is a bug in the library
-             * Might need to fork or something if not fixed soon.
-             * @see https://github.com/cesarferreira/kotlin-pluralizer/pull/5
-             */
-
             if (parts.size == 1) {
                 return table.pluralize()
             }
 
             val last = parts[parts.size - 1]
-            return parts.subList(0, parts.size - 2).joinToString("_") + last.pluralize()
+            return parts.subList(0, parts.size - 1).joinToString("_") + "_" + last.pluralize()
         }
     }
 }
