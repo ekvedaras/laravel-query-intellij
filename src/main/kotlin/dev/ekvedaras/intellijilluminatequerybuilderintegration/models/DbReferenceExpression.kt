@@ -7,8 +7,10 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.*
@@ -55,12 +57,38 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
     private fun collectTablesAndAliases() {
         val method = MethodUtils.resolveMethodReference(expression) ?: return
-        val methods = MethodUtils.findMethodsInTree(
-            if (MethodUtils.resolveMethodClasses(method).any { it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" })
-                method.parentOfType<Statement>()!!.parentOfType<Statement>()!!.parentOfType<Statement>()!!.firstChild
-            else
-                method.parentOfType<Statement>()!!.firstChild
-        )
+        val methods = mutableListOf<MethodReference>();
+
+        if (method.parentOfType<Statement>()!!.firstChild.firstChild is VariableImpl) {
+            // Resolve all statements for the variable
+
+            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstChild.firstChild).findAll().forEach loop@ { reference ->
+                val tree = reference.element.parentOfType<Statement>()?.firstChild ?: return@loop
+
+                if (tree is AssignmentExpressionImpl) {
+                    methods.addAll(
+                        MethodUtils.findMethodsInTree(
+                            tree.lastChild
+                        )
+                    )
+                } else {
+                    methods.addAll(
+                        MethodUtils.findMethodsInTree(
+                            tree.parent
+                        )
+                    )
+                }
+            }
+        } else {
+            methods.addAll(
+                MethodUtils.findMethodsInTree(
+                    if (MethodUtils.resolveMethodClasses(method).any { it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" })
+                        method.parentOfType<Statement>()!!.parentOfType<Statement>()!!.parentOfType<Statement>()!!.firstChild
+                    else
+                        method.parentOfType<Statement>()!!.firstChild
+                )
+            )
+        }
 
         //<editor-fold desc="Resolve model and table from static call like User::query()">
         var modelReference = methods.find {

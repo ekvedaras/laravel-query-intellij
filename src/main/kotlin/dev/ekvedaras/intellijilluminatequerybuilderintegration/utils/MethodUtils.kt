@@ -72,7 +72,7 @@ class MethodUtils {
          * Resolve all child method references in given element and return the list.
          * Usually the root element should be a first child of PSI Statement
          */
-        fun findMethodsInTree(root: PsiElement): List<MethodReference> {
+        fun findMethodsInTree(root: PsiElement): MutableList<MethodReference> {
             if (root.text == "return" || root.text == " ") {
                 return findMethodsInTree(root.nextSibling)
             }
