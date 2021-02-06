@@ -260,7 +260,8 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             } else if (parts.size == 2) {
                 // 3. 'schema.table'
 
-                DbUtil.getDataSources(expression.project).forEach { dataSource ->
+                DbUtil.getDataSources(expression.project)
+                    .forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).filter { schema.contains(it) }.forEach { namespace ->
                         table.addAll(
                             DasUtil.getTables(dataSource)
