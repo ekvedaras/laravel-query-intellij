@@ -42,7 +42,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
 
         if (target.parts.size == 1) {
-            val schemas = target.tablesAndAliases.map { it.value.second }.distinct()
+            val schemas = target.tablesAndAliases.map { it.value.second }.filter { it != null }.distinct()
             DbUtil.getDataSources(method.project).forEach { dataSource ->
                 result.addAllElements(
                     DasUtil.getSchemas(dataSource)

@@ -39,7 +39,7 @@ class ClassUtils {
         @JvmStatic
         fun String.asPhpClass(project: Project): PhpClass?
         {
-            return PhpIndex.getInstance(project).getClassesByFQN(this).first()
+            return PhpIndex.getInstance(project).getClassesByFQN(this).firstOrNull()
         }
 
         @JvmStatic
