@@ -1,10 +1,8 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 
-import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
-import kotlin.test.expect
 
 class ColumnsCompletionTest : BaseTestCase() {
     private fun caretAfterArgs(at: Int, prefix: String = ""): String {
@@ -31,20 +29,45 @@ class ColumnsCompletionTest : BaseTestCase() {
     }
 
     fun testCompletesSchemasAndTables() {
-        val table =
-            DasUtil.getTables(db).filter { !it.isSystem }.firstOrNull() ?: return fail("Did not find any tables.")
+        val table = DasUtil.getTables(db)
+            .filter { !it.isSystem }
+            .firstOrNull() ?: return fail("Did not find any tables.")
         val columns = DasUtil.getColumns(table)
 
-        val expected = columns.map { it.name } + listOf(table.name)
-        val size = columns.size() + 1
+        val expected = columns.map { it.name } + // All selected table columns
+                listOf(
+                    table.name,                 // Table itself
+                    table.dasParent!!.name      // Table schema
+                )
+
+        val notExpected = schemas.filter { it != table.dasParent!!.name } + // All other schemas
+                schemaTables.values.flatten().filter { it != table.name }   // All other tables
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach params@{ param ->
+            params.forEach { param ->
                 completeFor(table.name, "", method, param)
 
-                assertEquals(size, myFixture.lookupElementStrings?.size)  // TODO not working for method latest
                 assertCompletion(*expected.toList().toTypedArray())
-                myFixture.lookup.hideLookup(true)
+                assertNoCompletion(*notExpected.toList().toTypedArray())
+            }
+        }
+    }
+
+    fun testCompletesSchemaTables() {
+        val schema = schemas.first()
+        val table = schemaTables[schema]!!.first()
+        val expected = schemaTables[schema]!!
+
+        val notExpected = schemas.filterNot { it == schema } +                                 // All other schemas
+                schemaTables.entries.filterNot { it.key == schema }.map { it.value }
+                    .flatten() // Tables of other schemas
+
+        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
+            params.forEach { param ->
+                completeFor(table, "$schema.", method, param)
+
+                assertCompletion(*expected.toList().toTypedArray())
+                assertNoCompletion(*notExpected.toList().toTypedArray())
             }
         }
     }

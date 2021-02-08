@@ -39,10 +39,11 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
             return
         }
 
+
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
 
         if (target.parts.size == 1) {
-            val schemas = target.tablesAndAliases.map { it.value.second }.filter { it != null }.distinct()
+            val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
             DbUtil.getDataSources(method.project).forEach { dataSource ->
                 result.addAllElements(
                     DasUtil.getSchemas(dataSource)
@@ -132,11 +133,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                     target.schema.forEach { schema ->
                         result.addAllElements(
                             schema.getDasChildren(ObjectKind.TABLE)
-                                .filter {
-                                    !(it as DasTable).isSystem && (target.tablesAndAliases.isEmpty() || target.tablesAndAliases.containsKey(
-                                        it.name
-                                    ))
-                                }
+                                .filter { !(it as DasTable).isSystem }
                                 .map {
                                     val lookup = target.parts.first() + "." + it.name
                                     LookupElementBuilder

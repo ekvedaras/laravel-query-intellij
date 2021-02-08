@@ -48,4 +48,10 @@ abstract class BaseTestCase : BasePlatformTestCase() {
 
         assertContainsElements(strings, shouldContain.asList())
     }
+
+    protected fun assertNoCompletion(vararg shouldNotContain: String) {
+        val strings = myFixture.lookupElementStrings ?: return
+
+        assertDoesntContain(strings, shouldNotContain.asList())
+    }
 }

@@ -193,39 +193,58 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
                 val definition = (it.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
 
-                var _table: String = definition
-                var _schema: String? = null
+                var referencedTable: String = definition
+                var referencedSchema: String? = null
 
                 if (definition.contains(".")) {
                     for (part in definition.split(".").reversed()) {
-                        if (_table == definition) {
-                            _table = part.replace("IntellijIdeaRulezzz", "").trim()
+                        if (referencedTable == definition) {
+                            referencedTable = part.replace("IntellijIdeaRulezzz", "").trim()
                         } else {
-                            _schema = part.replace("IntellijIdeaRulezzz", "").trim()
+                            referencedSchema = part.replace("IntellijIdeaRulezzz", "").trim()
                         }
                     }
                 }
 
-                if (_table.contains(" as ")) {
-                    val alias = _table.substringAfter("as").trim()
-                    val table = _table.substringBefore("as").trim()
-                    tablesAndAliases[alias] = table to _schema
+                if (referencedTable.contains(" as ")) {
+                    val alias = referencedTable.substringAfter("as").trim()
+                    val table = referencedTable.substringBefore("as").trim()
+
+                    if (referencedSchema == null) {
+                        DbUtil.getDataSources(method.project).forEach { dataSource ->
+                            val dasTable = DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == table }
+                            if (dasTable != null) {
+                                referencedSchema = dasTable.dasParent?.name
+                            }
+                        }
+                    }
+
+                    tablesAndAliases[alias] = table to referencedSchema
                     aliases[table] = alias to it.getParameter(0)!!
                     return@loop
                 }
 
+                if (referencedSchema == null) {
+                    DbUtil.getDataSources(method.project).forEach { dataSource ->
+                        val dasTable = DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == referencedTable }
+                        if (dasTable != null) {
+                            referencedSchema = dasTable.dasParent?.name
+                        }
+                    }
+                }
+
                 if (!LaravelUtils.BuilderTableAliasParams.containsKey(it.name)) {
-                    tablesAndAliases[_table] = _table to _schema
+                    tablesAndAliases[referencedTable] = referencedTable to referencedSchema
                     return@loop
                 }
 
                 val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[it.name] ?: return@loop
                 val alias: String? = (it.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
 
-                tablesAndAliases[alias ?: _table] = _table to _schema
+                tablesAndAliases[alias ?: referencedTable] = referencedTable to referencedSchema
 
                 if (alias != null && it.getParameter(aliasParam) != null) {
-                    aliases[_table] = alias to it.getParameter(aliasParam)!!
+                    aliases[referencedTable] = alias to it.getParameter(aliasParam)!!
                 }
             }
     }
