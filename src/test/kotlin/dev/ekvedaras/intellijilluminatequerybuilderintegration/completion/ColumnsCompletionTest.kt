@@ -1,6 +1,5 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 
-import com.intellij.database.model.DasTable
 import com.intellij.database.util.DasUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
@@ -73,7 +72,7 @@ class ColumnsCompletionTest : BaseTestCase() {
         }
     }
 
-    fun testTableColumns() {
+    fun testCompletesTableColumns() {
         val table = DasUtil.getTables(db)
             .filterNot { it.isSystem }
             .firstOrNull() ?: return fail("Did not find any tables.")
@@ -82,12 +81,13 @@ class ColumnsCompletionTest : BaseTestCase() {
             .filterNot { it.isSystem }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
-        val notExpected = schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
-                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                    .flatten() +                                                                      // Tables of other schemas
-                DasUtil.getColumns(lastTable)
-                    .filterNot { columns.contains(it.name) }
-                    .map { it.name }                                                                  // Columns of other table
+        val notExpected =
+            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
+                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                        .flatten() +                                                                      // Tables of other schemas
+                    DasUtil.getColumns(lastTable)
+                        .filterNot { columns.contains(it.name) }
+                        .map { it.name }                                                                  // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -99,7 +99,7 @@ class ColumnsCompletionTest : BaseTestCase() {
         }
     }
 
-    fun testSchemaTableColumns() {
+    fun testCompletesSchemaTableColumns() {
         val table = DasUtil.getTables(db)
             .filterNot { it.isSystem }
             .firstOrNull() ?: return fail("Did not find any tables.")
@@ -108,16 +108,45 @@ class ColumnsCompletionTest : BaseTestCase() {
             .filterNot { it.isSystem }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
-        val notExpected = schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
-                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                    .flatten() +                                                                      // Tables of other schemas
-                DasUtil.getColumns(lastTable)
-                    .filterNot { columns.contains(it.name) }
-                    .map { it.name }                                                                  // Columns of other table
+        val notExpected =
+            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
+                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                        .flatten() +                                                                      // Tables of other schemas
+                    DasUtil.getColumns(lastTable)
+                        .filterNot { columns.contains(it.name) }
+                        .map { it.name }                                                                  // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
                 completeFor(table.name, "${table.dasParent?.name}.${table.name}.", method, param)
+
+                assertCompletion(*columns.toList().toTypedArray())
+                assertNoCompletion(*notExpected.toList().toTypedArray())
+            }
+        }
+    }
+
+    fun testCompletesAliasColumns() {
+        val table = DasUtil.getTables(db)
+            .filterNot { it.isSystem }
+            .firstOrNull() ?: return fail("Did not find any tables.")
+        val columns = DasUtil.getColumns(table).map { it.name }
+        val lastTable = DasUtil.getTables(db)
+            .filterNot { it.isSystem }
+            .lastOrNull() ?: return fail("Did not find any tables.")
+        val alias = "${table.name}_alias"
+
+        val notExpected =
+            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
+                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                        .flatten() +                                                                      // Tables of other schemas
+                    DasUtil.getColumns(lastTable)
+                        .filterNot { columns.contains(it.name) }
+                        .map { it.name }                                                                  // Columns of other table
+
+        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
+            params.forEach { param ->
+                completeFor("${table.name} as $alias", "$alias.", method, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
