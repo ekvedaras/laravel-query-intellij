@@ -87,11 +87,37 @@ class ColumnsCompletionTest : BaseTestCase() {
                     .flatten() +                                                                      // Tables of other schemas
                 DasUtil.getColumns(lastTable)
                     .filterNot { columns.contains(it.name) }
-                    .map { it.name }                                         // Columns of other table
+                    .map { it.name }                                                                  // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
                 completeFor(table.name, "${table.name}.", method, param)
+
+                assertCompletion(*columns.toList().toTypedArray())
+                assertNoCompletion(*notExpected.toList().toTypedArray())
+            }
+        }
+    }
+
+    fun testSchemaTableColumns() {
+        val table = DasUtil.getTables(db)
+            .filterNot { it.isSystem }
+            .firstOrNull() ?: return fail("Did not find any tables.")
+        val columns = DasUtil.getColumns(table).map { it.name }
+        val lastTable = DasUtil.getTables(db)
+            .filterNot { it.isSystem }
+            .lastOrNull() ?: return fail("Did not find any tables.")
+
+        val notExpected = schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
+                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                    .flatten() +                                                                      // Tables of other schemas
+                DasUtil.getColumns(lastTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name }                                                                  // Columns of other table
+
+        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
+            params.forEach { param ->
+                completeFor(table.name, "${table.dasParent?.name}.${table.name}.", method, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
