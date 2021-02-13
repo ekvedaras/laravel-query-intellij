@@ -27,8 +27,8 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Table)
         var references = arrayOf<PsiReference>()
 
-        target.schema.forEach { references += SchemaPsiReference(target, it) }
-        target.table.forEach { references += TableOrViewPsiReference(target, it) }
+        target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }
+        target.table.parallelStream().forEach { references += TableOrViewPsiReference(target, it) }
 
         return references
     }

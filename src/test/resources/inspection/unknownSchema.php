@@ -1,0 +1,1 @@
+<?php (new Illuminate\Database\Query\Builder())->from('<warning descr="Unknown schema">testProject3</warning>.<warning descr="Unknown table or view">users</warning>');

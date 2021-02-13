@@ -19,7 +19,8 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenc
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
-class ColumnCompletionProvider(private val completeFullList: Boolean = false) : CompletionProvider<CompletionParameters>() {
+class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
+    CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
@@ -44,14 +45,16 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
 
         if (target.parts.size == 1) {
             val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-            DbUtil.getDataSources(method.project).forEach { dataSource ->
-                result.addAllElements(
-                    DasUtil.getSchemas(dataSource)
-                        .filter { completeFullList || schemas.isEmpty() || schemas.contains(it.name) }
-                        .map {
-                            if (target.tablesAndAliases.isEmpty() || completeFullList) {
-                                result.addAllElements(
-                                    it.getDasChildren(ObjectKind.TABLE).map { dasTable ->
+            DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+                DasUtil.getSchemas(dataSource)
+                    .toList().parallelStream()
+                    .filter { completeFullList || schemas.isEmpty() || schemas.contains(it.name) }
+                    .forEach {
+                        if (target.tablesAndAliases.isEmpty() || completeFullList) {
+                            it.getDasChildren(ObjectKind.TABLE)
+                                .toList().parallelStream()
+                                .forEach { dasTable ->
+                                    result.addElement(
                                         LookupElementBuilder
                                             .create(dasTable.name)
                                             .withTailText(" (" + it.name + ")", true)
@@ -66,10 +69,11 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                                     .triggerAutoPopup()
                                                     .build()
                                             )
-                                    }
-                                )
-                            }
+                                    )
+                                }
+                        }
 
+                        result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
                                 .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
@@ -81,8 +85,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                         .triggerAutoPopup()
                                         .build()
                                 )
-                        }
-                )
+                        )
+                    }
 
                 if (target.tablesAndAliases.isNotEmpty()) {
                     result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
@@ -99,19 +103,19 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                     .build()
                             )
 
-                        val table = DasUtil.getTables(dataSource)
-                            .find { table ->
-                                table.name == it.value.first && (it.value.second == null || table.dasParent?.name == it.value.second)
-                            }
+                        val table = DasUtil.getTables(dataSource).find { table ->
+                            table.name == it.value.first && (it.value.second == null || table.dasParent?.name == it.value.second)
+                        }
 
                         if (table != null) {
                             lookup = lookup.withIcon(
                                 DasPsiWrappingSymbol(table, method.project).getIcon(false)
                             )
 
-                            result.addAllElements(
-                                table.getDasChildren(ObjectKind.COLUMN)
-                                    .map { column ->
+                            table.getDasChildren(ObjectKind.COLUMN)
+                                .toList().parallelStream()
+                                .forEach { column ->
+                                    result.addElement(
                                         LookupElementBuilder
                                             .create(column, column.name)
                                             .withIcon(DasPsiWrappingSymbol(column, method.project).getIcon(false))
@@ -119,8 +123,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                             .withInsertHandler(
                                                 DeclarativeInsertHandler.Builder().build()
                                             )
-                                    }
-                            )
+                                    )
+                                }
                         }
 
                         result.addElement(lookup)
@@ -128,14 +132,15 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                 }
             }
         } else if (target.parts.size == 2) {
-            DbUtil.getDataSources(method.project).forEach { dataSource ->
+            DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
                 if (target.schema.isNotEmpty()) {
-                    target.schema.forEach { schema ->
-                        result.addAllElements(
-                            schema.getDasChildren(ObjectKind.TABLE)
-                                .filter { !(it as DasTable).isSystem }
-                                .map {
-                                    val lookup = target.parts.first() + "." + it.name
+                    target.schema.parallelStream().forEach { schema ->
+                        schema.getDasChildren(ObjectKind.TABLE)
+                            .toList().parallelStream()
+                            .filter { !(it as DasTable).isSystem }
+                            .forEach {
+                                val lookup = target.parts.first() + "." + it.name
+                                result.addElement(
                                     LookupElementBuilder
                                         .create(it, it.name)
                                         .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
@@ -155,15 +160,16 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                             AutoPopupController.getInstance(method.project)
                                                 .scheduleAutoPopup(context.editor)
                                         }
-                                }
-                        )
+                                )
+                            }
                     }
                 } else {
-                    target.table.forEach { table ->
-                        result.addAllElements(
-                            table.getDasChildren(ObjectKind.COLUMN)
-                                .map {
-                                    val lookup = target.parts.first() + "." + it.name
+                    target.table.parallelStream().forEach { table ->
+                        table.getDasChildren(ObjectKind.COLUMN)
+                            .toList().parallelStream()
+                            .forEach {
+                                val lookup = target.parts.first() + "." + it.name
+                                result.addElement(
                                     LookupElementBuilder
                                         .create(it, it.name)
                                         .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
@@ -179,17 +185,18 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                                 true
                                             )
                                         }
-                                }
-                        )
+                                )
+                            }
                     }
                 }
             }
         } else if (target.parts.size == 3) {
-            target.table.forEach { table ->
-                result.addAllElements(
-                    table.getDasChildren(ObjectKind.COLUMN)
-                        .map {
-                            val lookup = target.parts.first() + "." + target.parts[1] + "." + it.name
+            target.table.parallelStream().forEach { table ->
+                table.getDasChildren(ObjectKind.COLUMN)
+                    .toList().parallelStream()
+                    .forEach {
+                        val lookup = target.parts.first() + "." + target.parts[1] + "." + it.name
+                        result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
                                 .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
@@ -205,8 +212,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) : 
                                         true
                                     )
                                 }
-                        }
-                )
+                        )
+                    }
             }
         }
     }

@@ -30,8 +30,8 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column)
         var references = arrayOf<PsiReference>()
 
-        target.schema.forEach { references += SchemaPsiReference(target, it) }
-        target.table.forEach {
+        target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }
+        target.table.parallelStream().forEach {
             references += TableOrViewPsiReference(target, it)
 
             if (target.aliases.containsKey(it.name)) {
@@ -42,7 +42,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
                 )
             }
         }
-        target.column.forEach { references += ColumnPsiReference(target, it) }
+        target.column.parallelStream().forEach { references += ColumnPsiReference(target, it) }
 
         return references
     }

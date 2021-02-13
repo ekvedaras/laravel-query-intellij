@@ -62,37 +62,39 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         if (method.parentOfType<Statement>()!!.firstChild.firstChild is VariableImpl) {
             // Resolve all statements for the variable
 
-            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstChild.firstChild).findAll().forEach loop@ { reference ->
-                val tree = reference.element.parentOfType<Statement>()?.firstChild ?: return@loop
+            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstChild.firstChild).findAll()
+                .forEach loop@{ reference ->
+                    val tree = reference.element.parentOfType<Statement>()?.firstChild ?: return@loop
 
-                if (tree is AssignmentExpressionImpl) {
-                    methods.addAll(
-                        MethodUtils.findMethodsInTree(
-                            tree.lastChild
+                    if (tree is AssignmentExpressionImpl) {
+                        methods.addAll(
+                            MethodUtils.findMethodsInTree(
+                                tree.lastChild
+                            )
                         )
-                    )
-                } else {
-                    methods.addAll(
-                        MethodUtils.findMethodsInTree(
-                            if (MethodUtils.resolveMethodClasses(tree as MethodReference).any {
-                                    it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
-                                            || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
-                                })
-                                tree.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
-                            else
-                                tree.parent
+                    } else {
+                        methods.addAll(
+                            MethodUtils.findMethodsInTree(
+                                if (MethodUtils.resolveMethodClasses(tree as MethodReference).any {
+                                        it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
+                                                || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+                                    })
+                                    tree.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
+                                else
+                                    tree.parent
+                            )
                         )
-                    )
+                    }
                 }
-            }
         } else {
             methods.addAll(
                 MethodUtils.findMethodsInTree(
                     if (MethodUtils.resolveMethodClasses(method).any {
                             it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
                                     || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
-                    })
-                        method.parentOfType<Statement>()!!.parentOfType<Statement>()!!.parentOfType<Statement>()!!.firstChild
+                        })
+                        method.parentOfType<Statement>()!!.parentOfType<Statement>()!!
+                            .parentOfType<Statement>()!!.firstChild
                     else
                         method.parentOfType<Statement>()!!.firstChild
                 )
@@ -155,10 +157,16 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 val relationMethod = model.methods.firstOrNull { it.name == relationName }
 
                 if (relationMethod != null) {
-                    val returnStatement = MethodUtils.firstChildOfType((relationMethod as MethodImpl).lastChild as GroupStatementImpl, PhpReturnImpl::class.java.name)
+                    val returnStatement = MethodUtils.firstChildOfType(
+                        (relationMethod as MethodImpl).lastChild as GroupStatementImpl,
+                        PhpReturnImpl::class.java.name
+                    )
 
                     if (returnStatement != null) {
-                        val firstParam = (MethodUtils.firstChildOfType(returnStatement, ParameterListImpl::class.java.name) as? ParameterListImpl)?.getParameter(0)
+                        val firstParam = (MethodUtils.firstChildOfType(
+                            returnStatement,
+                            ParameterListImpl::class.java.name
+                        ) as? ParameterListImpl)?.getParameter(0)
 
                         if (firstParam != null) {
                             if (firstParam is ClassConstantReferenceImpl) {
@@ -211,8 +219,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     val table = referencedTable.substringBefore("as").trim()
 
                     if (referencedSchema == null) {
-                        DbUtil.getDataSources(method.project).forEach { dataSource ->
-                            val dasTable = DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == table }
+                        DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+                            val dasTable =
+                                DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == table }
                             if (dasTable != null) {
                                 referencedSchema = dasTable.dasParent?.name
                             }
@@ -225,8 +234,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
 
                 if (referencedSchema == null) {
-                    DbUtil.getDataSources(method.project).forEach { dataSource ->
-                        val dasTable = DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == referencedTable }
+                    DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+                        val dasTable =
+                            DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == referencedTable }
                         if (dasTable != null) {
                             referencedSchema = dasTable.dasParent?.name
                         }
@@ -255,19 +265,18 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
          */
         if (type == Type.Table) {
             // 1. 'schema' or 'schema.table'
-            DbUtil.getDataSources(expression.project).forEach { dataSource ->
-                schema.addAll(
-                    DasUtil.getSchemas(dataSource)
-                        .filter { it.name == parts.first() }
-                        .toMutableList()
-                )
+            DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                DasUtil.getSchemas(dataSource)
+                    .toList().parallelStream()
+                    .filter { it.name == parts.first() }
+                    .forEach { schema.add(it) }
             }
 
             if (parts.size == 1) {
                 // 2. 'table'
 
-                DbUtil.getDataSources(expression.project).forEach { dataSource ->
-                    DasUtil.getTables(dataSource).forEach {
+                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                    DasUtil.getTables(dataSource).toList().parallelStream().forEach {
                         if (it.name == parts.last()) {
                             table.add(it)
                         } else if (tablesAndAliases[parts.last()]?.first == it.name) {
@@ -280,15 +289,18 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 3. 'schema.table'
 
                 DbUtil.getDataSources(expression.project)
+                    .toList().parallelStream()
                     .forEach { dataSource ->
-                    DasUtil.getSchemas(dataSource).filter { schema.contains(it) }.forEach { namespace ->
-                        table.addAll(
-                            DasUtil.getTables(dataSource)
-                                .filter { it.dasParent?.name == namespace.name }
-                                .filter { it.name == parts.last() }
-                        )
+                        DasUtil.getSchemas(dataSource).toList().parallelStream()
+                            .filter { schema.contains(it) }
+                            .forEach { namespace ->
+                                DasUtil.getTables(dataSource)
+                                    .toList().parallelStream()
+                                    .filter { it.dasParent?.name == namespace.name }
+                                    .filter { it.name == parts.last() }
+                                    .forEach { table.add(it) }
+                            }
                     }
-                }
             }
         } else if (type == Type.Column) {
             /**
@@ -299,12 +311,12 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 2. 'table'
                 // 3. 'schema'
                 // 4. 'alias'
-                DbUtil.getDataSources(expression.project).forEach { dataSource ->
-                    schema.addAll(
-                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
-                    )
+                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                        .filter { it.name == parts.first() }
+                        .forEach { schema.add(it) }
 
-                    DasUtil.getTables(dataSource).forEach { dasTable ->
+                    DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
                         if (dasTable.name == parts.first()) {
                             table.add(dasTable)
                         } else if (tablesAndAliases[parts.first()]?.first == dasTable.name) {
@@ -312,9 +324,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                             alias = dasTable.name
                         }
 
-                        column.addAll(
-                            DasUtil.getColumns(dasTable).filter { it.name == parts.first() }
-                        )
+                        DasUtil.getColumns(dasTable).toList().parallelStream()
+                            .filter { it.name == parts.first() }
+                            .forEach { column.add(it) }
                     }
                 }
 
@@ -324,53 +336,54 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 5. 'table.column'
                 // 6. 'schema.table'
                 // 7. 'alias.column'
-                DbUtil.getDataSources(expression.project).forEach { dataSource ->
-                    schema.addAll(
-                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
-                    )
+                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                        .filter { it.name == parts.first() }
+                        .forEach { schema.add(it) }
 
-                    DasUtil.getTables(dataSource).forEach { dasTable ->
+                    DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
                         if (schema.isEmpty() || schema.contains(dasTable.dasParent)) {
                             if (dasTable.name == parts.first() || dasTable.name == parts.last()) {
                                 table.add(dasTable)
 
-                                column.addAll(
-                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
-                                )
+                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                    .filter { it.name == parts.last() }
+                                    .forEach { column.add(it) }
                             } else if (schema.isEmpty() && (tablesAndAliases[parts.first()]?.first == dasTable.name || tablesAndAliases[parts.last()]?.first == dasTable.name)) {
                                 table.add(dasTable)
                                 alias = dasTable.name
 
-                                column.addAll(
-                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
-                                )
+                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                    .filter { it.name == parts.last() }
+                                    .forEach { column.add(it) }
                             }
                         }
                     }
                 }
             } else if (parts.size == 3) {
                 // 8. 'schema.table.column
-                DbUtil.getDataSources(expression.project).forEach { dataSource ->
-                    schema.addAll(
-                        DasUtil.getSchemas(dataSource).filter { it.name == parts.first() }
-                    )
+                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                        .filter { it.name == parts.first() }
+                        .forEach { schema.add(it) }
 
                     DasUtil.getTables(dataSource)
+                        .toList().parallelStream()
                         .filter { schema.contains(it.dasParent) }
                         .forEach { dasTable ->
                             if (dasTable.name == parts[1]) {
                                 table.add(dasTable)
 
-                                column.addAll(
-                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
-                                )
+                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                    .filter { it.name == parts.last() }
+                                    .forEach { column.add(it) }
                             } else if (tablesAndAliases[parts[1]]?.first == dasTable.name) {
                                 table.add(dasTable)
                                 alias = dasTable.name
 
-                                column.addAll(
-                                    DasUtil.getColumns(dasTable).filter { it.name == parts.last() }
-                                )
+                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                    .filter { it.name == parts.last() }
+                                    .forEach { column.add(it) }
                             }
                         }
                 }

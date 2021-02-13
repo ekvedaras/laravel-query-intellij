@@ -1,0 +1,1 @@
+<?php (new Illuminate\Database\Query\Builder())->from('testProject1.users')->get('users.<warning descr="Unknown column">payload</warning>');
