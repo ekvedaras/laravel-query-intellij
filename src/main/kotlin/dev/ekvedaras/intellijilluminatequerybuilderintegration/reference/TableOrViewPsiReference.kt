@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 
-class TableOrViewPsiReference(target: DbReferenceExpression, private val table: DasTable, forColumn: Boolean = false) :
+class TableOrViewPsiReference(target: DbReferenceExpression, private val table: DasTable) :
     PsiReferenceBase<PsiElement>(
         target.expression,
         if (target.schema.isNotEmpty()) target.ranges[1] else target.ranges.first()

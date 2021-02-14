@@ -1,31 +1,15 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 
+import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 
 class ColumnsCompletionTest : BaseTestCase() {
-    private fun caretAfterArgs(at: Int, prefix: String = ""): String {
-        var args = ""
-
-        for (arg in 0 until at) {
-            args += "'',"
-        }
-
-        args += "'$prefix<caret>'"
-
-        return args
-    }
-
-    private fun completeFor(from: String, prefix: String, method: String, argument: Int) {
-        myFixture.configureByText(
-            "test.php",
-            run {
-                val args = caretAfterArgs(argument, prefix)
-                "<?php (new Illuminate\\Database\\Query\\Builder())->from('$from')->$method($args)"
-            }
-        )
-        myFixture.completeBasic()
+    private fun completeFor(from: String, prefix: String, method: String, argument: Int, completionType: CompletionType = CompletionType.BASIC) {
+        configureQueryBuilderMethod(from, prefix, method, argument)
+        myFixture.complete(completionType)
     }
 
     fun testCompletesSchemasAndTables() {
@@ -149,6 +133,24 @@ class ColumnsCompletionTest : BaseTestCase() {
                 completeFor("${table.name} as $alias", "$alias.", method, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
+                assertNoCompletion(*notExpected.toList().toTypedArray())
+            }
+        }
+    }
+
+    fun testCompletesColumnsAndSchemasTablesAfterSmartSearch() {
+        val schema = schemas.first()
+        val table = schemaTables[schema]!!.first()
+        val expected = schemasAndTables + DasUtil.getTables(db).first { it.name == table }
+            .getDasChildren(ObjectKind.COLUMN).map { it.name }
+
+        val notExpected = listOf("failed_at")
+
+        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
+            params.forEach { param ->
+                completeFor(table, "", method, param, CompletionType.SMART)
+
+                assertCompletion(*expected.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
             }
         }

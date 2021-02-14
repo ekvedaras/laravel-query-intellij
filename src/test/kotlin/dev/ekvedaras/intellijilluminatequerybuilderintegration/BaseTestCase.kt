@@ -1,10 +1,12 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration
 
+import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.database.Dbms
 import com.intellij.database.dataSource.LocalDataSource
 import com.intellij.database.dataSource.LocalDataSourceManager
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
+import com.intellij.psi.PsiFile
 import com.intellij.sql.database.SqlCommonTestUtils
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.io.File
@@ -43,6 +45,28 @@ abstract class BaseTestCase : BasePlatformTestCase() {
         super.tearDown()
     }
 
+    private fun caretAfterArgs(at: Int, prefix: String = ""): String {
+        var args = ""
+
+        for (arg in 0 until at) {
+            args += "'',"
+        }
+
+        args += "'$prefix<caret>'"
+
+        return args
+    }
+
+    protected fun configureQueryBuilderMethod(from: String, prefix: String, method: String, argument: Int): PsiFile? {
+        return myFixture.configureByText(
+            "test.php",
+            run {
+                val args = caretAfterArgs(argument, prefix)
+                "<?php (new Illuminate\\Database\\Query\\Builder())->from('$from')->$method($args);"
+            }
+        )
+    }
+
     protected fun assertCompletion(vararg shouldContain: String) {
         val strings = myFixture.lookupElementStrings ?: return fail("Empty completion result")
 
@@ -53,5 +77,10 @@ abstract class BaseTestCase : BasePlatformTestCase() {
         val strings = myFixture.lookupElementStrings ?: return
 
         assertDoesntContain(strings, shouldNotContain.asList())
+    }
+
+    protected fun assertInspection(file: PsiFile, inspection: InspectionProfileEntry) {
+        myFixture.enableInspections(inspection)
+        myFixture.testHighlighting(true, false, false, file.virtualFile)
     }
 }
