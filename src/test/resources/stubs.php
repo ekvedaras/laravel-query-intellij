@@ -1,5 +1,22 @@
 <?php
 
+namespace Illuminate\Database\Eloquent {
+    class Model {
+    }
+}
+
+namespace Illuminate\Database\Eloquent\Relations {
+    class Relation {
+    }
+}
+
+namespace Illuminate\Database\Eloquent {
+    class Model {
+    }
+}
+
+
+
 namespace Illuminate\Database\Query {
 class Builder
 {
@@ -1112,6 +1129,87 @@ class Builder
      * @throws \BadMethodCallException
      */
     public function __call($method, $parameters)
+    {
+    }
+}
+
+class JoinClause extends Builder {
+    /**
+     * Add an "on" clause to the join.
+     *
+     * On clauses can be chained, e.g.
+     *
+     *  $join->on('contacts.user_id', '=', 'users.id')
+     *       ->on('contacts.info_id', '=', 'info.id')
+     *
+     * will produce the following SQL:
+     *
+     * on `contacts`.`user_id` = `users`.`id` and `contacts`.`info_id` = `info`.`id`
+     *
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  \Illuminate\Database\Query\Expression|string|null  $second
+     * @param  string  $boolean
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function on($first, $operator = null, $second = null, $boolean = 'and')
+    {
+    }
+
+    /**
+     * Add an "or on" clause to the join.
+     *
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function orOn($first, $operator = null, $second = null)
+    {
+    }
+
+    /**
+     * Get a new instance of the join clause builder.
+     *
+     * @return \Illuminate\Database\Query\JoinClause
+     */
+    public function newQuery()
+    {
+    }
+}
+}
+
+namespace Illuminate\Support\Facades {
+/**
+ * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null)
+ * @method static \Illuminate\Database\Query\Builder table(string $table, string $as = null)
+ * @method static \Illuminate\Database\Query\Expression raw($value)
+ * @method static array prepareBindings(array $bindings)
+ * @method static array pretend(\Closure $callback)
+ * @method static array select(string $query, array $bindings = [], bool $useReadPdo = true)
+ * @method static bool insert(string $query, array $bindings = [])
+ * @method static bool statement(string $query, array $bindings = [])
+ * @method static bool unprepared(string $query)
+ * @method static int affectingStatement(string $query, array $bindings = [])
+ * @method static int delete(string $query, array $bindings = [])
+ * @method static int transactionLevel()
+ * @method static int update(string $query, array $bindings = [])
+ * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)
+ * @method static mixed transaction(\Closure $callback, int $attempts = 1)
+ * @method static string getDefaultConnection()
+ * @method static void beginTransaction()
+ * @method static void commit()
+ * @method static void listen(\Closure $callback)
+ * @method static void rollBack(int $toLevel = null)
+ * @method static void setDefaultConnection(string $name)
+ */
+class DB {
+    /**
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function query()
     {
     }
 }

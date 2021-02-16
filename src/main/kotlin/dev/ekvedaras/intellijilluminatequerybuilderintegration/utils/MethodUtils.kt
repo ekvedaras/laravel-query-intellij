@@ -79,6 +79,11 @@ class MethodUtils {
             }
 
             val list = mutableListOf<MethodReference>()
+
+            if (root is MethodReference) {
+                list.add(root)
+            }
+
             findMethodsInTree(root, list)
             return list
         }

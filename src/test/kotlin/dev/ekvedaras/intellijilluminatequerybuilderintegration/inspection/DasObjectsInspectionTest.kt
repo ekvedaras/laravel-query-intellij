@@ -77,4 +77,9 @@ class DasObjectsInspectionTest : BaseTestCase() {
         val file = myFixture.configureByFile("inspection/columnFromOtherTable.php")
         assertInspection(file!!, UnknownColumnInspection());
     }
+
+    fun testWarnsAboutUnknownTableAndColumn() {
+        val file = myFixture.configureByFile("inspection/unknownTableAndColumn.php")
+        assertInspection(file!!, UnknownColumnInspection());
+    }
 }

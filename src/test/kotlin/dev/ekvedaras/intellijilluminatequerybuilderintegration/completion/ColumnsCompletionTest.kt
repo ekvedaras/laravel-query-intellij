@@ -7,7 +7,13 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 
 class ColumnsCompletionTest : BaseTestCase() {
-    private fun completeFor(from: String, prefix: String, method: String, argument: Int, completionType: CompletionType = CompletionType.BASIC) {
+    private fun completeFor(
+        from: String,
+        prefix: String,
+        method: String,
+        argument: Int,
+        completionType: CompletionType = CompletionType.BASIC
+    ) {
         configureQueryBuilderMethod(from, prefix, method, argument)
         myFixture.complete(completionType)
     }

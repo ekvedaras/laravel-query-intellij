@@ -59,14 +59,14 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         val method = MethodUtils.resolveMethodReference(expression) ?: return
         val methods = mutableListOf<MethodReference>();
 
-        if (method.parentOfType<Statement>()!!.firstChild.firstChild is VariableImpl) {
+        if (method.parentOfType<Statement>()!!.firstPsiChild?.firstPsiChild is VariableImpl) {
             // Resolve all statements for the variable
 
-            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstChild.firstChild).findAll()
+            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstPsiChild!!.firstPsiChild!!.originalElement).findAll()
                 .forEach loop@{ reference ->
-                    val tree = reference.element.parentOfType<Statement>()?.firstChild ?: return@loop
+                    val tree = reference.element.parentOfType<Statement>()?.firstPsiChild ?: return@loop
 
-                    if (tree is AssignmentExpressionImpl) {
+                    if (tree is AssignmentExpressionImpl && tree.lastChild is MethodReference) {
                         methods.addAll(
                             MethodUtils.findMethodsInTree(
                                 tree.lastChild
@@ -86,7 +86,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                         )
                     }
                 }
-        } else {
+        }
+
+        if (methods.isEmpty()) {
             methods.addAll(
                 MethodUtils.findMethodsInTree(
                     if (MethodUtils.resolveMethodClasses(method).any {
@@ -102,39 +104,43 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         }
 
         //<editor-fold desc="Resolve model and table from static call like User::query()">
-        var modelReference = methods.find {
-            (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(method.project)
-                .getClassesByFQN(
-                    (it.firstChild as ClassReferenceImpl).declaredType.types.first()
-                )
-                .first() as PhpClassImpl)
-                .isChildOf(
-                    PhpIndex.getInstance(method.project)
-                        .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
-                        .first()
-                ))
-                    || (it.firstChild is VariableImpl && (PhpIndex.getInstance(method.project)
-                .getClassesByFQN(
-                    (it.firstChild as VariableImpl).declaredType.types.first()
-                )
-                .firstOrNull() as? PhpClassImpl)
-                ?.isChildOf(
-                    PhpIndex.getInstance(method.project)
-                        .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
-                        .first()
-                ) == true)
-        }?.firstChild as? PhpTypedElement
+        var modelReference : PhpTypedElement? = null;
 
-        if (modelReference == null) {
+        if (methods.none { it.name == "from" }) {
             modelReference = methods.find {
-                it.firstChild is ParenthesizedExpressionImpl &&
-                        (PhpIndex.getInstance(method.project)
-                            .getClassesByFQN(
-                                (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
-                            )
-                            .first() as PhpClassImpl)
-                            .isChildOf("\\Illuminate\\Database\\Eloquent\\Model")
-            }?.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? PhpTypedElement
+                (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(method.project)
+                    .getClassesByFQN(
+                        (it.firstChild as ClassReferenceImpl).declaredType.types.first()
+                    )
+                    .first() as PhpClassImpl)
+                    .isChildOf(
+                        PhpIndex.getInstance(method.project)
+                            .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                            .first()
+                    ))
+                        || (it.firstChild is VariableImpl && (PhpIndex.getInstance(method.project)
+                    .getClassesByFQN(
+                        (it.firstChild as VariableImpl).declaredType.types.first()
+                    )
+                    .firstOrNull() as? PhpClassImpl)
+                    ?.isChildOf(
+                        PhpIndex.getInstance(method.project)
+                            .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                            .first()
+                    ) == true)
+            }?.firstChild as? PhpTypedElement
+
+            if (modelReference == null) {
+                modelReference = methods.find {
+                    it.firstChild is ParenthesizedExpressionImpl &&
+                            (PhpIndex.getInstance(method.project)
+                                .getClassesByFQN(
+                                    (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
+                                )
+                                .first() as PhpClassImpl)
+                                .isChildOf("\\Illuminate\\Database\\Eloquent\\Model")
+                }?.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? PhpTypedElement
+            }
         }
 
         if (modelReference != null) {
