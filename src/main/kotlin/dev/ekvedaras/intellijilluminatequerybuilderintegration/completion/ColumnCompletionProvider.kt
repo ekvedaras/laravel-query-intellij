@@ -231,5 +231,6 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-                && parameters.position.parent.parent.elementType?.index?.toInt() == 1889
+                && (parameters.position.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
+                || parameters.position.parent.parent.elementType?.index?.toInt() == 805) // 805 - array value
 }

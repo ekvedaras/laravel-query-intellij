@@ -161,4 +161,22 @@ class ColumnsCompletionTest : BaseTestCase() {
             }
         }
     }
+
+    fun testCompletesColumnsInsideJoinClause() {
+        val tables = DasUtil.getTables(db).filter {
+            it.name == "users" || it.name == "customers"
+        }
+
+        val expected = tables.map { it.name } +
+                (tables.first()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>()) +
+                (tables.last()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>())
+
+        val notExpected = listOf("failed_jobs", "migrations", "testProject2")
+
+        myFixture.configureByFile("inspection/joinColumns.php")
+        myFixture.completeBasic()
+
+        assertCompletion(*expected.toList().toTypedArray())
+        assertNoCompletion(*notExpected.toList().toTypedArray())
+    }
 }

@@ -136,7 +136,8 @@ class UnknownColumnInspection : PhpInspection() {
 
             private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-                        && expression.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
+                        && (expression.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
+                        || expression.parent.parent.elementType?.index?.toInt() == 805) // 805 - array value
         }
     }
 }

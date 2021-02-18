@@ -56,5 +56,6 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, element: PsiElement) =
         !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-                && element.parent.parent.elementType?.index?.toInt() == 1889
+                && (element.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
+                || element.parent.parent.elementType?.index?.toInt() == 805) // 805 - array value
 }

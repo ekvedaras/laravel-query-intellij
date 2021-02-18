@@ -72,10 +72,10 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                                 tree.lastChild
                             )
                         )
-                    } else {
+                    } else if (tree is MethodReference) {
                         methods.addAll(
                             MethodUtils.findMethodsInTree(
-                                if (MethodUtils.resolveMethodClasses(tree as MethodReference).any {
+                                if (MethodUtils.resolveMethodClasses(tree).any {
                                         it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
                                                 || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
                                     })
