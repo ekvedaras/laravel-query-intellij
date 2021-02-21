@@ -2,19 +2,481 @@
 
 namespace Illuminate\Database\Eloquent {
     class Model {
+        /**
+         * Begin querying the model.
+         *
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        public static function query()
+        {
+        }
+
+        /**
+         * Get a new query builder for the model's table.
+         *
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        public function newQuery()
+        {
+        }
+
+        /**
+         * Get a new query builder that doesn't have any global scopes or eager loading.
+         *
+         * @return \Illuminate\Database\Eloquent\Builder|static
+         */
+        public function newModelQuery()
+        {
+        }
+
+        /**
+         * Get a new query builder with no relationships loaded.
+         *
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        public function newQueryWithoutRelationships()
+        {
+        }
+
+        /**
+         * Get a new query builder that doesn't have any global scopes.
+         *
+         * @return \Illuminate\Database\Eloquent\Builder|static
+         */
+        public function newQueryWithoutScopes()
+        {
+        }
+
+        /**
+         * Get a new query instance without a given scope.
+         *
+         * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        public function newQueryWithoutScope($scope)
+        {
+        }
+
+        /**
+         * Get a new query to restore one or more models by their queueable IDs.
+         *
+         * @param  array|int  $ids
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        public function newQueryForRestoration($ids)
+        {
+        }
+
+        /**
+         * Create a new Eloquent query builder for the model.
+         *
+         * @param  \Illuminate\Database\Query\Builder  $query
+         * @return \Illuminate\Database\Eloquent\Builder|static
+         */
+        public function newEloquentBuilder($query)
+        {
+        }
+
+        /**
+         * Get a new query builder instance for the connection.
+         *
+         * @return \Illuminate\Database\Query\Builder
+         */
+        protected function newBaseQueryBuilder()
+        {
+        }
     }
+
+    /**
+         * @property-read HigherOrderBuilderProxy $orWhere
+         *
+         * @mixin \Illuminate\Database\Query\Builder
+         */
+        class Builder
+        {
+            /**
+             * Create and return an un-saved model instance.
+             *
+             * @param  array  $attributes
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function make(array $attributes = [])
+            {
+            }
+
+            /**
+             * Add a basic where clause to the query.
+             *
+             * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+             * @param  mixed  $operator
+             * @param  mixed  $value
+             * @param  string  $boolean
+             * @return $this
+             */
+            public function where($column, $operator = null, $value = null, $boolean = 'and')
+            {
+            }
+
+            /**
+             * Add a basic where clause to the query, and return the first result.
+             *
+             * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
+             * @param  mixed  $operator
+             * @param  mixed  $value
+             * @param  string  $boolean
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
+            {
+            }
+
+            /**
+             * Add an "or where" clause to the query.
+             *
+             * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
+             * @param  mixed  $operator
+             * @param  mixed  $value
+             * @return $this
+             */
+            public function orWhere($column, $operator = null, $value = null)
+            {
+            }
+
+            /**
+             * Add an "order by" clause for a timestamp to the query.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @return $this
+             */
+            public function latest($column = null)
+            {
+            }
+
+            /**
+             * Add an "order by" clause for a timestamp to the query.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @return $this
+             */
+            public function oldest($column = null)
+            {
+            }
+
+            /**
+             * Find a model by its primary key.
+             *
+             * @param  mixed  $id
+             * @param  array  $columns
+             * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
+             */
+            public function find($id, $columns = ['*'])
+            {
+            }
+
+            /**
+             * Find multiple models by their primary keys.
+             *
+             * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
+             * @param  array  $columns
+             * @return \Illuminate\Database\Eloquent\Collection
+             */
+            public function findMany($ids, $columns = ['*'])
+            {
+            }
+
+            /**
+             * Find a model by its primary key or throw an exception.
+             *
+             * @param  mixed  $id
+             * @param  array  $columns
+             * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
+             *
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             */
+            public function findOrFail($id, $columns = ['*'])
+            {
+            }
+
+            /**
+             * Find a model by its primary key or return fresh model instance.
+             *
+             * @param  mixed  $id
+             * @param  array  $columns
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function findOrNew($id, $columns = ['*'])
+            {
+            }
+
+            /**
+             * Get the first record matching the attributes or instantiate it.
+             *
+             * @param  array  $attributes
+             * @param  array  $values
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function firstOrNew(array $attributes = [], array $values = [])
+            {
+            }
+
+            /**
+             * Get the first record matching the attributes or create it.
+             *
+             * @param  array  $attributes
+             * @param  array  $values
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function firstOrCreate(array $attributes = [], array $values = [])
+            {
+            }
+
+            /**
+             * Create or update a record matching the attributes, and fill it with values.
+             *
+             * @param  array  $attributes
+             * @param  array  $values
+             * @return \Illuminate\Database\Eloquent\Model|static
+             */
+            public function updateOrCreate(array $attributes, array $values = [])
+            {
+            }
+
+            /**
+             * Execute the query and get the first result or throw an exception.
+             *
+             * @param  array  $columns
+             * @return \Illuminate\Database\Eloquent\Model|static
+             *
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             */
+            public function firstOrFail($columns = ['*'])
+            {
+            }
+
+            /**
+             * Execute the query and get the first result or call a callback.
+             *
+             * @param  \Closure|array  $columns
+             * @param  \Closure|null  $callback
+             * @return \Illuminate\Database\Eloquent\Model|static|mixed
+             */
+            public function firstOr($columns = ['*'], Closure $callback = null)
+            {
+            }
+
+            /**
+             * Execute the query and get the first result if it's the sole matching record.
+             *
+             * @param  array|string  $columns
+             * @return \Illuminate\Database\Eloquent\Model
+             *
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             * @throws \Illuminate\Database\MultipleRecordsFoundException
+             */
+            public function sole($columns = ['*'])
+            {
+            }
+
+            /**
+             * Get a single column's value from the first result of a query.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @return mixed
+             */
+            public function value($column)
+            {
+            }
+
+            /**
+             * Execute the query as a "select" statement.
+             *
+             * @param  array|string  $columns
+             * @return \Illuminate\Database\Eloquent\Collection|static[]
+             */
+            public function get($columns = ['*'])
+            {
+            }
+
+            /**
+             * Get the hydrated models without eager loading.
+             *
+             * @param  array|string  $columns
+             * @return \Illuminate\Database\Eloquent\Model[]|static[]
+             */
+            public function getModels($columns = ['*'])
+            {
+            }
+
+            /**
+             * Get the relation instance for the given relation name.
+             *
+             * @param  string  $name
+             * @return \Illuminate\Database\Eloquent\Relations\Relation
+             */
+            public function getRelation($name)
+            {
+            }
+
+            /**
+             * Get an array with the values of a given column.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @param  string|null  $key
+             * @return \Illuminate\Support\Collection
+             */
+            public function pluck($column, $key = null)
+            {
+            }
+
+            /**
+             * Paginate the given query.
+             *
+             * @param  int|null  $perPage
+             * @param  array  $columns
+             * @param  string  $pageName
+             * @param  int|null  $page
+             * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+             *
+             * @throws \InvalidArgumentException
+             */
+            public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+            {
+            }
+
+            /**
+             * Paginate the given query into a simple paginator.
+             *
+             * @param  int|null  $perPage
+             * @param  array  $columns
+             * @param  string  $pageName
+             * @param  int|null  $page
+             * @return \Illuminate\Contracts\Pagination\Paginator
+             */
+            public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+            {
+            }
+
+            /**
+             * Save a new model and return the instance.
+             *
+             * @param  array  $attributes
+             * @return \Illuminate\Database\Eloquent\Model|$this
+             */
+            public function create(array $attributes = [])
+            {
+            }
+
+            /**
+             * Save a new model and return the instance. Allow mass-assignment.
+             *
+             * @param  array  $attributes
+             * @return \Illuminate\Database\Eloquent\Model|$this
+             */
+            public function forceCreate(array $attributes)
+            {
+            }
+
+            /**
+             * Update records in the database.
+             *
+             * @param  array  $values
+             * @return int
+             */
+            public function update(array $values)
+            {
+            }
+
+            /**
+             * Insert new records or update the existing ones.
+             *
+             * @param  array  $values
+             * @param  array|string  $uniqueBy
+             * @param  array|null  $update
+             * @return int
+             */
+            public function upsert(array $values, $uniqueBy, $update = null)
+            {
+            }
+
+            /**
+             * Increment a column's value by a given amount.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @param  float|int  $amount
+             * @param  array  $extra
+             * @return int
+             */
+            public function increment($column, $amount = 1, array $extra = [])
+            {
+            }
+
+            /**
+             * Decrement a column's value by a given amount.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @param  float|int  $amount
+             * @param  array  $extra
+             * @return int
+             */
+            public function decrement($column, $amount = 1, array $extra = [])
+            {
+            }
+
+            /**
+             * Set the relationships that should be eager loaded.
+             *
+             * @param  string|array  $relations
+             * @param  string|\Closure|null  $callback
+             * @return $this
+             */
+            public function with($relations, $callback = null)
+            {
+            }
+
+            /**
+             * Prevent the specified relations from being eager loaded.
+             *
+             * @param  mixed  $relations
+             * @return $this
+             */
+            public function without($relations)
+            {
+            }
+
+            /**
+             * Get the underlying query builder instance.
+             *
+             * @return \Illuminate\Database\Query\Builder
+             */
+            public function getQuery()
+            {
+            }
+
+            /**
+             * Get a base query builder instance.
+             *
+             * @return \Illuminate\Database\Query\Builder
+             */
+            public function toBase()
+            {
+            }
+
+            /**
+             * Qualify the given column name by the model's table.
+             *
+             * @param  string|\Illuminate\Database\Query\Expression  $column
+             * @return string
+             */
+            public function qualifyColumn($column)
+            {
+            }
+        }
 }
 
 namespace Illuminate\Database\Eloquent\Relations {
     class Relation {
     }
 }
-
-namespace Illuminate\Database\Eloquent {
-    class Model {
-    }
-}
-
 
 
 namespace Illuminate\Database\Query {

@@ -1,15 +1,11 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.edgeCases
 
-import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
-import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownColumnInspection
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownTableOrViewInspection
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.ColumnPsiReference
-import junit.framework.TestCase
 
 class EdgeCasesTest : BaseTestCase() {
     fun testClassCastException1() {
@@ -27,7 +23,8 @@ class EdgeCasesTest : BaseTestCase() {
     fun testNonQueryBuilderTableMethod() {
         val file = myFixture.configureByFile("edgeCases/nonQueryBuilderTableMethod.php")
         val schema = DasUtil.getSchemas(db).first()
-        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
+        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
+            ?: return fail("Failed to resolve DB schema")
 
         myFixture.completeBasic()
         assertEmpty(myFixture.lookupElementStrings?.toList() ?: listOf<String>())
@@ -38,7 +35,8 @@ class EdgeCasesTest : BaseTestCase() {
     fun testNonQueryBuilderColumnMethod() {
         val file = myFixture.configureByFile("edgeCases/nonQueryBuilderColumnMethod.php")
         val schema = DasUtil.getSchemas(db).first()
-        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
+        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
+            ?: return fail("Failed to resolve DB schema")
 
         myFixture.completeBasic()
         assertEmpty(myFixture.lookupElementStrings?.toList() ?: listOf<String>())

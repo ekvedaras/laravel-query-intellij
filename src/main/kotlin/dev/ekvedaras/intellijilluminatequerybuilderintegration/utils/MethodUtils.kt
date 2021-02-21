@@ -7,7 +7,6 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
-import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaClass
 
 class MethodUtils {
     companion object {
@@ -89,12 +88,12 @@ class MethodUtils {
         }
 
         fun firstChildOfType(parent: PsiElement, type: String): PsiElement? {
-            for(child in parent.children) {
+            for (child in parent.children) {
                 if (child.javaClass.name == type) {
                     return child
                 } else if (child.children.isNotEmpty()) {
                     val find = firstChildOfType(child, type)
-                    if (find != null)  {
+                    if (find != null) {
                         return find
                     }
                 }

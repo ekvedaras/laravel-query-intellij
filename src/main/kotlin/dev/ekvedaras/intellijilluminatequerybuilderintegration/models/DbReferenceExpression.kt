@@ -18,6 +18,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
+import java.util.*
 
 class DbReferenceExpression(val expression: PsiElement, private val type: Type) {
     companion object {
@@ -266,6 +267,11 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
     }
 
     private fun findExpressionReferences() {
+        val syncSchema = Collections.synchronizedList(schema)
+        val syncTable = Collections.synchronizedList(table)
+        val syncColumn = Collections.synchronizedList(column)
+
+
         /**
          * For table
          */
@@ -275,7 +281,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 DasUtil.getSchemas(dataSource)
                     .toList().parallelStream()
                     .filter { it.name == parts.first() }
-                    .forEach { schema.add(it) }
+                    .forEach { syncSchema.add(it) }
             }
 
             if (parts.size == 1) {
@@ -284,9 +290,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getTables(dataSource).toList().parallelStream().forEach {
                         if (it.name == parts.last()) {
-                            table.add(it)
+                            syncTable.add(it)
                         } else if (tablesAndAliases[parts.last()]?.first == it.name) {
-                            table.add(it)
+                            syncTable.add(it)
                             alias = it.name
                         }
                     }
@@ -298,13 +304,13 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     .toList().parallelStream()
                     .forEach { dataSource ->
                         DasUtil.getSchemas(dataSource).toList().parallelStream()
-                            .filter { schema.contains(it) }
+                            .filter { syncSchema.contains(it) }
                             .forEach { namespace ->
                                 DasUtil.getTables(dataSource)
                                     .toList().parallelStream()
                                     .filter { it.dasParent?.name == namespace.name }
                                     .filter { it.name == parts.last() }
-                                    .forEach { table.add(it) }
+                                    .forEach { syncTable.add(it) }
                             }
                     }
             }
@@ -320,19 +326,19 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
-                        .forEach { schema.add(it) }
+                        .forEach { syncSchema.add(it) }
 
                     DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
                         if (dasTable.name == parts.first()) {
-                            table.add(dasTable)
+                            syncTable.add(dasTable)
                         } else if (tablesAndAliases[parts.first()]?.first == dasTable.name) {
-                            table.add(dasTable)
+                            syncTable.add(dasTable)
                             alias = dasTable.name
                         }
 
                         DasUtil.getColumns(dasTable).toList().parallelStream()
                             .filter { it.name == parts.first() }
-                            .forEach { column.add(it) }
+                            .forEach { syncColumn.add(it) }
                     }
                 }
 
@@ -345,23 +351,23 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
-                        .forEach { schema.add(it) }
+                        .forEach { syncSchema.add(it) }
 
                     DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
                         if (schema.isEmpty() || schema.contains(dasTable.dasParent)) {
                             if (dasTable.name == parts.first() || dasTable.name == parts.last()) {
-                                table.add(dasTable)
+                                syncTable.add(dasTable)
 
                                 DasUtil.getColumns(dasTable).toList().parallelStream()
                                     .filter { it.name == parts.last() }
-                                    .forEach { column.add(it) }
+                                    .forEach { syncColumn.add(it) }
                             } else if (schema.isEmpty() && (tablesAndAliases[parts.first()]?.first == dasTable.name || tablesAndAliases[parts.last()]?.first == dasTable.name)) {
-                                table.add(dasTable)
+                                syncTable.add(dasTable)
                                 alias = dasTable.name
 
                                 DasUtil.getColumns(dasTable).toList().parallelStream()
                                     .filter { it.name == parts.last() }
-                                    .forEach { column.add(it) }
+                                    .forEach { syncColumn.add(it) }
                             }
                         }
                     }
@@ -371,25 +377,25 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
-                        .forEach { schema.add(it) }
+                        .forEach { syncSchema.add(it) }
 
                     DasUtil.getTables(dataSource)
                         .toList().parallelStream()
                         .filter { schema.contains(it.dasParent) }
                         .forEach { dasTable ->
                             if (dasTable.name == parts[1]) {
-                                table.add(dasTable)
+                                syncTable.add(dasTable)
 
                                 DasUtil.getColumns(dasTable).toList().parallelStream()
                                     .filter { it.name == parts.last() }
-                                    .forEach { column.add(it) }
+                                    .forEach { syncColumn.add(it) }
                             } else if (tablesAndAliases[parts[1]]?.first == dasTable.name) {
-                                table.add(dasTable)
+                                syncTable.add(dasTable)
                                 alias = dasTable.name
 
                                 DasUtil.getColumns(dasTable).toList().parallelStream()
                                     .filter { it.name == parts.last() }
-                                    .forEach { column.add(it) }
+                                    .forEach { syncColumn.add(it) }
                             }
                         }
                 }
