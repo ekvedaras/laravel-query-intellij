@@ -22,12 +22,13 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 }
 
                 val method = MethodUtils.resolveMethodReference(expression) ?: return
+                val project = method.project
 
                 if (shouldNotCompleteCurrentParam(method, expression)) {
                     return
                 }
 
-                if (!LaravelUtils.isQueryBuilderMethod(method)) {
+                if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
                     return
                 }
 

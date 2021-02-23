@@ -1,6 +1,7 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
@@ -28,20 +29,20 @@ class MethodUtils {
         /**
          * Resolve in which classes given method may be defined
          */
-        fun resolveMethodClasses(method: MethodReference): List<PhpClassImpl> {
-            if (DumbService.isDumb(method.project) || method.classReference == null) {
+        fun resolveMethodClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
+            if (DumbService.isDumb(project) || method.classReference == null) {
                 return listOf()
             }
 
             val classes = mutableListOf<PhpClassImpl>()
 
             PhpIndex
-                .getInstance(method.project)
-                .completeType(method.project, method.classReference!!.declaredType, null)
+                .getInstance(project)
+                .completeType(project, method.classReference!!.declaredType, null)
                 .types
                 .toList()
                 .forEach {
-                    PhpIndex.getInstance(method.project)
+                    PhpIndex.getInstance(project)
                         .getClassesByFQN(it)
                         .forEach { clazz -> classes.add(clazz as PhpClassImpl) }
                 }
@@ -73,7 +74,7 @@ class MethodUtils {
          * Usually the root element should be a first child of PSI Statement
          */
         fun findMethodsInTree(root: PsiElement): MutableList<MethodReference> {
-            if (root.text == "return" || root.text == " ") {
+            if (root.textMatches("return") || root.textMatches(" ")) {
                 return findMethodsInTree(root.nextSibling)
             }
 

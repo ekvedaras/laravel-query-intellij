@@ -27,6 +27,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
         result: CompletionResultSet
     ) {
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
+        val project = method.project
 
         if (shouldNotCompleteCurrentParameter(method, parameters)) {
             return
@@ -36,7 +37,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
             return
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method)) {
+        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
             return
         }
 
@@ -45,7 +46,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
         if (target.parts.size == 1) {
             val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-            DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 DasUtil.getSchemas(dataSource)
                     .toList().parallelStream()
                     .filter { completeFullList || schemas.isEmpty() || schemas.contains(it.name) }
@@ -60,7 +61,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                             .withTailText(" (" + it.name + ")", true)
                                             .withTypeText(dataSource.name, true)
                                             .withIcon(
-                                                DasPsiWrappingSymbol(dasTable, method.project).getIcon(false)
+                                                DasPsiWrappingSymbol(dasTable, project).getIcon(false)
                                             )
                                             .withInsertHandler(
                                                 DeclarativeInsertHandler.Builder()
@@ -76,7 +77,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                         result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
-                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                 .withTypeText(dataSource.name, true)
                                 .withInsertHandler(
                                     DeclarativeInsertHandler.Builder()
@@ -109,7 +110,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
                         if (table != null) {
                             lookup = lookup.withIcon(
-                                DasPsiWrappingSymbol(table, method.project).getIcon(false)
+                                DasPsiWrappingSymbol(table, project).getIcon(false)
                             )
 
                             table.getDasChildren(ObjectKind.COLUMN)
@@ -118,7 +119,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                     result.addElement(
                                         LookupElementBuilder
                                             .create(column, column.name)
-                                            .withIcon(DasPsiWrappingSymbol(column, method.project).getIcon(false))
+                                            .withIcon(DasPsiWrappingSymbol(column, project).getIcon(false))
                                             .withTypeText(table.name)
                                             .withInsertHandler(
                                                 DeclarativeInsertHandler.Builder().build()
@@ -132,7 +133,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                 }
             }
         } else if (target.parts.size == 2) {
-            DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 if (target.schema.isNotEmpty()) {
                     target.schema.parallelStream().forEach { schema ->
                         schema.getDasChildren(ObjectKind.TABLE)
@@ -143,7 +144,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                 result.addElement(
                                     LookupElementBuilder
                                         .create(it, it.name)
-                                        .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                        .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                         .withTailText(" (" + it.dasParent?.name + ")", true)
                                         .withTypeText(dataSource.name, true)
                                         .withLookupString(lookup)
@@ -157,7 +158,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                                 false,
                                                 true
                                             )
-                                            AutoPopupController.getInstance(method.project)
+                                            AutoPopupController.getInstance(project)
                                                 .scheduleAutoPopup(context.editor)
                                         }
                                 )
@@ -172,7 +173,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                 result.addElement(
                                     LookupElementBuilder
                                         .create(it, it.name)
-                                        .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                        .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                         .withLookupString(lookup)
                                         .withInsertHandler { context, _ ->
                                             context.document.deleteString(context.startOffset, context.tailOffset)
@@ -199,7 +200,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                         result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
-                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                 .withLookupString(lookup)
                                 .withInsertHandler { context, _ ->
                                     context.document.deleteString(context.startOffset, context.tailOffset)

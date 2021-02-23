@@ -28,6 +28,8 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         }
     }
 
+    private val project = expression.project
+
     val tablesAndAliases = mutableMapOf<String, Pair<String, String?>>()
     val aliases = mutableMapOf<String, Pair<String, PsiElement>>()
 
@@ -58,6 +60,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
     private fun collectTablesAndAliases() {
         val method = MethodUtils.resolveMethodReference(expression) ?: return
+        val project = expression.project
         val methods = mutableListOf<MethodReference>();
 
         if (method.parentOfType<Statement>()!!.firstPsiChild?.firstPsiChild is VariableImpl) {
@@ -76,7 +79,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     } else if (tree is MethodReference) {
                         methods.addAll(
                             MethodUtils.findMethodsInTree(
-                                if (MethodUtils.resolveMethodClasses(tree).any {
+                                if (MethodUtils.resolveMethodClasses(tree, project).any {
                                         it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
                                                 || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
                                     })
@@ -92,7 +95,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         if (methods.isEmpty()) {
             methods.addAll(
                 MethodUtils.findMethodsInTree(
-                    if (MethodUtils.resolveMethodClasses(method).any {
+                    if (MethodUtils.resolveMethodClasses(method, project).any {
                             it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
                                     || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
                         })
@@ -109,23 +112,23 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
         if (methods.none { it.name == "from" }) {
             modelReference = methods.find {
-                (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(method.project)
+                (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(project)
                     .getClassesByFQN(
                         (it.firstChild as ClassReferenceImpl).declaredType.types.first()
                     )
                     .first() as PhpClassImpl)
                     .isChildOf(
-                        PhpIndex.getInstance(method.project)
+                        PhpIndex.getInstance(project)
                             .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
                             .first()
                     ))
-                        || (it.firstChild is VariableImpl && (PhpIndex.getInstance(method.project)
+                        || (it.firstChild is VariableImpl && (PhpIndex.getInstance(project)
                     .getClassesByFQN(
                         (it.firstChild as VariableImpl).declaredType.types.first()
                     )
                     .firstOrNull() as? PhpClassImpl)
                     ?.isChildOf(
-                        PhpIndex.getInstance(method.project)
+                        PhpIndex.getInstance(project)
                             .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
                             .first()
                     ) == true)
@@ -134,7 +137,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             if (modelReference == null) {
                 modelReference = methods.find {
                     it.firstChild is ParenthesizedExpressionImpl &&
-                            (PhpIndex.getInstance(method.project)
+                            (PhpIndex.getInstance(project)
                                 .getClassesByFQN(
                                     (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
                                 )
@@ -145,7 +148,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         }
 
         if (modelReference != null) {
-            val model = PhpIndex.getInstance(method.project)
+            val model = PhpIndex.getInstance(project)
                 .getClassesByFQN(modelReference.declaredType.types.first())
                 .first()
 
@@ -177,7 +180,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
 
                         if (firstParam != null) {
                             if (firstParam is ClassConstantReferenceImpl) {
-                                val relationModel = PhpIndex.getInstance(method.project)
+                                val relationModel = PhpIndex.getInstance(project)
                                     .getClassesByFQN(firstParam.classReference?.declaredType?.types?.first())
                                     .first()
 
@@ -226,7 +229,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     val table = referencedTable.substringBefore("as").trim()
 
                     if (referencedSchema == null) {
-                        DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+                        DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                             val dasTable =
                                 DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == table }
                             if (dasTable != null) {
@@ -241,7 +244,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
 
                 if (referencedSchema == null) {
-                    DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+                    DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                         val dasTable =
                             DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == referencedTable }
                         if (dasTable != null) {
@@ -277,7 +280,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
          */
         if (type == Type.Table) {
             // 1. 'schema' or 'schema.table'
-            DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 DasUtil.getSchemas(dataSource)
                     .toList().parallelStream()
                     .filter { it.name == parts.first() }
@@ -287,7 +290,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             if (parts.size == 1) {
                 // 2. 'table'
 
-                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getTables(dataSource).toList().parallelStream().forEach {
                         if (it.name == parts.last()) {
                             syncTable.add(it)
@@ -300,7 +303,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             } else if (parts.size == 2) {
                 // 3. 'schema.table'
 
-                DbUtil.getDataSources(expression.project)
+                DbUtil.getDataSources(project)
                     .toList().parallelStream()
                     .forEach { dataSource ->
                         DasUtil.getSchemas(dataSource).toList().parallelStream()
@@ -323,7 +326,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 2. 'table'
                 // 3. 'schema'
                 // 4. 'alias'
-                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }
@@ -348,7 +351,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 5. 'table.column'
                 // 6. 'schema.table'
                 // 7. 'alias.column'
-                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }
@@ -374,7 +377,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
             } else if (parts.size == 3) {
                 // 8. 'schema.table.column
-                DbUtil.getDataSources(expression.project).toList().parallelStream().forEach { dataSource ->
+                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                     DasUtil.getSchemas(dataSource).toList().parallelStream()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }

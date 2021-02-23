@@ -22,7 +22,7 @@ class SchemaTableColumnReferenceTest : BaseTestCase() {
 
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(ColumnPsiReference::class.java, usages.first().referenceClass)
-        TestCase.assertEquals("'id'", usages.first().element?.text)
+        TestCase.assertTrue(usages.first().element?.textMatches("'id'") ?: false)
         TestCase.assertEquals(82, usages.first().navigationRange.startOffset)
         TestCase.assertEquals(82 + column.name.length, usages.first().navigationRange.endOffset)
     }
@@ -45,8 +45,8 @@ class SchemaTableColumnReferenceTest : BaseTestCase() {
         TestCase.assertEquals(TableOrViewPsiReference::class.java, tableUsages.last().referenceClass)
         TestCase.assertEquals(ColumnPsiReference::class.java, columnUsages.first().referenceClass)
 
-        TestCase.assertEquals("'users.id'", tableUsages.last().element?.text)
-        TestCase.assertEquals("'users.id'", columnUsages.first().element?.text)
+        TestCase.assertTrue(tableUsages.last().element?.textMatches("'users.id'") ?: false)
+        TestCase.assertTrue(columnUsages.first().element?.textMatches("'users.id'") ?: false)
 
         TestCase.assertEquals(82, tableUsages.last().navigationRange.startOffset)
         TestCase.assertEquals(82 + table.name.length + 1, columnUsages.first().navigationRange.startOffset)
@@ -78,9 +78,9 @@ class SchemaTableColumnReferenceTest : BaseTestCase() {
         TestCase.assertEquals(TableOrViewPsiReference::class.java, tableUsages.first().referenceClass)
         TestCase.assertEquals(ColumnPsiReference::class.java, columnUsages.first().referenceClass)
 
-        TestCase.assertEquals("'testProject1.users.id'", schemaUsages.last().element?.text)
-        TestCase.assertEquals("'testProject1.users.id'", tableUsages.last().element?.text)
-        TestCase.assertEquals("'testProject1.users.id'", columnUsages.first().element?.text)
+        TestCase.assertTrue(schemaUsages.last().element?.textMatches("'testProject1.users.id'") ?: false)
+        TestCase.assertTrue(tableUsages.last().element?.textMatches("'testProject1.users.id'") ?: false)
+        TestCase.assertTrue(columnUsages.first().element?.textMatches("'testProject1.users.id'") ?: false)
 
         TestCase.assertEquals(82, schemaUsages.last().navigationRange.startOffset)
         TestCase.assertEquals(82 + schema.name.length + 1, tableUsages.last().navigationRange.startOffset)

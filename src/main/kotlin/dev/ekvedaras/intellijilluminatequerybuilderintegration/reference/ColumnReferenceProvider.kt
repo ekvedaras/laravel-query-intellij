@@ -14,6 +14,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 class ColumnReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
+        val project = method.project
 
         if (shouldNotCompleteCurrentParameter(method, element)) {
             return PsiReference.EMPTY_ARRAY
@@ -23,7 +24,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method)) {
+        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
             return PsiReference.EMPTY_ARRAY
         }
 

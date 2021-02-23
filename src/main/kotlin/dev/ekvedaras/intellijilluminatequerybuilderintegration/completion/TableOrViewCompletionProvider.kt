@@ -24,25 +24,26 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         result: CompletionResultSet
     ) {
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
+        val project = method.project
 
         if (shouldNotCompleteCurrentParam(method, parameters)) {
             return
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method)) {
+        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
             return
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
 
         if (target.parts.size == 1) {
-            DbUtil.getDataSources(method.project).toList().parallelStream().forEach { dataSource ->
+            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 DasUtil.getSchemas(dataSource).toList().parallelStream()
                     .forEach {
                         result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
-                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                 .withTypeText(dataSource.name, true)
                                 .withInsertHandler(
                                     DeclarativeInsertHandler.Builder()
@@ -61,7 +62,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
                         result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
-                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                 .withTailText(" (" + it.dasParent?.name + ")", true)
                                 .withTypeText(dataSource.name, true)
                                 .withInsertHandler(
@@ -82,7 +83,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
                                 .create(it, it.name)
                                 .withLookupString(lookup)
                                 .withTypeText(schema.name)
-                                .withIcon(DasPsiWrappingSymbol(it, method.project).getIcon(false))
+                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                 .withInsertHandler { context, _ ->
                                     context.document.deleteString(context.startOffset, context.tailOffset)
                                     context.document.insertString(context.startOffset, lookup)

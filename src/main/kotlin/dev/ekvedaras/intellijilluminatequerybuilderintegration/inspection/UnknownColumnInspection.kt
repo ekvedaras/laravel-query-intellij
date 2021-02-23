@@ -23,6 +23,7 @@ class UnknownColumnInspection : PhpInspection() {
                 }
 
                 val method = MethodUtils.resolveMethodReference(expression) ?: return
+                val project = method.project
 
                 if (shouldNotCompleteCurrentParameter(method, expression)) {
                     return
@@ -32,7 +33,7 @@ class UnknownColumnInspection : PhpInspection() {
                     return
                 }
 
-                if (!LaravelUtils.isQueryBuilderMethod(method)) {
+                if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
                     return
                 }
 

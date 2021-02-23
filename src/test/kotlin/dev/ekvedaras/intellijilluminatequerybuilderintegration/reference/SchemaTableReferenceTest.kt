@@ -18,7 +18,7 @@ class SchemaTableReferenceTest : BaseTestCase() {
 
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(SchemaPsiReference::class.java, usages.first().referenceClass)
-        TestCase.assertEquals("'testProject1'", usages.first().element?.text)
+        TestCase.assertTrue(usages.first().element?.textMatches("'testProject1'") ?: false)
         TestCase.assertEquals(55, usages.first().navigationRange.startOffset)
         TestCase.assertEquals(55 + schema.name.length, usages.first().navigationRange.endOffset)
     }
@@ -33,7 +33,7 @@ class SchemaTableReferenceTest : BaseTestCase() {
 
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(TableOrViewPsiReference::class.java, usages.first().referenceClass)
-        TestCase.assertEquals("'users'", usages.first().element?.text)
+        TestCase.assertTrue(usages.first().element?.textMatches("'users'") ?: false)
         TestCase.assertEquals(55, usages.first().navigationRange.startOffset)
         TestCase.assertEquals(55 + table.name.length, usages.first().navigationRange.endOffset)
     }
@@ -56,8 +56,8 @@ class SchemaTableReferenceTest : BaseTestCase() {
         TestCase.assertEquals(SchemaPsiReference::class.java, schemaUsages.first().referenceClass)
         TestCase.assertEquals(TableOrViewPsiReference::class.java, tableUsages.first().referenceClass)
 
-        TestCase.assertEquals("'testProject1.users'", schemaUsages.first().element?.text)
-        TestCase.assertEquals("'testProject1.users'", tableUsages.first().element?.text)
+        TestCase.assertTrue(schemaUsages.first().element?.textMatches("'testProject1.users'") ?: false)
+        TestCase.assertTrue(tableUsages.first().element?.textMatches("'testProject1.users'") ?: false)
 
         TestCase.assertEquals(55, schemaUsages.first().navigationRange.startOffset)
         TestCase.assertEquals(55 + schema.name.length + 1, tableUsages.first().navigationRange.startOffset)

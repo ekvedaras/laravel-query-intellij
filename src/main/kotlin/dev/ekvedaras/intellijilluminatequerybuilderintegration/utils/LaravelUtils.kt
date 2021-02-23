@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.intellij.openapi.project.Project
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 
@@ -137,8 +138,8 @@ class LaravelUtils {
         )
         //</editor-fold>
 
-        fun isQueryBuilderMethod(method: MethodReference): Boolean {
-            return MethodUtils.resolveMethodClasses(method).any { clazz ->
+        fun isQueryBuilderMethod(method: MethodReference, project: Project): Boolean {
+            return MethodUtils.resolveMethodClasses(method, project).any { clazz ->
                 DatabaseBuilderClasses.any {
                     clazz.isChildOf(it)
                 }
