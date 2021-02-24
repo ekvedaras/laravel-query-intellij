@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
@@ -40,7 +41,6 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
         if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
             return
         }
-
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
 
@@ -121,6 +121,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                             .create(column, column.name)
                                             .withIcon(DasPsiWrappingSymbol(column, project).getIcon(false))
                                             .withTypeText(table.name)
+                                            .withTailText( "  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" } + if (it.comment != null) { "  ${it.comment}" } else { "" })
                                             .withInsertHandler(
                                                 DeclarativeInsertHandler.Builder().build()
                                             )
@@ -165,7 +166,11 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                             }
                     }
                 } else {
-                    target.table.parallelStream().forEach { table ->
+                    target.table.filter {
+                        target.tablesAndAliases.isEmpty() ||
+                                target.tablesAndAliases.contains(it.name) &&
+                                target.tablesAndAliases[it.name]?.second == it.dasParent?.name
+                    }.parallelStream().forEach { table ->
                         table.getDasChildren(ObjectKind.COLUMN)
                             .toList().parallelStream()
                             .forEach {
@@ -175,6 +180,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                         .create(it, it.name)
                                         .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                         .withLookupString(lookup)
+                                        .withTailText("  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" })
+                                        .withTypeText(if (it.comment != null) { it.comment } else { "" })
                                         .withInsertHandler { context, _ ->
                                             context.document.deleteString(context.startOffset, context.tailOffset)
                                             context.document.insertString(context.startOffset, lookup)
@@ -201,6 +208,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                             LookupElementBuilder
                                 .create(it, it.name)
                                 .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
+                                .withTailText( "  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" })
+                                .withTypeText(if (it.comment != null) { it.comment } else { "" })
                                 .withLookupString(lookup)
                                 .withInsertHandler { context, _ ->
                                     context.document.deleteString(context.startOffset, context.tailOffset)
