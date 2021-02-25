@@ -49,14 +49,18 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotCompleteCurrentParameter(method: MethodReference, element: PsiElement) =
-        element.textContains('$')
-                || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
-                || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(element))
-                && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
-                || (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
+        element.textContains('$') ||
+            !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name) ||
+            (
+                !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(element)) &&
+                    !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)
+                ) ||
+            (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, element: PsiElement) =
-        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-                && (element.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
-                || element.parent.parent.elementType?.index?.toInt() == 805) // 805 - array value
+        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name) &&
+            (
+                element.parent.parent.elementType?.index?.toInt() == 1889 || // 1889 - array expression
+                    element.parent.parent.elementType?.index?.toInt() == 805
+                ) // 805 - array value
 }

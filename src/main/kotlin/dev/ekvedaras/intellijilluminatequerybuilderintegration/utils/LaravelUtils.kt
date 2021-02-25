@@ -6,7 +6,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.
 
 class LaravelUtils {
     companion object {
-        //<editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
+        // <editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
         @JvmStatic
         val DatabaseBuilderClasses = listOf(
             "\\Illuminate\\Database\\Query\\Builder",
@@ -14,9 +14,9 @@ class LaravelUtils {
             "\\Illuminate\\Database\\Query\\JoinClause",
             "\\Illuminate\\Database\\Eloquent\\Relations\\Relation",
         )
-        //</editor-fold>
+        // </editor-fold>
 
-        //<editor-fold desc="Query builder methods where table name should be completed" defaultstate="collapsed">
+        // <editor-fold desc="Query builder methods where table name should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableMethods = listOf(
             "from",
@@ -25,18 +25,18 @@ class LaravelUtils {
             "rightJoin", "rightJoinWhere",
             "crossJoin",
         )
-        //</editor-fold>
+        // </editor-fold>
 
-        //<editor-fold desc="Query builder table methods param indexes where table alias is defined" defaultstate="collapsed">
+        // <editor-fold desc="Query builder table methods param indexes where table alias is defined" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableAliasParams = hashMapOf(
             "from" to 1,
             "fromSub" to 1,
             "selectSub" to 1,
         )
-        //</editor-fold>
+        // </editor-fold>
 
-        //<editor-fold desc="Query builder methods and params where columns should be completed" defaultstate="collapsed">
+        // <editor-fold desc="Query builder methods and params where columns should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableColumnsParams = mapOf(
             "select" to listOf(-1),
@@ -127,16 +127,16 @@ class LaravelUtils {
             "update" to listOf(0),
             "on" to listOf(0, 1, 2),
         )
-        //</editor-fold>
+        // </editor-fold>
 
-        //<editor-fold desc="Query builder methods where params may accept columns as array values" defaultstate="collapsed">
+        // <editor-fold desc="Query builder methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         val BuilderMethodsWithTableColumnsInArrayValues = listOf(
             "get", "select",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
         )
-        //</editor-fold>
+        // </editor-fold>
 
         fun isQueryBuilderMethod(method: MethodReference, project: Project): Boolean {
             return MethodUtils.resolveMethodClasses(method, project).any { clazz ->
@@ -146,5 +146,4 @@ class LaravelUtils {
             }
         }
     }
-
 }

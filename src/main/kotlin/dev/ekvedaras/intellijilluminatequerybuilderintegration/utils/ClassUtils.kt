@@ -9,8 +9,7 @@ import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 class ClassUtils {
     companion object {
         @JvmStatic
-        fun PhpClassImpl.isChildOf(clazz: PhpClass): Boolean
-        {
+        fun PhpClassImpl.isChildOf(clazz: PhpClass): Boolean {
             if (this.fqn == clazz.fqn) {
                 return true
             }
@@ -23,8 +22,7 @@ class ClassUtils {
         }
 
         @JvmStatic
-        fun PhpClassImpl.isChildOf(clazz: String): Boolean
-        {
+        fun PhpClassImpl.isChildOf(clazz: String): Boolean {
             if (this.fqn == clazz.asPhpClass(project)?.fqn) {
                 return true
             }
@@ -37,20 +35,18 @@ class ClassUtils {
         }
 
         @JvmStatic
-        fun String.asPhpClass(project: Project): PhpClass?
-        {
+        fun String.asPhpClass(project: Project): PhpClass? {
             return PhpIndex.getInstance(project).getClassesByFQN(this).firstOrNull()
         }
 
         @JvmStatic
-        fun PhpClass.asTableName(): String
-        {
+        fun PhpClass.asTableName(): String {
             val table = this.name.fold(StringBuilder(this.name.length)) { acc, c ->
                 if (c in 'A'..'Z') (if (acc.isNotEmpty()) acc.append('_') else acc).append(c + ('a' - 'A'))
                 else acc.append(c)
             }.toString()
 
-            val parts = table.split("_");
+            val parts = table.split("_")
 
             if (parts.size == 1) {
                 return table.pluralize()

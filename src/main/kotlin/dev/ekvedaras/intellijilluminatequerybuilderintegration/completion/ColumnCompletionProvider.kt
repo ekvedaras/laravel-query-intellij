@@ -8,15 +8,17 @@ import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasTable
-import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
-import com.intellij.database.util.DbUtil
 import com.intellij.psi.util.elementType
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.columnsInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import java.util.*
@@ -52,14 +54,12 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
             val addedColumns = mutableListOf<String>()
             val syncAddedColumns = Collections.synchronizedList(addedColumns)
 
-            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                DasUtil.getSchemas(dataSource)
-                    .toList().parallelStream()
+            project.dbDataSourcesInParallel().forEach { dataSource ->
+                dataSource.schemasInParallel()
                     .filter { completeFullList || schemas.isEmpty() || schemas.contains(it.name) }
-                    .forEach {
+                    .forEach { schema ->
                         if (target.tablesAndAliases.isEmpty() || completeFullList) {
-                            it.getDasChildren(ObjectKind.TABLE)
-                                .toList().parallelStream()
+                            schema.tablesInParallel()
                                 .filter { dasTable ->
                                     dasTable is DasTable && !dasTable.isSystem && !addedTables.contains(
                                         dasTable.name
@@ -69,7 +69,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                     result.addElement(
                                         LookupElementBuilder
                                             .create(dasTable.name)
-                                            .withTailText(" (" + it.name + ")", true)
+                                            .withTailText(" (" + schema.name + ")", true)
                                             .withTypeText(dataSource.name, true)
                                             .withIcon(
                                                 DasPsiWrappingSymbol(dasTable, project).getIcon(false)
@@ -89,8 +89,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
                         result.addElement(
                             LookupElementBuilder
-                                .create(it, it.name)
-                                .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
+                                .create(schema, schema.name)
+                                .withIcon(DasPsiWrappingSymbol(schema, project).getIcon(false))
                                 .withTypeText(dataSource.name, true)
                                 .withInsertHandler(
                                     DeclarativeInsertHandler.Builder()
@@ -126,8 +126,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                 DasPsiWrappingSymbol(table, project).getIcon(false)
                             )
 
-                            table.getDasChildren(ObjectKind.COLUMN)
-                                .toList().parallelStream()
+                            table.columnsInParallel()
                                 .filter { column -> (column is DasColumn) && !addedColumns.contains(column.name) }
                                 .forEach { column ->
                                     result.addElement(
@@ -165,11 +164,10 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
             val addedColumns = mutableListOf<String>()
             val syncAddedColumns = Collections.synchronizedList(addedColumns)
 
-            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
+            project.dbDataSourcesInParallel().forEach { dataSource ->
                 if (target.schema.isNotEmpty()) {
                     target.schema.parallelStream().forEach { schema ->
-                        schema.getDasChildren(ObjectKind.TABLE)
-                            .toList().parallelStream()
+                        schema.tablesInParallel()
                             .filter { it is DasTable && !it.isSystem && !addedTables.contains(it.name) }
                             .forEach {
                                 val lookup = target.parts.first() + "." + it.name
@@ -200,8 +198,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                     }
                 } else {
                     target.table.parallelStream().forEach { table ->
-                        table.getDasChildren(ObjectKind.COLUMN)
-                            .toList().parallelStream()
+                        table.columnsInParallel()
                             .filter { it is DasColumn && !addedColumns.contains(it.name) }
                             .forEach {
                                 val lookup = target.parts.first() + "." + it.name
@@ -247,8 +244,7 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
             val syncAddedColumns = Collections.synchronizedList(addedColumns)
 
             target.table.parallelStream().forEach { table ->
-                table.getDasChildren(ObjectKind.COLUMN)
-                    .toList().parallelStream()
+                table.columnsInParallel()
                     .filter { it is DasColumn && !addedColumns.contains(it.name) }
                     .forEach {
                         val lookup = target.parts.first() + "." + target.parts[1] + "." + it.name
@@ -291,18 +287,22 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
     }
 
     private fun shouldNotCompleteCurrentParameter(method: MethodReference, parameters: CompletionParameters) =
-        parameters.position.textContains('$')
-                || !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name)
-                || (!LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(
-            MethodUtils.findParameterIndex(
-                parameters.position
-            )
-        )
-                && !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1))
-                || (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
+        parameters.position.textContains('$') ||
+                !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name) ||
+                (
+                        !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(
+                            MethodUtils.findParameterIndex(
+                                parameters.position
+                            )
+                        ) &&
+                                !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)
+                        ) ||
+                (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
 
     private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
-        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name)
-                && (parameters.position.parent.parent.elementType?.index?.toInt() == 1889 // 1889 - array expression
-                || parameters.position.parent.parent.elementType?.index?.toInt() == 805) // 805 - array value
+        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name) &&
+                (
+                        parameters.position.parent.parent.elementType?.index?.toInt() == 1889 || // 1889 - array expression
+                                parameters.position.parent.parent.elementType?.index?.toInt() == 805
+                        ) // 805 - array value
 }

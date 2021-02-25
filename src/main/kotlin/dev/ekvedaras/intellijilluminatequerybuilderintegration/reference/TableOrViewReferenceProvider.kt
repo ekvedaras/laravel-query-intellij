@@ -1,7 +1,5 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 
-import com.intellij.database.util.DasUtil
-import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
@@ -35,7 +33,7 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotCompleteCurrentParam(method: MethodReference, element: PsiElement) =
-        !LaravelUtils.BuilderTableMethods.contains(method.name)
-                || MethodUtils.findParameterIndex(element) != 0
-                || (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
+        !LaravelUtils.BuilderTableMethods.contains(method.name) ||
+            MethodUtils.findParameterIndex(element) != 0 ||
+            (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
 }

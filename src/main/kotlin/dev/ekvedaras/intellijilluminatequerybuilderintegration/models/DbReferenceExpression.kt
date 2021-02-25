@@ -3,8 +3,6 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.models
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
-import com.intellij.database.util.DasUtil
-import com.intellij.database.util.DbUtil
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -16,6 +14,11 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.*
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.columnsInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import java.util.*
@@ -61,12 +64,13 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
     private fun collectTablesAndAliases() {
         val method = MethodUtils.resolveMethodReference(expression) ?: return
         val project = expression.project
-        val methods = mutableListOf<MethodReference>();
+        val methods = mutableListOf<MethodReference>()
 
         if (method.parentOfType<Statement>()!!.firstPsiChild?.firstPsiChild is VariableImpl) {
             // Resolve all statements for the variable
 
-            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstPsiChild!!.firstPsiChild!!.originalElement).findAll()
+            ReferencesSearch.search(method.parentOfType<Statement>()!!.firstPsiChild!!.firstPsiChild!!.originalElement)
+                .findAll()
                 .forEach loop@{ reference ->
                     val tree = reference.element.parentOfType<Statement>()?.firstPsiChild ?: return@loop
 
@@ -80,9 +84,10 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                         methods.addAll(
                             MethodUtils.findMethodsInTree(
                                 if (MethodUtils.resolveMethodClasses(tree, project).any {
-                                        it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
-                                                || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
-                                    })
+                                        it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" ||
+                                                it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+                                    }
+                                )
                                     tree.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
                                 else
                                     tree.parent
@@ -96,9 +101,10 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             methods.addAll(
                 MethodUtils.findMethodsInTree(
                     if (MethodUtils.resolveMethodClasses(method, project).any {
-                            it.fqn == "\\Illuminate\\Database\\Query\\JoinClause"
-                                    || it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
-                        })
+                            it.fqn == "\\Illuminate\\Database\\Query\\JoinClause" ||
+                                    it.fqn == "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+                        }
+                    )
                         method.parentOfType<Statement>()!!.parentOfType<Statement>()!!
                             .parentOfType<Statement>()!!.firstChild
                     else
@@ -107,41 +113,51 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             )
         }
 
-        //<editor-fold desc="Resolve model and table from static call like User::query()">
-        var modelReference : PhpTypedElement? = null;
+        // <editor-fold desc="Resolve model and table from static call like User::query()">
+        var modelReference: PhpTypedElement? = null
 
         if (methods.none { it.name == "from" }) {
             modelReference = methods.find {
-                (it.firstChild is ClassReferenceImpl && (PhpIndex.getInstance(project)
-                    .getClassesByFQN(
-                        (it.firstChild as ClassReferenceImpl).declaredType.types.first()
-                    )
-                    .first() as PhpClassImpl)
-                    .isChildOf(
-                        PhpIndex.getInstance(project)
-                            .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
-                            .first()
-                    ))
-                        || (it.firstChild is VariableImpl && (PhpIndex.getInstance(project)
-                    .getClassesByFQN(
-                        (it.firstChild as VariableImpl).declaredType.types.first()
-                    )
-                    .firstOrNull() as? PhpClassImpl)
-                    ?.isChildOf(
-                        PhpIndex.getInstance(project)
-                            .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
-                            .first()
-                    ) == true)
+                (
+                        it.firstChild is ClassReferenceImpl && (
+                                PhpIndex.getInstance(project)
+                                    .getClassesByFQN(
+                                        (it.firstChild as ClassReferenceImpl).declaredType.types.first()
+                                    )
+                                    .first() as PhpClassImpl
+                                )
+                            .isChildOf(
+                                PhpIndex.getInstance(project)
+                                    .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                                    .first()
+                            )
+                        ) ||
+                        (
+                                it.firstChild is VariableImpl && (
+                                        PhpIndex.getInstance(project)
+                                            .getClassesByFQN(
+                                                (it.firstChild as VariableImpl).declaredType.types.first()
+                                            )
+                                            .firstOrNull() as? PhpClassImpl
+                                        )
+                                    ?.isChildOf(
+                                        PhpIndex.getInstance(project)
+                                            .getClassesByFQN("\\Illuminate\\Database\\Eloquent\\Model")
+                                            .first()
+                                    ) == true
+                                )
             }?.firstChild as? PhpTypedElement
 
             if (modelReference == null) {
                 modelReference = methods.find {
                     it.firstChild is ParenthesizedExpressionImpl &&
-                            (PhpIndex.getInstance(project)
-                                .getClassesByFQN(
-                                    (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
-                                )
-                                .first() as PhpClassImpl)
+                            (
+                                    PhpIndex.getInstance(project)
+                                        .getClassesByFQN(
+                                            (it.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
+                                        )
+                                        .first() as PhpClassImpl
+                                    )
                                 .isChildOf("\\Illuminate\\Database\\Eloquent\\Model")
                 }?.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? PhpTypedElement
             }
@@ -161,7 +177,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 tablesAndAliases[name] = name to null
             }
 
-            val deepParent = method.parent?.parent?.parent?.parent?.parent?.parent;
+            val deepParent = method.parent?.parent?.parent?.parent?.parent?.parent
             if (deepParent is ArrayHashElementImpl && deepParent.parentOfType<MethodReferenceImpl>()?.name == "with") {
                 val relationName = deepParent.firstChild.text.replace("'", "").replace("\"", "")
                 val relationMethod = model.methods.firstOrNull { it.name == relationName }
@@ -173,10 +189,12 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     )
 
                     if (returnStatement != null) {
-                        val firstParam = (MethodUtils.firstChildOfType(
-                            returnStatement,
-                            ParameterListImpl::class.java.name
-                        ) as? ParameterListImpl)?.getParameter(0)
+                        val firstParam = (
+                                MethodUtils.firstChildOfType(
+                                    returnStatement,
+                                    ParameterListImpl::class.java.name
+                                ) as? ParameterListImpl
+                                )?.getParameter(0)
 
                         if (firstParam != null) {
                             if (firstParam is ClassConstantReferenceImpl) {
@@ -200,7 +218,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
             }
         }
-        //</editor-fold>
+        // </editor-fold>
 
         methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
@@ -229,9 +247,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     val table = referencedTable.substringBefore("as").trim()
 
                     if (referencedSchema == null) {
-                        DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
+                        project.dbDataSourcesInParallel().forEach { dataSource ->
                             val dasTable =
-                                DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == table }
+                                dataSource.tables().firstOrNull { dasTable -> dasTable.name == table }
                             if (dasTable != null) {
                                 referencedSchema = dasTable.dasParent?.name
                             }
@@ -244,9 +262,9 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
 
                 if (referencedSchema == null) {
-                    DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
+                    project.dbDataSourcesInParallel().forEach { dataSource ->
                         val dasTable =
-                            DasUtil.getTables(dataSource).firstOrNull { dasTable -> dasTable.name == referencedTable }
+                            dataSource.tables().firstOrNull { dasTable -> dasTable.name == referencedTable }
                         if (dasTable != null) {
                             referencedSchema = dasTable.dasParent?.name
                         }
@@ -274,15 +292,13 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         val syncTable = Collections.synchronizedList(table)
         val syncColumn = Collections.synchronizedList(column)
 
-
         /**
          * For table
          */
         if (type == Type.Table) {
             // 1. 'schema' or 'schema.table'
-            DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                DasUtil.getSchemas(dataSource)
-                    .toList().parallelStream()
+            project.dbDataSourcesInParallel().forEach { dataSource ->
+                dataSource.schemasInParallel()
                     .filter { it.name == parts.first() }
                     .forEach { syncSchema.add(it) }
             }
@@ -290,8 +306,8 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             if (parts.size == 1) {
                 // 2. 'table'
 
-                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                    DasUtil.getTables(dataSource).toList().parallelStream().forEach {
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.tablesInParallel().forEach {
                         if (it.name == parts.last()) {
                             syncTable.add(it)
                         } else if (tablesAndAliases[parts.last()]?.first == it.name) {
@@ -303,19 +319,16 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
             } else if (parts.size == 2) {
                 // 3. 'schema.table'
 
-                DbUtil.getDataSources(project)
-                    .toList().parallelStream()
-                    .forEach { dataSource ->
-                        DasUtil.getSchemas(dataSource).toList().parallelStream()
-                            .filter { syncSchema.contains(it) }
-                            .forEach { namespace ->
-                                DasUtil.getTables(dataSource)
-                                    .toList().parallelStream()
-                                    .filter { it.dasParent?.name == namespace.name }
-                                    .filter { it.name == parts.last() }
-                                    .forEach { syncTable.add(it) }
-                            }
-                    }
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel()
+                        .filter { syncSchema.contains(it) }
+                        .forEach { schema ->
+                            dataSource.tablesInParallel()
+                                .filter { it.dasParent?.name == schema.name }
+                                .filter { it.name == parts.last() }
+                                .forEach { syncTable.add(it) }
+                        }
+                }
             }
         } else if (type == Type.Column) {
             /**
@@ -326,12 +339,12 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 // 2. 'table'
                 // 3. 'schema'
                 // 4. 'alias'
-                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }
 
-                    DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
+                    dataSource.tablesInParallel().forEach { dasTable ->
                         if (dasTable.name == parts.first()) {
                             syncTable.add(dasTable)
                         } else if (tablesAndAliases[parts.first()]?.first == dasTable.name) {
@@ -339,36 +352,35 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                             alias = dasTable.name
                         }
 
-                        DasUtil.getColumns(dasTable).toList().parallelStream()
+                        dasTable.columnsInParallel()
                             .filter { it.name == parts.first() }
                             .forEach { syncColumn.add(it) }
                     }
                 }
 
                 // 4. 'alias'
-
             } else if (parts.size == 2) {
                 // 5. 'table.column'
                 // 6. 'schema.table'
                 // 7. 'alias.column'
-                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }
 
-                    DasUtil.getTables(dataSource).toList().parallelStream().forEach { dasTable ->
+                    dataSource.tablesInParallel().forEach { dasTable ->
                         if (schema.isEmpty() || schema.contains(dasTable.dasParent)) {
                             if (dasTable.name == parts.first() || dasTable.name == parts.last()) {
                                 syncTable.add(dasTable)
 
-                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                dasTable.columnsInParallel()
                                     .filter { it.name == parts.last() }
                                     .forEach { syncColumn.add(it) }
                             } else if (schema.isEmpty() && (tablesAndAliases[parts.first()]?.first == dasTable.name || tablesAndAliases[parts.last()]?.first == dasTable.name)) {
                                 syncTable.add(dasTable)
                                 alias = dasTable.name
 
-                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                dasTable.columnsInParallel()
                                     .filter { it.name == parts.last() }
                                     .forEach { syncColumn.add(it) }
                             }
@@ -377,26 +389,25 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                 }
             } else if (parts.size == 3) {
                 // 8. 'schema.table.column
-                DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
-                    DasUtil.getSchemas(dataSource).toList().parallelStream()
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel()
                         .filter { it.name == parts.first() }
                         .forEach { syncSchema.add(it) }
 
-                    DasUtil.getTables(dataSource)
-                        .toList().parallelStream()
+                    dataSource.tablesInParallel()
                         .filter { schema.contains(it.dasParent) }
                         .forEach { dasTable ->
                             if (dasTable.name == parts[1]) {
                                 syncTable.add(dasTable)
 
-                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                dasTable.columnsInParallel()
                                     .filter { it.name == parts.last() }
                                     .forEach { syncColumn.add(it) }
                             } else if (tablesAndAliases[parts[1]]?.first == dasTable.name) {
                                 syncTable.add(dasTable)
                                 alias = dasTable.name
 
-                                DasUtil.getColumns(dasTable).toList().parallelStream()
+                                dasTable.columnsInParallel()
                                     .filter { it.name == parts.last() }
                                     .forEach { syncColumn.add(it) }
                             }

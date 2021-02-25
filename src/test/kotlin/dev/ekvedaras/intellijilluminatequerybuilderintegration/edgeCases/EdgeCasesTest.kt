@@ -29,7 +29,7 @@ class EdgeCasesTest : BaseTestCase() {
         myFixture.completeBasic()
         assertEmpty(myFixture.lookupElementStrings?.toList() ?: listOf<String>())
         assertEmpty(myFixture.findUsages(dbSchema))
-        assertInspection(file!!, UnknownTableOrViewInspection());
+        assertInspection(file!!, UnknownTableOrViewInspection())
     }
 
     fun testNonQueryBuilderColumnMethod() {
@@ -41,7 +41,7 @@ class EdgeCasesTest : BaseTestCase() {
         myFixture.completeBasic()
         assertEmpty(myFixture.lookupElementStrings?.toList() ?: listOf<String>())
         assertEmpty(myFixture.findUsages(dbSchema))
-        assertInspection(file!!, UnknownColumnInspection());
+        assertInspection(file!!, UnknownColumnInspection())
     }
 
     fun testDoesNotResolvesColumnReferenceIfStringContainsDollarSign() {

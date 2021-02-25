@@ -25,13 +25,13 @@ class ColumnsCompletionTest : BaseTestCase() {
         val columns = DasUtil.getColumns(table)
 
         val expected = columns.map { it.name } + // All selected table columns
-                listOf(
-                    table.name,                 // Table itself
-                    table.dasParent!!.name      // Table schema
-                )
+            listOf(
+                table.name, // Table itself
+                table.dasParent!!.name // Table schema
+            )
 
         val notExpected = schemas.filter { it != table.dasParent!!.name } + // All other schemas
-                schemaTables.values.flatten().filter { it != table.name }   // All other tables
+            schemaTables.values.flatten().filter { it != table.name } // All other tables
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -48,9 +48,9 @@ class ColumnsCompletionTest : BaseTestCase() {
         val table = schemaTables[schema]!!.first()
         val expected = schemaTables[schema]!!
 
-        val notExpected = schemas.filterNot { it == schema } +                                 // All other schemas
-                schemaTables.entries.filterNot { it.key == schema }.map { it.value }
-                    .flatten() // Tables of other schemas
+        val notExpected = schemas.filterNot { it == schema } + // All other schemas
+            schemaTables.entries.filterNot { it.key == schema }.map { it.value }
+                .flatten() // Tables of other schemas
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -72,12 +72,12 @@ class ColumnsCompletionTest : BaseTestCase() {
             .lastOrNull() ?: return fail("Did not find any tables.")
 
         val notExpected =
-            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
-                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                        .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(lastTable)
-                        .filterNot { columns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+            schemas.filterNot { it == table.dasParent?.name } + // All other schemas
+                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                    .flatten() + // Tables of other schemas
+                DasUtil.getColumns(lastTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -99,12 +99,12 @@ class ColumnsCompletionTest : BaseTestCase() {
             .lastOrNull() ?: return fail("Did not find any tables.")
 
         val notExpected =
-            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
-                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                        .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(lastTable)
-                        .filterNot { columns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+            schemas.filterNot { it == table.dasParent?.name } + // All other schemas
+                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                    .flatten() + // Tables of other schemas
+                DasUtil.getColumns(lastTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -127,12 +127,12 @@ class ColumnsCompletionTest : BaseTestCase() {
         val alias = "${table.name}_alias"
 
         val notExpected =
-            schemas.filterNot { it == table.dasParent?.name } +                         // All other schemas
-                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                        .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(lastTable)
-                        .filterNot { columns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+            schemas.filterNot { it == table.dasParent?.name } + // All other schemas
+                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                    .flatten() + // Tables of other schemas
+                DasUtil.getColumns(lastTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
             params.forEach { param ->
@@ -168,8 +168,8 @@ class ColumnsCompletionTest : BaseTestCase() {
         }
 
         val expected = tables.map { it.name } +
-                (tables.first()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>()) +
-                (tables.last()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>())
+            (tables.first()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>()) +
+            (tables.last()?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>())
 
         val notExpected = listOf("failed_jobs", "migrations", "testProject2")
 

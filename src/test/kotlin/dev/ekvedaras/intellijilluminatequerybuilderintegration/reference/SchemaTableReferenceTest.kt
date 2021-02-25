@@ -14,7 +14,7 @@ class SchemaTableReferenceTest : BaseTestCase() {
         val schema = DasUtil.getSchemas(db).first { it.name == "testProject1" }
         val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
 
-        val usages = myFixture.findUsages(dbSchema);
+        val usages = myFixture.findUsages(dbSchema)
 
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(SchemaPsiReference::class.java, usages.first().referenceClass)
@@ -29,7 +29,7 @@ class SchemaTableReferenceTest : BaseTestCase() {
         val table = DasUtil.getTables(db).first { it.name == "users" }
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table) ?: return fail("Failed to resolve DB table")
 
-        val usages = myFixture.findUsages(dbTable);
+        val usages = myFixture.findUsages(dbTable)
 
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(TableOrViewPsiReference::class.java, usages.first().referenceClass)
@@ -47,8 +47,8 @@ class SchemaTableReferenceTest : BaseTestCase() {
         val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table) ?: return fail("Failed to resolve DB table")
 
-        val schemaUsages = myFixture.findUsages(dbSchema);
-        val tableUsages = myFixture.findUsages(dbTable);
+        val schemaUsages = myFixture.findUsages(dbSchema)
+        val tableUsages = myFixture.findUsages(dbTable)
 
         UsefulTestCase.assertSize(1, schemaUsages)
         UsefulTestCase.assertSize(1, tableUsages)

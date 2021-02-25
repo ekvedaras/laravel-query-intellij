@@ -13,15 +13,15 @@ class ModelReferenceTest : BaseTestCase() {
         val columns = DasUtil.getColumns(table).map { it.name }
         val otherTable = DasUtil.getTables(db)
             .filterNot { it.name == "users" }
-            .lastOrNull() ?: return  fail("Did not find any tables.")
+            .lastOrNull() ?: return fail("Did not find any tables.")
 
         val expected = schemas + columns
         val notExpected =
-                    schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                        .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(otherTable)
-                        .filterNot { columns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+            schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                .flatten() + // Tables of other schemas
+                DasUtil.getColumns(otherTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         myFixture.completeBasic()
         assertCompletion(*expected.toList().toTypedArray())
@@ -42,10 +42,10 @@ class ModelReferenceTest : BaseTestCase() {
         val expected = schemas + columns
         val notExpected =
             schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(otherTable)
-                        .filterNot { columns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+                .flatten() + // Tables of other schemas
+                DasUtil.getColumns(otherTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         myFixture.completeBasic()
         assertCompletion(*expected.toList().toTypedArray())
@@ -73,10 +73,10 @@ class ModelReferenceTest : BaseTestCase() {
         val expected = schemas + usersColumns + customersColumns
         val notExpected =
             schemaTables.entries.filterNot { it.key == users.dasParent?.name }.map { it.value }
-                .flatten() +                                                                      // Tables of other schemas
-                    DasUtil.getColumns(otherTable)
-                        .filterNot { usersColumns.contains(it.name) || customersColumns.contains(it.name) }
-                        .map { it.name }                                                                  // Columns of other table
+                .flatten() + // Tables of other schemas
+                DasUtil.getColumns(otherTable)
+                    .filterNot { usersColumns.contains(it.name) || customersColumns.contains(it.name) }
+                    .map { it.name } // Columns of other table
 
         myFixture.completeBasic()
         assertCompletion(*expected.toList().toTypedArray())
