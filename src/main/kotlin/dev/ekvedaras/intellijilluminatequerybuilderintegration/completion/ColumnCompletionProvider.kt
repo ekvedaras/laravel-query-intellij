@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
+import java.util.*
 
 class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
     CompletionProvider<CompletionParameters>() {
@@ -46,6 +47,11 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
         if (target.parts.size == 1) {
             val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
+            val addedTables = mutableListOf<String>()
+            val syncAddedTables = Collections.synchronizedList(addedTables)
+            val addedColumns = mutableListOf<String>()
+            val syncAddedColumns = Collections.synchronizedList(addedColumns)
+
             DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 DasUtil.getSchemas(dataSource)
                     .toList().parallelStream()
@@ -54,6 +60,11 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                         if (target.tablesAndAliases.isEmpty() || completeFullList) {
                             it.getDasChildren(ObjectKind.TABLE)
                                 .toList().parallelStream()
+                                .filter { dasTable ->
+                                    dasTable is DasTable && !dasTable.isSystem && !addedTables.contains(
+                                        dasTable.name
+                                    )
+                                }
                                 .forEach { dasTable ->
                                     result.addElement(
                                         LookupElementBuilder
@@ -71,6 +82,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                                     .build()
                                             )
                                     )
+
+                                    syncAddedTables.add(dasTable.name)
                                 }
                         }
 
@@ -115,17 +128,30 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
 
                             table.getDasChildren(ObjectKind.COLUMN)
                                 .toList().parallelStream()
+                                .filter { column -> (column is DasColumn) && !addedColumns.contains(column.name) }
                                 .forEach { column ->
                                     result.addElement(
                                         LookupElementBuilder
                                             .create(column, column.name)
                                             .withIcon(DasPsiWrappingSymbol(column, project).getIcon(false))
                                             .withTypeText(table.name)
-                                            .withTailText( "  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" } + if (it.comment != null) { "  ${it.comment}" } else { "" })
+                                            .withTailText(
+                                                "  " + (column as DasColumn).dataType.toString() + if (column.default != null) {
+                                                    " = ${column.default}"
+                                                } else {
+                                                    ""
+                                                } + if (column.comment != null) {
+                                                    "  ${column.comment}"
+                                                } else {
+                                                    ""
+                                                }
+                                            )
                                             .withInsertHandler(
                                                 DeclarativeInsertHandler.Builder().build()
                                             )
                                     )
+
+                                    syncAddedColumns.add(column.name)
                                 }
                         }
 
@@ -134,12 +160,17 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                 }
             }
         } else if (target.parts.size == 2) {
+            val addedTables = mutableListOf<String>()
+            val syncAddedTables = Collections.synchronizedList(addedTables)
+            val addedColumns = mutableListOf<String>()
+            val syncAddedColumns = Collections.synchronizedList(addedColumns)
+
             DbUtil.getDataSources(project).toList().parallelStream().forEach { dataSource ->
                 if (target.schema.isNotEmpty()) {
                     target.schema.parallelStream().forEach { schema ->
                         schema.getDasChildren(ObjectKind.TABLE)
                             .toList().parallelStream()
-                            .filter { !(it as DasTable).isSystem }
+                            .filter { it is DasTable && !it.isSystem && !addedTables.contains(it.name) }
                             .forEach {
                                 val lookup = target.parts.first() + "." + it.name
                                 result.addElement(
@@ -163,16 +194,15 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                                 .scheduleAutoPopup(context.editor)
                                         }
                                 )
+
+                                syncAddedTables.add(it.name)
                             }
                     }
                 } else {
-                    target.table.filter {
-                        target.tablesAndAliases.isEmpty() ||
-                                target.tablesAndAliases.contains(it.name) &&
-                                target.tablesAndAliases[it.name]?.second == it.dasParent?.name
-                    }.parallelStream().forEach { table ->
+                    target.table.parallelStream().forEach { table ->
                         table.getDasChildren(ObjectKind.COLUMN)
                             .toList().parallelStream()
+                            .filter { it is DasColumn && !addedColumns.contains(it.name) }
                             .forEach {
                                 val lookup = target.parts.first() + "." + it.name
                                 result.addElement(
@@ -180,8 +210,20 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                         .create(it, it.name)
                                         .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
                                         .withLookupString(lookup)
-                                        .withTailText("  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" })
-                                        .withTypeText(if (it.comment != null) { it.comment } else { "" })
+                                        .withTailText(
+                                            "  " + (it as DasColumn).dataType.toString() + if (it.default != null) {
+                                                " = ${it.default}"
+                                            } else {
+                                                ""
+                                            }
+                                        )
+                                        .withTypeText(
+                                            if (it.comment != null) {
+                                                it.comment
+                                            } else {
+                                                ""
+                                            }
+                                        )
                                         .withInsertHandler { context, _ ->
                                             context.document.deleteString(context.startOffset, context.tailOffset)
                                             context.document.insertString(context.startOffset, lookup)
@@ -194,22 +236,40 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                             )
                                         }
                                 )
+
+                                syncAddedColumns.add(it.name)
                             }
                     }
                 }
             }
         } else if (target.parts.size == 3) {
+            val addedColumns = mutableListOf<String>()
+            val syncAddedColumns = Collections.synchronizedList(addedColumns)
+
             target.table.parallelStream().forEach { table ->
                 table.getDasChildren(ObjectKind.COLUMN)
                     .toList().parallelStream()
+                    .filter { it is DasColumn && !addedColumns.contains(it.name) }
                     .forEach {
                         val lookup = target.parts.first() + "." + target.parts[1] + "." + it.name
                         result.addElement(
                             LookupElementBuilder
                                 .create(it, it.name)
                                 .withIcon(DasPsiWrappingSymbol(it, project).getIcon(false))
-                                .withTailText( "  " + (it as DasColumn).dataType.toString() + if (it.default != null) { " = ${it.default}" } else { "" })
-                                .withTypeText(if (it.comment != null) { it.comment } else { "" })
+                                .withTailText(
+                                    "  " + (it as DasColumn).dataType.toString() + if (it.default != null) {
+                                        " = ${it.default}"
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                .withTypeText(
+                                    if (it.comment != null) {
+                                        it.comment
+                                    } else {
+                                        ""
+                                    }
+                                )
                                 .withLookupString(lookup)
                                 .withInsertHandler { context, _ ->
                                     context.document.deleteString(context.startOffset, context.tailOffset)
@@ -223,6 +283,8 @@ class ColumnCompletionProvider(private val completeFullList: Boolean = false) :
                                     )
                                 }
                         )
+
+                        syncAddedColumns.add(it.name)
                     }
             }
         }
