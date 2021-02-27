@@ -14,16 +14,14 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.*
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.columnsInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DbReferenceResolver
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import java.util.*
 
-class DbReferenceExpression(val expression: PsiElement, private val type: Type) {
+class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     companion object {
         enum class Type {
             Table,
@@ -31,7 +29,7 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         }
     }
 
-    private val project = expression.project
+    val project = expression.project
 
     val tablesAndAliases = mutableMapOf<String, Pair<String, String?>>()
     val aliases = mutableMapOf<String, Pair<String, PsiElement>>()
@@ -58,7 +56,8 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
         }
 
         if (type == Type.Column) collectTablesAndAliases()
-        findExpressionReferences()
+
+        DbReferenceResolver(this).resolve()
     }
 
     private fun collectTablesAndAliases() {
@@ -285,135 +284,5 @@ class DbReferenceExpression(val expression: PsiElement, private val type: Type) 
                     aliases[referencedTable] = alias to it.getParameter(aliasParam)!!
                 }
             }
-    }
-
-    private fun findExpressionReferences() {
-        val syncSchema = Collections.synchronizedList(schema)
-        val syncTable = Collections.synchronizedList(table)
-        val syncColumn = Collections.synchronizedList(column)
-
-        /**
-         * For table
-         */
-        if (type == Type.Table) {
-            // 1. 'schema' or 'schema.table'
-            project.dbDataSourcesInParallel().forEach { dataSource ->
-                dataSource.schemasInParallel()
-                    .filter { it.name == parts.first() }
-                    .forEach { syncSchema.add(it) }
-            }
-
-            if (parts.size == 1) {
-                // 2. 'table'
-
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.tablesInParallel().forEach {
-                        if (it.name == parts.last()) {
-                            syncTable.add(it)
-                        } else if (tablesAndAliases[parts.last()]?.first == it.name) {
-                            syncTable.add(it)
-                            alias = it.name
-                        }
-                    }
-                }
-            } else if (parts.size == 2) {
-                // 3. 'schema.table'
-
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel()
-                        .filter { syncSchema.contains(it) }
-                        .forEach { schema ->
-                            dataSource.tablesInParallel()
-                                .filter { it.dasParent?.name == schema.name }
-                                .filter { it.name == parts.last() }
-                                .forEach { syncTable.add(it) }
-                        }
-                }
-            }
-        } else if (type == Type.Column) {
-            /**
-             * For column
-             */
-            if (parts.size == 1) {
-                // 1. 'column'
-                // 2. 'table'
-                // 3. 'schema'
-                // 4. 'alias'
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel()
-                        .filter { it.name == parts.first() }
-                        .forEach { syncSchema.add(it) }
-
-                    dataSource.tablesInParallel().forEach { dasTable ->
-                        if (dasTable.name == parts.first()) {
-                            syncTable.add(dasTable)
-                        } else if (tablesAndAliases[parts.first()]?.first == dasTable.name) {
-                            syncTable.add(dasTable)
-                            alias = dasTable.name
-                        }
-
-                        dasTable.columnsInParallel()
-                            .filter { it.name == parts.first() }
-                            .forEach { syncColumn.add(it) }
-                    }
-                }
-
-                // 4. 'alias'
-            } else if (parts.size == 2) {
-                // 5. 'table.column'
-                // 6. 'schema.table'
-                // 7. 'alias.column'
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel()
-                        .filter { it.name == parts.first() }
-                        .forEach { syncSchema.add(it) }
-
-                    dataSource.tablesInParallel().forEach { dasTable ->
-                        if (schema.isEmpty() || schema.contains(dasTable.dasParent)) {
-                            if (dasTable.name == parts.first() || dasTable.name == parts.last()) {
-                                syncTable.add(dasTable)
-
-                                dasTable.columnsInParallel()
-                                    .filter { it.name == parts.last() }
-                                    .forEach { syncColumn.add(it) }
-                            } else if (schema.isEmpty() && (tablesAndAliases[parts.first()]?.first == dasTable.name || tablesAndAliases[parts.last()]?.first == dasTable.name)) {
-                                syncTable.add(dasTable)
-                                alias = dasTable.name
-
-                                dasTable.columnsInParallel()
-                                    .filter { it.name == parts.last() }
-                                    .forEach { syncColumn.add(it) }
-                            }
-                        }
-                    }
-                }
-            } else if (parts.size == 3) {
-                // 8. 'schema.table.column
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel()
-                        .filter { it.name == parts.first() }
-                        .forEach { syncSchema.add(it) }
-
-                    dataSource.tablesInParallel()
-                        .filter { schema.contains(it.dasParent) }
-                        .forEach { dasTable ->
-                            if (dasTable.name == parts[1]) {
-                                syncTable.add(dasTable)
-
-                                dasTable.columnsInParallel()
-                                    .filter { it.name == parts.last() }
-                                    .forEach { syncColumn.add(it) }
-                            } else if (tablesAndAliases[parts[1]]?.first == dasTable.name) {
-                                syncTable.add(dasTable)
-                                alias = dasTable.name
-
-                                dasTable.columnsInParallel()
-                                    .filter { it.name == parts.last() }
-                                    .forEach { syncColumn.add(it) }
-                            }
-                        }
-                }
-            }
-        }
     }
 }
