@@ -19,13 +19,13 @@ class DatabaseUtils {
             DasUtil.getSchemas(this).toList().parallelStream()
 
         fun DbDataSource.tables() =
-            DasUtil.getTables(this)
+            DasUtil.getTables(this).filter { !it.isSystem }
 
         fun DbDataSource.tablesInParallel(): Stream<out DasTable> =
-            DasUtil.getTables(this).toList().parallelStream()
+            DasUtil.getTables(this).toList().parallelStream().filter { !it.isSystem }
 
         fun DasNamespace.tablesInParallel(): Stream<out DasTable> =
-            this.getDasChildren(ObjectKind.TABLE).toList().parallelStream().map { it as DasTable }
+            this.getDasChildren(ObjectKind.TABLE).toList().parallelStream().map { it as DasTable }.filter { !it.isSystem }
 
         fun DasTable.columnsInParallel(): Stream<out DasColumn> =
             this.getDasChildren(ObjectKind.COLUMN).toList().parallelStream().map { it as DasColumn }

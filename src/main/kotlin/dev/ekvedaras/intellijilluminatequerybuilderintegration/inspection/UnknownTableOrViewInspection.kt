@@ -17,11 +17,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return object : PhpElementVisitor() {
             override fun visitPhpStringLiteralExpression(expression: StringLiteralExpression?) {
-                if (expression == null) {
-                    return
-                }
-
-                val method = MethodUtils.resolveMethodReference(expression) ?: return
+                val method = MethodUtils.resolveMethodReference(expression ?: return) ?: return
                 val project = method.project
 
                 if (shouldNotCompleteCurrentParam(method, expression)) {
@@ -33,41 +29,31 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 }
 
                 val target = DbReferenceExpression(expression, DbReferenceExpression.Companion.Type.Table)
-                if (target.parts.size == 1) {
-                    if (target.table.isEmpty()) {
-                        holder.registerProblem(
-                            expression,
-                            MyBundle.message("unknownTableOrViewDescription"),
-                            ProblemHighlightType.WARNING,
-                            target.ranges.last()
-                        )
-                    }
-                } else if (target.parts.size == 2) {
-                    if (target.schema.isEmpty()) {
-                        holder.registerProblem(
-                            expression,
-                            MyBundle.message("unknownSchemaDescription"),
-                            ProblemHighlightType.WARNING,
-                            target.ranges.first()
-                        )
-                    }
 
-                    if (target.table.isEmpty()) {
-                        holder.registerProblem(
-                            expression,
-                            MyBundle.message("unknownTableOrViewDescription"),
-                            ProblemHighlightType.WARNING,
-                            target.ranges.last()
-                        )
-                    }
+                if (target.table.isEmpty()) {
+                    holder.registerProblem(
+                        expression,
+                        MyBundle.message("unknownTableOrViewDescription"),
+                        ProblemHighlightType.WARNING,
+                        target.ranges.last()
+                    )
+                }
+
+                if (target.parts.size > 1 && target.schema.isEmpty()) {
+                    holder.registerProblem(
+                        expression,
+                        MyBundle.message("unknownSchemaDescription"),
+                        ProblemHighlightType.WARNING,
+                        target.ranges.first()
+                    )
                 }
             }
 
             private fun shouldNotCompleteCurrentParam(method: MethodReference, expression: StringLiteralExpression) =
                 !LaravelUtils.BuilderTableMethods.contains(method.name) ||
-                    MethodUtils.findParameterIndex(expression) != 0 ||
-                    (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference) ||
-                    (expression.parent?.parent is FunctionReference && expression.parent?.parent !is MethodReference)
+                        MethodUtils.findParameterIndex(expression) != 0 ||
+                        (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference) ||
+                        (expression.parent?.parent is FunctionReference && expression.parent?.parent !is MethodReference)
         }
     }
 }
