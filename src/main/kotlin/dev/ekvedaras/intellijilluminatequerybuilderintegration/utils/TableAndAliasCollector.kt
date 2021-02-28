@@ -103,7 +103,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val relationName = deepParent.firstChild.text.unquote()
         val relationMethod = model.methods.firstOrNull { it.name == relationName } ?: return
         val returnStatement = MethodUtils.firstChildOfType(
-            (relationMethod as MethodImpl).lastChild as GroupStatementImpl,
+            relationMethod.lastChild as GroupStatementImpl,
             PhpReturnImpl::class.java.name
         ) ?: return
         val firstParam = (
