@@ -1,18 +1,37 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.parentOfType
+import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.PhpClass
+import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
+import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.unquote
 
 class LaravelUtils {
     companion object {
+        @JvmStatic
+        val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
+
+        @JvmStatic
+        val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+
+        @JvmStatic
+        val Model = "\\Illuminate\\Database\\Eloquent\\Model"
+
         // <editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
         @JvmStatic
         val DatabaseBuilderClasses = listOf(
             "\\Illuminate\\Database\\Query\\Builder",
             "\\Illuminate\\Database\\Eloquent\\Builder",
-            "\\Illuminate\\Database\\Query\\JoinClause",
-            "\\Illuminate\\Database\\Eloquent\\Relations\\Relation",
+            JoinClause,
+            Relation,
         )
         // </editor-fold>
 
@@ -145,5 +164,28 @@ class LaravelUtils {
                 }
             }
         }
+
+        fun modelClass(project: Project): PhpClass =
+            CachedValuesManager.getManager(project).getCachedValue(project) {
+                CachedValueProvider.Result(
+                    PhpIndex.getInstance(project).getClassesByFQN(Model).first(),
+                    project
+                )
+            }
+
+        fun PhpClass.tableName(): String {
+            val tableField = this.fields.find { it.name == "table" }
+
+            if (ClassUtils.fieldHasDefaultValue(tableField)) {
+                return tableField!!.defaultValue!!.text.unquote()
+            }
+
+            return this.asTableName()
+        }
+
+        fun PsiElement.isInsideRelationClosure(): Boolean =
+            this is ArrayHashElementImpl && this.parentOfType<MethodReferenceImpl>()?.name == "with"
+
+        fun PhpClass.isJoinOrRelation(): Boolean = this.fqn == JoinClause || this.fqn == Relation
     }
 }

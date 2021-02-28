@@ -3,11 +3,15 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
+import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
-import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.ParameterList
+import com.jetbrains.php.lang.psi.elements.*
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isJoinOrRelation
+import java.util.stream.Stream
 
 class MethodUtils {
     companion object {
@@ -102,6 +106,25 @@ class MethodUtils {
 
             return null
         }
+
+        fun MethodReference.isJoinOrRelation(project: Project): Boolean =
+            resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
+
+        fun PhpTypedElement.getClass(project: Project): PhpClass =
+            PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.first()).first()
+
+        /**
+         * @todo Should this be in VariableUtils? PsiUtils?
+         */
+        fun Variable.referencesInParallel(): Stream<out PsiReference> =
+            ReferencesSearch
+                .search(this.originalElement)
+                .findAll()
+                .parallelStream()
+
+        fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
+
+        fun String.unquote() = this.trim('\'', '"')
 
         /**
          * Resolve all child method references in given element and add to given list.

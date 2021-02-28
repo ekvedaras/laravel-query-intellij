@@ -3,6 +3,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 import com.cesarferreira.pluralize.pluralize
 import com.intellij.openapi.project.Project
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 
@@ -55,5 +56,7 @@ class ClassUtils {
             val last = parts[parts.size - 1]
             return parts.subList(0, parts.size - 1).joinToString("_") + "_" + last.pluralize()
         }
+
+        fun fieldHasDefaultValue(field: Field?) = field != null && field.defaultValue != null
     }
 }
