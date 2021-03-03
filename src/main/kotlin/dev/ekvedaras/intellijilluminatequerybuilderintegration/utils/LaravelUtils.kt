@@ -2,8 +2,6 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -166,12 +164,7 @@ class LaravelUtils {
         }
 
         fun modelClass(project: Project): PhpClass =
-            CachedValuesManager.getManager(project).getCachedValue(project) {
-                CachedValueProvider.Result(
-                    PhpIndex.getInstance(project).getClassesByFQN(Model).first(),
-                    project
-                )
-            }
+            PhpIndex.getInstance(project).getClassesByFQN(Model).first()
 
         fun PhpClass.tableName(): String {
             val tableField = this.fields.find { it.name == "table" }

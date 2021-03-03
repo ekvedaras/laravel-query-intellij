@@ -3,7 +3,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.database.model.DasColumn
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.elementType
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
@@ -46,41 +46,39 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
+        val items = Collections.synchronizedList(mutableListOf<LookupElementBuilder>())
 
         when (target.parts.size) {
-            1 -> completeForOnePart(project, target, result)
-            2 -> completeForTwoParts(project, target, result)
-            else -> completeForThreeParts(project, target, result)
+            1 -> completeForOnePart(project, target, items, result)
+            2 -> completeForTwoParts(project, target, items)
+            else -> completeForThreeParts(project, target, items)
         }
+
+        result.addAllElements(
+            items.distinctBy { it.lookupString }
+        )
     }
 
     private fun completeForOnePart(
         project: @NotNull Project,
         target: DbReferenceExpression,
-        result: CompletionResultSet
+        items: MutableList<LookupElementBuilder>,
+        result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-
-        val addedSchemas = Collections.synchronizedList(mutableListOf<String>())
-        val addedTables = Collections.synchronizedList(mutableListOf<String>())
-        val addedColumns = Collections.synchronizedList(mutableListOf<String>())
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.schemasInParallel()
                 .filter {
-                    (shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)) && !addedSchemas.contains(it.name)
+                    shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)
                 }
                 .forEach { schema ->
-                    result.addElement(schema.buildLookup(project, dataSource))
-                    addedSchemas.add(schema.name)
+                    items.add(schema.buildLookup(project, dataSource))
 
                     if (shouldCompleteAll || target.tablesAndAliases.isEmpty()) {
-                        schema.tablesInParallel()
-                            .filter { !addedTables.contains(it.name) }
-                            .forEach { table ->
-                                result.addElement(table.buildLookup(project))
-                                addedTables.add(table.name)
-                            }
+                        schema.tablesInParallel().forEach { table ->
+                            items.add(table.buildLookup(project))
+                        }
                     }
                 }
 
@@ -96,15 +94,12 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
                     if (table != null) {
                         lookup = lookup.withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
 
-                        table.columnsInParallel()
-                            .filter { column -> !addedColumns.contains(column.name) }
-                            .forEach { column ->
-                                result.addElement(column.buildLookup(project))
-                                addedColumns.add(column.name)
-                            }
+                        table.columnsInParallel().forEach { column ->
+                            items.add(column.buildLookup(project))
+                        }
                     }
 
-                    result.addElement(lookup)
+                    items.add(lookup)
                 }
             }
         }
@@ -113,31 +108,22 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun completeForTwoParts(
         project: @NotNull Project,
         target: DbReferenceExpression,
-        result: CompletionResultSet
+        result: MutableList<LookupElementBuilder>
     ) {
-        val addedTables = Collections.synchronizedList(mutableListOf<String>())
-        val addedColumns = Collections.synchronizedList(mutableListOf<String>())
-
         project.dbDataSourcesInParallel().forEach {
             if (target.schema.isNotEmpty()) {
                 target.schema.parallelStream().forEach { schema ->
-                    schema.tablesInParallel()
-                        .filter { !addedTables.contains(it.name) }
-                        .forEach { table ->
-                            result.addElement(table.buildLookup(project, true))
-                            addedTables.add(table.name)
-                        }
+                    schema.tablesInParallel().forEach { table ->
+                        result.add(table.buildLookup(project, true))
+                    }
                 }
             } else {
                 target.table.parallelStream().forEach { table ->
                     val alias = target.tablesAndAliases.entries.firstOrNull { it.value.first == table.name }?.key
 
-                    table.columnsInParallel()
-                        .filter { !addedColumns.contains(it.name) }
-                        .forEach { column ->
-                            result.addElement(column.buildLookup(project, alias))
-                            addedColumns.add(column.name)
-                        }
+                    table.columnsInParallel().forEach { column ->
+                        result.add(column.buildLookup(project, alias))
+                    }
                 }
             }
         }
@@ -146,17 +132,12 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun completeForThreeParts(
         project: @NotNull Project,
         target: DbReferenceExpression,
-        result: CompletionResultSet,
+        result: MutableList<LookupElementBuilder>,
     ) {
-        val addedColumns = Collections.synchronizedList(mutableListOf<String>())
-
         target.table.parallelStream().forEach { table ->
-            table.columnsInParallel()
-                .filter { it is DasColumn && !addedColumns.contains(it.name) }
-                .forEach {
-                    result.addElement(it.buildLookup(project))
-                    addedColumns.add(it.name)
-                }
+            table.columnsInParallel().forEach { column ->
+                result.add(column.buildLookup(project))
+            }
         }
     }
 

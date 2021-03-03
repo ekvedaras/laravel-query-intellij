@@ -34,6 +34,7 @@ class LookupUtils {
                 .withTailText("  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}", true)
                 .withTypeText(this.comment ?: "", true)
                 .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
+                .withLookupString("${this.tableName}.${this.name}")
                 .withInsertHandler(project)
 
         fun buildForAlias(

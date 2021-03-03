@@ -110,8 +110,8 @@ class MethodUtils {
         fun MethodReference.isJoinOrRelation(project: Project): Boolean =
             resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
 
-        fun PhpTypedElement.getClass(project: Project): PhpClass =
-            PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.first()).first()
+        fun PhpTypedElement.getClass(project: Project): PhpClassImpl =
+            PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.first()).first() as PhpClassImpl
 
         /**
          * @todo Should this be in VariableUtils? PsiUtils?

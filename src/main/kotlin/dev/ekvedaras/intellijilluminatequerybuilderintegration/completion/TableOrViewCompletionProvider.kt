@@ -3,6 +3,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.FunctionReference
@@ -35,51 +36,42 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
+        val items = Collections.synchronizedList(mutableListOf<LookupElementBuilder>())
 
         when (target.parts.size) {
-            1 -> populateWithOnePart(project, result)
-            else -> populateWithTwoParts(project, target, result)
+            1 -> populateWithOnePart(project, items)
+            else -> populateWithTwoParts(project, target, items)
         }
+
+        result.addAllElements(
+            items.distinctBy { it.lookupString }
+        )
     }
 
     private fun populateWithOnePart(
         project: @NotNull Project,
-        result: CompletionResultSet
+        result: MutableList<LookupElementBuilder>
     ) {
-        val addedSchemas = Collections.synchronizedList(mutableListOf<String>())
-        val addedTables = Collections.synchronizedList(mutableListOf<String>())
-
         project.dbDataSourcesInParallel().forEach { dataSource ->
-            dataSource.schemasInParallel()
-                .filter { schema -> !addedSchemas.contains(schema.name) }
-                .forEach { schema ->
-                    addedSchemas.add(schema.name)
-                    result.addElement(schema.buildLookup(project, dataSource))
-                }
+            dataSource.schemasInParallel().forEach { schema ->
+                result.add(schema.buildLookup(project, dataSource))
+            }
 
-            dataSource.tablesInParallel()
-                .filter { table -> !addedTables.contains(table.name) }
-                .forEach { table ->
-                    addedTables.add(table.name)
-                    result.addElement(table.buildLookup(project))
-                }
+            dataSource.tablesInParallel().forEach { table ->
+                result.add(table.buildLookup(project))
+            }
         }
     }
 
     private fun populateWithTwoParts(
         project: @NotNull Project,
         target: DbReferenceExpression,
-        result: CompletionResultSet,
+        result: MutableList<LookupElementBuilder>,
     ) {
-        val addedTables = Collections.synchronizedList(mutableListOf<String>())
-
         target.schema.parallelStream().forEach { schema ->
-            schema.tablesInParallel()
-                .filter { table -> !addedTables.contains(table.name) }
-                .forEach { table ->
-                    addedTables.add(table.name)
-                    result.addElement(table.buildLookup(project))
-                }
+            schema.tablesInParallel().forEach { table ->
+                result.add(table.buildLookup(project))
+            }
         }
     }
 

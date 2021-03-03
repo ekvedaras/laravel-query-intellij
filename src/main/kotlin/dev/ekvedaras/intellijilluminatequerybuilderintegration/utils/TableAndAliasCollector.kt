@@ -2,7 +2,6 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
@@ -107,11 +106,11 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             PhpReturnImpl::class.java.name
         ) ?: return
         val firstParam = (
-                MethodUtils.firstChildOfType(
-                    returnStatement,
-                    ParameterListImpl::class.java.name
-                ) as? ParameterListImpl
-                )?.getParameter(0) ?: return
+            MethodUtils.firstChildOfType(
+                returnStatement,
+                ParameterListImpl::class.java.name
+            ) as? ParameterListImpl
+            )?.getParameter(0) ?: return
 
         when (firstParam) {
             is ClassConstantReferenceImpl -> {
@@ -131,47 +130,35 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     }
 
     private fun resolveModelReference(methods: MutableList<MethodReference>): PhpTypedElement? {
-        var modelReference: PhpTypedElement? = null
+        if (!methods.none { it.name == "from" }) return null
 
-        if (methods.none { it.name == "from" }) {
-            modelReference = methods.find { methodReference ->
-                (
-                        methodReference.firstChild is ClassReferenceImpl && (
-                                PhpIndex.getInstance(reference.project)
-                                    .getClassesByFQN(
-                                        (methodReference.firstChild as ClassReferenceImpl).declaredType.types.first()
-                                    )
-                                    .first() as PhpClassImpl
-                                )
-                            .isChildOf(LaravelUtils.modelClass(reference.project))
-                        ) ||
-                        (
-                                methodReference.firstChild is VariableImpl && (
-                                        PhpIndex.getInstance(reference.project)
-                                            .getClassesByFQN(
-                                                (methodReference.firstChild as VariableImpl).declaredType.types.first()
-                                            )
-                                            .firstOrNull() as? PhpClassImpl
-                                        )
-                                    ?.isChildOf(LaravelUtils.modelClass(reference.project)) == true
-                                )
-            }?.firstChild as? PhpTypedElement
+        val modelReference: PhpTypedElement? = methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
 
-            if (modelReference == null) {
-                modelReference = methods.find { methodReference ->
-                    methodReference.firstChild is ParenthesizedExpressionImpl &&
-                            (
-                                    PhpIndex.getInstance(reference.project)
-                                        .getClassesByFQN(
-                                            (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.declaredType?.types?.first()
-                                        )
-                                        .first() as PhpClassImpl
-                                    )
-                                .isChildOf("\\Illuminate\\Database\\Eloquent\\Model")
-                }?.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? PhpTypedElement
-            }
+        if (modelReference != null) return modelReference
+
+        return methods.find { isNewModelInstance(it) } // TODO can this be improved with methods like firstPsiChild, nextPsiSibling ?
+            ?.firstChild
+            ?.firstChild
+            ?.nextSibling
+            ?.firstChild
+            ?.nextSibling
+            ?.nextSibling as? PhpTypedElement
+    }
+
+    private fun isNewModelInstance(methodReference: MethodReference) =
+        methodReference.firstChild is ParenthesizedExpressionImpl &&
+            (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
+            reference.project
+        )?.isChildOf(LaravelUtils.Model) == true
+
+    private fun isModelReference(methodReference: MethodReference): Boolean {
+        return when (methodReference.firstPsiChild) {
+            is ClassReferenceImpl -> (methodReference.firstChild as ClassReferenceImpl).getClass(reference.project)
+                .isChildOf(LaravelUtils.Model)
+            is VariableImpl ->
+                (methodReference.firstChild as VariableImpl).getClass(reference.project).isChildOf(LaravelUtils.Model)
+            else -> false
         }
-        return modelReference
     }
 
     private fun scanMethodReference(method: MethodReference) {
@@ -199,17 +186,15 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             val table = referencedTable.substringBefore("as").trim()
 
             if (referencedSchema == null) {
-                reference.project.dbDataSourcesInParallel().forEach { dataSource ->
-                    val dasTable =
-                        dataSource.tables().firstOrNull { dasTable -> dasTable.name == table }
-                    if (dasTable != null) {
-                        referencedSchema = dasTable.dasParent?.name
-                    }
+                reference.project.dbDataSourcesInParallel().forEach loop@{ dataSource ->
+                    val dasTable = dataSource.tables().firstOrNull { it.name == table } ?: return@loop
+                    referencedSchema = dasTable.dasParent?.name
                 }
             }
 
             reference.tablesAndAliases[alias] = table to referencedSchema
             reference.aliases[table] = alias to method.getParameter(0)!!
+
             return
         }
 
