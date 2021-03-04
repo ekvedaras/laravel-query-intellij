@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DbReferenceResolver
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.unquote
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.TableAndAliasCollector
 
 class DbReferenceExpression(val expression: PsiElement, val type: Type) {
@@ -33,9 +33,9 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
 
     init {
         parts.addAll(
-            expression.text.unquote()
+            expression.text.unquoteAndCleanup()
                 .split(".")
-                .map { it.replace("IntellijIdeaRulezzz", "").substringBefore(" as").trim() }
+                .map { it.substringBefore(" as").trim() }
         )
 
         for (part in parts) {

@@ -1,6 +1,5 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
-import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
@@ -11,16 +10,20 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenc
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRelationClosure
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveAliasParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.isJoinOrRelation
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.referencesInParallel
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.statementFirstPsiChild
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.unquote
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsAlias
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.referencesInParallel
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.statementFirstPsiChild
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
 import java.util.*
 
 class TableAndAliasCollector(private val reference: DbReferenceExpression) {
+    private val aliasCollector = AliasCollector(reference)
+    private val relationResolver = ModelRelationResolver(reference, this)
+
     fun collect() {
         val method = MethodUtils.resolveMethodReference(reference.expression) ?: return
         val methods = Collections.synchronizedList(mutableListOf<MethodReference>())
@@ -28,7 +31,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         collectMethodsAcrossVariableReferences(methods, method)
         collectMethodsInCurrentTree(methods, method)
 
-        resolveModelAndRelationTables(methods, method)
+        relationResolver.resolveModelAndRelationTables(methods, method)
 
         methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
@@ -84,52 +87,12 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         )
     }
 
-    private fun resolveModelAndRelationTables(methods: MutableList<MethodReference>, method: MethodReference) {
-        val modelReference: PhpTypedElement = resolveModelReference(methods) ?: return
-        val model = modelReference.getClass(reference.project)
-
-        resolveTableName(model)
-
-        val deepParent =
-            method.parent?.parent?.parent?.parent?.parent?.parent ?: return // TODO utilize parentOfType<>() ?
-
-        if (deepParent.isInsideRelationClosure()) {
-            resolveRelationTable(deepParent, model)
-        }
-    }
-
-    private fun resolveRelationTable(deepParent: PsiElement, model: PhpClass) {
-        val relationName = deepParent.firstChild.text.unquote()
-        val relationMethod = model.methods.firstOrNull { it.name == relationName } ?: return
-        val returnStatement = MethodUtils.firstChildOfType(
-            relationMethod.lastChild as GroupStatementImpl,
-            PhpReturnImpl::class.java.name
-        ) ?: return
-        val firstParam = (
-            MethodUtils.firstChildOfType(
-                returnStatement,
-                ParameterListImpl::class.java.name
-            ) as? ParameterListImpl
-            )?.getParameter(0) ?: return
-
-        when (firstParam) {
-            is ClassConstantReferenceImpl -> {
-                resolveTableName(
-                    firstParam.classReference?.getClass(reference.project) ?: return
-                )
-            }
-            is StringLiteralExpressionImpl -> {
-                reference.tablesAndAliases[firstParam.contents] = firstParam.contents to null
-            }
-        }
-    }
-
-    private fun resolveTableName(model: PhpClass) {
+    fun resolveTableName(model: PhpClass) {
         val name = model.tableName()
         reference.tablesAndAliases[name] = name to null
     }
 
-    private fun resolveModelReference(methods: MutableList<MethodReference>): PhpTypedElement? {
+    fun resolveModelReference(methods: MutableList<MethodReference>): PhpTypedElement? {
         if (!methods.none { it.name == "from" }) return null
 
         val modelReference: PhpTypedElement? = methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
@@ -147,9 +110,9 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
 
     private fun isNewModelInstance(methodReference: MethodReference) =
         methodReference.firstChild is ParenthesizedExpressionImpl &&
-            (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
-            reference.project
-        )?.isChildOf(LaravelUtils.Model) == true
+                (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
+                    reference.project
+                )?.isChildOf(LaravelUtils.Model) == true
 
     private fun isModelReference(methodReference: MethodReference): Boolean {
         return when (methodReference.firstPsiChild) {
@@ -166,60 +129,45 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             return
         }
 
-        val definition = (method.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
+        var (referencedTable: String, referencedSchema: String?) = extractTableAndSchema(method)
 
-        var referencedTable: String = definition
-        var referencedSchema: String? = null
-
-        if (definition.contains(".")) {
-            for (part in definition.split(".").reversed()) {
-                if (referencedTable == definition) {
-                    referencedTable = part.replace("IntellijIdeaRulezzz", "").trim()
-                } else {
-                    referencedSchema = part.replace("IntellijIdeaRulezzz", "").trim()
-                }
-            }
-        }
-
-        if (referencedTable.contains(" as ")) {
-            val alias = referencedTable.substringAfter("as").trim()
-            val table = referencedTable.substringBefore("as").trim()
-
-            if (referencedSchema == null) {
-                reference.project.dbDataSourcesInParallel().forEach loop@{ dataSource ->
-                    val dasTable = dataSource.tables().firstOrNull { it.name == table } ?: return@loop
-                    referencedSchema = dasTable.dasParent?.name
-                }
-            }
-
-            reference.tablesAndAliases[alias] = table to referencedSchema
-            reference.aliases[table] = alias to method.getParameter(0)!!
-
+        if (referencedTable.containsAlias()) {
+            aliasCollector.extractAliasFromString(method, referencedTable, referencedSchema)
             return
         }
 
         if (referencedSchema == null) {
             reference.project.dbDataSourcesInParallel().forEach { dataSource ->
-                val dasTable =
-                    dataSource.tables().firstOrNull { dasTable -> dasTable.name == referencedTable }
-                if (dasTable != null) {
-                    referencedSchema = dasTable.dasParent?.name
+                dataSource.tables().firstOrNull { it.name == referencedTable }?.let {
+                    referencedSchema = it.dasParent?.name
                 }
             }
         }
 
-        if (!LaravelUtils.BuilderTableAliasParams.containsKey(method.name)) {
+        if (!method.canHaveAliasParam()) {
             reference.tablesAndAliases[referencedTable] = referencedTable to referencedSchema
             return
         }
 
-        val aliasParam: Int = LaravelUtils.BuilderTableAliasParams[method.name] ?: return
-        val alias: String? = (method.getParameter(aliasParam) as? StringLiteralExpressionImpl)?.contents
+        aliasCollector.resolveAliasFromParam(method, referencedTable, referencedSchema)
+    }
 
-        reference.tablesAndAliases[alias ?: referencedTable] = referencedTable to referencedSchema
+    private fun extractTableAndSchema(method: MethodReference): Pair<String, String?> {
+        val definition = (method.getParameter(0) as StringLiteralExpressionImpl).contents.trim()
 
-        if (alias != null && method.getParameter(aliasParam) != null) {
-            reference.aliases[referencedTable] = alias to method.getParameter(aliasParam)!!
+        var referencedTable: String = definition
+        var referencedSchema: String? = null
+
+        if (!definition.contains(".")) return Pair(referencedTable, referencedSchema)
+
+        for (part in definition.split(".").reversed()) {
+            if (referencedTable == definition) {
+                referencedTable = part.unquoteAndCleanup()
+            } else {
+                referencedSchema = part.unquoteAndCleanup()
+            }
         }
+
+        return Pair(referencedTable, referencedSchema)
     }
 }

@@ -100,19 +100,6 @@ class MethodUtils {
         fun PhpTypedElement.getClass(project: Project): PhpClassImpl =
             PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.first()).first() as PhpClassImpl
 
-        /**
-         * @todo Should this be in VariableUtils? PsiUtils?
-         */
-        fun Variable.referencesInParallel(): Stream<out PsiReference> =
-            ReferencesSearch
-                .search(this.originalElement)
-                .findAll()
-                .parallelStream()
-
-        fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
-
-        fun String.unquote() = this.trim('\'', '"')
-
         private fun findMethodsInTree(root: PsiElement, list: MutableList<MethodReference>) {
             for (child in root.children) {
                 if (child is MethodReference) {

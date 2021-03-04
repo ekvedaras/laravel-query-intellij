@@ -12,13 +12,11 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.hasColumnsInAllParams
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isColumnParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.findParamIndex
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.findParameterList
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.unquote
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.isPhpArray
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
 
 class LaravelUtils {
     companion object {
@@ -177,7 +175,7 @@ class LaravelUtils {
             val tableField = this.fields.find { it.name == "table" }
 
             if (ClassUtils.fieldHasDefaultValue(tableField)) {
-                return tableField!!.defaultValue!!.text.unquote()
+                return tableField!!.defaultValue!!.text.unquoteAndCleanup()
             }
 
             return this.asTableName()
@@ -206,6 +204,9 @@ class LaravelUtils {
 
         fun MethodReference.isColumnParam(index: Int): Boolean =
             BuilderTableColumnsParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.canHaveAliasParam(): Boolean =
+            BuilderTableAliasParams.containsKey(this.name)
 
         fun CompletionParameters.isColumnIn(method: MethodReference): Boolean =
             this.position.isColumnIn(method)
