@@ -4,6 +4,8 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.database.model.DasNamespace
+import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.elementType
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
@@ -68,40 +70,58 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
-            dataSource.schemasInParallel()
-                .filter {
-                    shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)
-                }
-                .forEach { schema ->
-                    items.add(schema.buildLookup(project, dataSource))
-
-                    if (shouldCompleteAll || target.tablesAndAliases.isEmpty()) {
-                        schema.tablesInParallel().forEach { table ->
-                            items.add(table.buildLookup(project))
-                        }
-                    }
-                }
+            dataSource.schemasInParallel().filter {
+                shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)
+            }.forEach { schema ->
+                addSchemaAndItsTables(items, schema, project, dataSource, target)
+            }
 
             if (target.tablesAndAliases.isNotEmpty()) {
-                result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
-                target.tablesAndAliases.forEach { tableAlias ->
-                    var lookup = LookupUtils.buildForAlias(tableAlias, dataSource)
+                addTablesAndAliases(result, target, dataSource, project, items)
+            }
+        }
+    }
 
-                    val table = dataSource.tables().find { table ->
-                        table.name == tableAlias.value.first && (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
-                    }
+    private fun addSchemaAndItsTables(
+        items: MutableList<LookupElementBuilder>,
+        schema: DasNamespace,
+        project: @NotNull Project,
+        dataSource: DbDataSource,
+        target: DbReferenceExpression
+    ) {
+        items.add(schema.buildLookup(project, dataSource))
 
-                    if (table != null) {
-                        lookup = lookup.withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
+        if (shouldCompleteAll || target.tablesAndAliases.isEmpty()) {
+            schema.tablesInParallel().forEach { table ->
+                items.add(table.buildLookup(project, withTablePrefix = false, triggerCompletion = true))
+            }
+        }
+    }
 
-                        table.columnsInParallel().forEach { column ->
-                            items.add(column.buildLookup(project))
-                        }
-                    }
+    private fun addTablesAndAliases(
+        result: CompletionResultSet,
+        target: DbReferenceExpression,
+        dataSource: DbDataSource,
+        project: @NotNull Project,
+        items: MutableList<LookupElementBuilder>
+    ) {
+        result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
+        target.tablesAndAliases.forEach { tableAlias ->
+            var lookup = LookupUtils.buildForAlias(tableAlias, dataSource)
 
-                    items.add(lookup)
+            val table = dataSource.tables().find { table ->
+                table.name == tableAlias.value.first && (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
+            }
+
+            if (table != null) {
+                lookup = lookup.withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
+
+                table.columnsInParallel().forEach { column ->
+                    items.add(column.buildLookup(project))
                 }
             }
+
+            items.add(lookup)
         }
     }
 
@@ -112,19 +132,35 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     ) {
         project.dbDataSourcesInParallel().forEach {
             if (target.schema.isNotEmpty()) {
-                target.schema.parallelStream().forEach { schema ->
-                    schema.tablesInParallel().forEach { table ->
-                        result.add(table.buildLookup(project, true))
-                    }
-                }
+                addTables(target, result, project)
             } else {
-                target.table.parallelStream().forEach { table ->
-                    val alias = target.tablesAndAliases.entries.firstOrNull { it.value.first == table.name }?.key
+                addTableColumns(target, result, project)
+            }
+        }
+    }
 
-                    table.columnsInParallel().forEach { column ->
-                        result.add(column.buildLookup(project, alias))
-                    }
-                }
+    private fun addTableColumns(
+        target: DbReferenceExpression,
+        result: MutableList<LookupElementBuilder>,
+        project: @NotNull Project
+    ) {
+        target.table.parallelStream().forEach { table ->
+            val alias = target.tablesAndAliases.entries.firstOrNull { it.value.first == table.name }?.key
+
+            table.columnsInParallel().forEach { column ->
+                result.add(column.buildLookup(project, withTablePrefix = true, withSchemaPrefix = false, alias = alias))
+            }
+        }
+    }
+
+    private fun addTables(
+        target: DbReferenceExpression,
+        result: MutableList<LookupElementBuilder>,
+        project: @NotNull Project
+    ) {
+        target.schema.parallelStream().forEach { schema ->
+            schema.tablesInParallel().forEach { table ->
+                result.add(table.buildLookup(project, withTablePrefix = true, triggerCompletion = true))
             }
         }
     }
@@ -136,7 +172,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     ) {
         target.table.parallelStream().forEach { table ->
             table.columnsInParallel().forEach { column ->
-                result.add(column.buildLookup(project))
+                result.add(column.buildLookup(project, withTablePrefix = true, withSchemaPrefix = true))
             }
         }
     }

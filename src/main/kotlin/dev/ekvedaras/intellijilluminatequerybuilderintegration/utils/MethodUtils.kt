@@ -15,9 +15,6 @@ import java.util.stream.Stream
 
 class MethodUtils {
     companion object {
-        /**
-         * Resolve method reference from given position
-         */
         fun resolveMethodReference(element: PsiElement?, depthLimit: Int = 10): MethodReference? {
             if (element == null || depthLimit <= 0) {
                 return null
@@ -30,9 +27,6 @@ class MethodUtils {
             return resolveMethodReference(element.parent, depthLimit - 1)
         }
 
-        /**
-         * Resolve in which classes given method may be defined
-         */
         fun resolveMethodClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
             if (DumbService.isDumb(project) || method.classReference == null) {
                 return listOf()
@@ -54,9 +48,6 @@ class MethodUtils {
             return classes
         }
 
-        /**
-         * Resolve given parameter index in its parent method call
-         */
         fun findParameterIndex(psiElement: PsiElement): Int {
             val parent = psiElement.parent ?: return -1
             return if (parent is ParameterList) {
@@ -64,19 +55,12 @@ class MethodUtils {
             } else findParameterIndex(parent)
         }
 
-        /**
-         * Resolve parent ParameterList PSI element
-         */
         fun findParameters(psiElement: PsiElement?): ParameterList? {
             return if (psiElement == null || psiElement is ParameterList)
                 psiElement as ParameterList?
             else findParameters(psiElement.parent)
         }
 
-        /**
-         * Resolve all child method references in given element and return the list.
-         * Usually the root element should be a first child of PSI Statement
-         */
         fun findMethodsInTree(root: PsiElement): MutableList<MethodReference> {
             if (root.textMatches("return") || root.textMatches(" ")) {
                 return findMethodsInTree(root.nextSibling)
@@ -126,9 +110,6 @@ class MethodUtils {
 
         fun String.unquote() = this.trim('\'', '"')
 
-        /**
-         * Resolve all child method references in given element and add to given list.
-         */
         private fun findMethodsInTree(root: PsiElement, list: MutableList<MethodReference>) {
             for (child in root.children) {
                 if (child is MethodReference) {

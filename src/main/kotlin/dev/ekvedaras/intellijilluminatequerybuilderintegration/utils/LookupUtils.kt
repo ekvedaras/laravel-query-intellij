@@ -17,17 +17,34 @@ class LookupUtils {
                 .create(this, this.name)
                 .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
                 .withTypeText(dataSource.name, true)
-                .withInsertHandler(project)
+                .withInsertHandler(project, true)
 
-        fun DasTable.buildLookup(project: Project, triggerCompletion: Boolean = false): LookupElementBuilder =
+        fun DasTable.buildLookup(
+            project: Project,
+            withTablePrefix: Boolean = false,
+            triggerCompletion: Boolean = false
+        ): LookupElementBuilder =
             LookupElementBuilder
                 .create(this, this.name)
                 .withLookupString("${this.dasParent?.name}.${this.name}")
                 .withTypeText(this.dasParent?.name ?: "", true)
                 .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
-                .withInsertHandler(project, triggerCompletion)
+                .withInsertHandler(
+                    project,
+                    triggerCompletion,
+                    if (withTablePrefix) {
+                        this.dasParent?.name ?: ""
+                    } else {
+                        ""
+                    }
+                )
 
-        fun DasColumn.buildLookup(project: Project, alias: String? = null): LookupElementBuilder =
+        fun DasColumn.buildLookup(
+            project: Project,
+            withTablePrefix: Boolean = false,
+            withSchemaPrefix: Boolean = false,
+            alias: String? = null
+        ): LookupElementBuilder =
             LookupElementBuilder
                 .create(this, this.name)
                 .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
@@ -35,7 +52,24 @@ class LookupUtils {
                 .withTypeText(this.comment ?: "", true)
                 .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
                 .withLookupString("${this.tableName}.${this.name}")
-                .withInsertHandler(project)
+                .withInsertHandler(
+                    project,
+                    false,
+                    alias
+                        ?: "${
+                            if (withSchemaPrefix) {
+                                this.table?.dasParent?.name ?: ""
+                            } else {
+                                ""
+                            }
+                        }.${
+                            if (withTablePrefix) {
+                                this.dasParent?.name ?: ""
+                            } else {
+                                ""
+                            }
+                        }".trim('.')
+                )
 
         fun buildForAlias(
             tableAlias: Map.Entry<String, Pair<String, String?>>,
@@ -55,13 +89,27 @@ class LookupUtils {
 
         private fun LookupElementBuilder.withInsertHandler(
             project: Project,
-            triggerCompletion: Boolean = false
-        ): LookupElementBuilder =
-            this.withInsertHandler { context, lookup ->
+            triggerCompletion: Boolean = false,
+            prefix: String = ""
+        ): LookupElementBuilder {
+            var lookupPrefix = prefix
+            if (prefix.isNotEmpty()) {
+                lookupPrefix += "."
+            }
+
+            val suffix = if (triggerCompletion) {
+                "."
+            } else {
+                ""
+            }
+
+            return this.withInsertHandler { context, lookup ->
                 context.document.deleteString(context.startOffset, context.tailOffset)
-                context.document.insertString(context.startOffset, lookup.lookupString)
+                context.document.insertString(
+                    context.startOffset, "${lookupPrefix}${lookup.lookupString}${suffix}"
+                )
                 context.editor.caretModel.moveCaretRelatively(
-                    lookup.lookupString.length,
+                    lookupPrefix.length + lookup.lookupString.length + suffix.length,
                     0,
                     false,
                     false,
@@ -72,5 +120,6 @@ class LookupUtils {
                     AutoPopupController.getInstance(project).scheduleAutoPopup(context.editor)
                 }
             }
+        }
     }
 }

@@ -70,7 +70,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     ) {
         target.schema.parallelStream().forEach { schema ->
             schema.tablesInParallel().forEach { table ->
-                result.add(table.buildLookup(project))
+                result.add(table.buildLookup(project, true))
             }
         }
     }
