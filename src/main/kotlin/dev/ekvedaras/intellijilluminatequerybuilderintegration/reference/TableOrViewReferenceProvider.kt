@@ -4,10 +4,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 
 class TableOrViewReferenceProvider : PsiReferenceProvider() {
@@ -15,11 +17,11 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
-        if (shouldNotCompleteCurrentParam(method, element)) {
+        if (shouldNotInspect(method, element)) {
             return PsiReference.EMPTY_ARRAY
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
+        if (!method.isBuilderClassMethod(project)) {
             return PsiReference.EMPTY_ARRAY
         }
 
@@ -32,8 +34,8 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         return references
     }
 
-    private fun shouldNotCompleteCurrentParam(method: MethodReference, element: PsiElement) =
-        !LaravelUtils.BuilderTableMethods.contains(method.name) ||
-            MethodUtils.findParameterIndex(element) != 0 ||
-            (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
+    private fun shouldNotInspect(method: MethodReference, element: PsiElement) =
+        !method.isBuilderMethodByName()
+                || !element.isTableParam()
+                || element.isInsideRegularFunction()
 }

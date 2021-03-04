@@ -7,10 +7,8 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
-import com.intellij.psi.util.elementType
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.columnsInParallel
@@ -18,10 +16,16 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUti
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isColumnIn
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsVariable
 import org.jetbrains.annotations.NotNull
 import java.util.*
 
@@ -35,15 +39,15 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
         val project = method.project
 
-        if (shouldNotCompleteCurrentParameter(method, parameters)) {
+        if (shouldNotComplete(method, parameters)) {
             return
         }
 
-        if (shouldNotCompleteArrayValue(method, parameters)) {
+        if (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
             return
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
+        if (!method.isBuilderClassMethod(project)) {
             return
         }
 
@@ -177,23 +181,9 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
-    private fun shouldNotCompleteCurrentParameter(method: MethodReference, parameters: CompletionParameters) =
-        parameters.position.textContains('$') ||
-                !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name) ||
-                (
-                        !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(
-                            MethodUtils.findParameterIndex(
-                                parameters.position
-                            )
-                        ) &&
-                                !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)
-                        ) ||
-                (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
-
-    private fun shouldNotCompleteArrayValue(method: MethodReference, parameters: CompletionParameters) =
-        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name) &&
-                (
-                        parameters.position.parent.parent.elementType?.index?.toInt() == 1889 || // 1889 - array expression
-                                parameters.position.parent.parent.elementType?.index?.toInt() == 805
-                        ) // 805 - array value
+    private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
+        parameters.containsVariable()
+                || !method.isBuilderMethodForColumns()
+                || !parameters.isColumnIn(method)
+                || parameters.isInsideRegularFunction()
 }

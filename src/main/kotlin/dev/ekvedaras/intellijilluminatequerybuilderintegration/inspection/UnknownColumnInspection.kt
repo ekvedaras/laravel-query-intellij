@@ -4,16 +4,22 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.util.elementType
 import com.jetbrains.php.lang.inspections.PhpInspection
-import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.MyBundle
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isColumnIn
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isOperatorParam
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.selectsAllColumns
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsVariable
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
@@ -27,15 +33,15 @@ class UnknownColumnInspection : PhpInspection() {
                 val method = MethodUtils.resolveMethodReference(expression ?: return) ?: return
                 val project = method.project
 
-                if (shouldNotCompleteCurrentParameter(method, expression)) {
+                if (shouldNotInspect(method, expression)) {
                     return
                 }
 
-                if (shouldNotCompleteArrayValue(method, expression)) {
+                if (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
                     return
                 }
 
-                if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
+                if (!method.isBuilderClassMethod(project)) {
                     return
                 }
 
@@ -109,33 +115,16 @@ class UnknownColumnInspection : PhpInspection() {
                 }
             }
 
-            private fun shouldNotCompleteCurrentParameter(
+            private fun shouldNotInspect(
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
-                expression.textContains('$') || // don't inspect variables
-                    expression.textContains('*') || // * means all column, no need to inspect
-                    MethodUtils.findParameters(expression)?.parameters?.size == 3 && MethodUtils.findParameterIndex(
-                    expression
-                ) == 1 || // It's an operator argument: <=, =, >=, etc.
-                    !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name) ||
-                    (
-                        !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(
-                            MethodUtils.findParameterIndex(
-                                expression
-                            )
-                        ) && // argument index must be in preconfigured list for the method
-                            !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)
-                        ) || // -1 means any argument should auto complete
-                    (expression.parent?.parent?.parent is FunctionReference && expression.parent?.parent?.parent !is MethodReference) || // ->where(DB::raw('column')), etc.
-                    (expression.parent?.parent is FunctionReference && expression.parent?.parent !is MethodReference) // ->whereIn('column', explode(' ' , 'string')), etc. todo: make this check and above work together and be more flexible
-
-            private fun shouldNotCompleteArrayValue(method: MethodReference, expression: StringLiteralExpression) =
-                !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name) &&
-                    (
-                        expression.parent.parent.elementType?.index?.toInt() == 1889 || // 1889 - array expression
-                            expression.parent.parent.elementType?.index?.toInt() == 805
-                        ) // 805 - array value
+                expression.containsVariable()
+                        || expression.selectsAllColumns()
+                        || expression.isOperatorParam()
+                        || !method.isBuilderMethodForColumns()
+                        || !expression.isColumnIn(method)
+                        || expression.isInsideRegularFunction()
         }
     }
 }

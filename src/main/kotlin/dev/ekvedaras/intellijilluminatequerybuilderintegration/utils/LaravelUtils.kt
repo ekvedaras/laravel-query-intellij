@@ -1,16 +1,24 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.hasColumnsInAllParams
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isColumnParam
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.findParamIndex
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.findParameterList
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.unquote
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.isArrayValue
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.isPhpArray
 
 class LaravelUtils {
     companion object {
@@ -155,13 +163,12 @@ class LaravelUtils {
         )
         // </editor-fold>
 
-        fun isQueryBuilderMethod(method: MethodReference, project: Project): Boolean {
-            return MethodUtils.resolveMethodClasses(method, project).any { clazz ->
+        fun MethodReference.isBuilderClassMethod(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
                 DatabaseBuilderClasses.any {
                     clazz.isChildOf(it)
                 }
             }
-        }
 
         fun modelClass(project: Project): PhpClass =
             PhpIndex.getInstance(project).getClassesByFQN(Model).first()
@@ -179,6 +186,60 @@ class LaravelUtils {
         fun PsiElement.isInsideRelationClosure(): Boolean =
             this is ArrayHashElementImpl && this.parentOfType<MethodReferenceImpl>()?.name == "with"
 
-        fun PhpClass.isJoinOrRelation(): Boolean = this.fqn == JoinClause || this.fqn == Relation
+        fun PhpClass.isJoinOrRelation(): Boolean =
+            this.fqn == JoinClause || this.fqn == Relation
+
+        fun MethodReference.isBuilderMethodByName(): Boolean =
+            BuilderTableMethods.contains(this.name)
+
+        fun MethodReference.isBuilderMethodForColumns(): Boolean =
+            BuilderTableColumnsParams.containsKey(this.name)
+
+        fun MethodReference.isColumnParam(parameters: CompletionParameters): Boolean =
+            this.isColumnParam(parameters.position)
+
+        fun MethodReference.isColumnParam(position: PsiElement): Boolean =
+            this.isColumnParam(position.findParamIndex())
+
+        fun MethodReference.hasColumnsInAllParams(): Boolean =
+            this.isColumnParam(-1)
+
+        fun MethodReference.isColumnParam(index: Int): Boolean =
+            BuilderTableColumnsParams[this.name]?.contains(index) ?: false
+
+        fun CompletionParameters.isColumnIn(method: MethodReference): Boolean =
+            this.position.isColumnIn(method)
+
+        fun PsiElement.isColumnIn(method: MethodReference): Boolean =
+            method.isColumnParam(this) || method.hasColumnsInAllParams()
+
+        fun MethodReference.canHaveColumnsInArrayValues(): Boolean =
+            BuilderMethodsWithTableColumnsInArrayValues.contains(this.name)
+
+        fun CompletionParameters.isInsideRegularFunction(): Boolean =
+            this.position.isInsideRegularFunction()
+
+        fun PsiElement.isInsideRegularFunction(): Boolean =
+            (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference)
+                    || (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
+
+        fun PsiElement.isOperatorParam(): Boolean =
+            this.findParameterList()?.parameters?.size == 3 && this.findParamIndex() == 1
+
+        fun CompletionParameters.isInsidePhpArrayOrValue(): Boolean =
+            this.position.isInsidePhpArrayOrValue()
+
+        fun PsiElement.isInsidePhpArrayOrValue(): Boolean =
+            this.parent.parent.isPhpArray()
+                    || this.parent.parent.isArrayValue()
+
+        fun PsiElement.selectsAllColumns(): Boolean =
+            this.textContains('*')
+
+        fun CompletionParameters.isTableParam(): Boolean =
+            this.position.isTableParam()
+
+        fun PsiElement.isTableParam(): Boolean =
+            this.findParamIndex() == 0  // So far all functions accept table as the first argument
     }
 }

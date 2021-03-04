@@ -3,28 +3,32 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
-import com.intellij.psi.util.elementType
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isColumnIn
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsVariable
 
 class ColumnReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
-        if (shouldNotCompleteCurrentParameter(method, element)) {
+        if (shouldNotInspect(method, element)) {
             return PsiReference.EMPTY_ARRAY
         }
 
-        if (shouldNotCompleteArrayValue(method, element)) {
+        if (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
             return PsiReference.EMPTY_ARRAY
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
+        if (!method.isBuilderClassMethod(project)) {
             return PsiReference.EMPTY_ARRAY
         }
 
@@ -48,19 +52,9 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         return references
     }
 
-    private fun shouldNotCompleteCurrentParameter(method: MethodReference, element: PsiElement) =
-        element.textContains('$') ||
-            !LaravelUtils.BuilderTableColumnsParams.containsKey(method.name) ||
-            (
-                !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(MethodUtils.findParameterIndex(element)) &&
-                    !LaravelUtils.BuilderTableColumnsParams[method.name]!!.contains(-1)
-                ) ||
-            (element.parent?.parent?.parent is FunctionReference && element.parent?.parent?.parent !is MethodReference)
-
-    private fun shouldNotCompleteArrayValue(method: MethodReference, element: PsiElement) =
-        !LaravelUtils.BuilderMethodsWithTableColumnsInArrayValues.contains(method.name) &&
-            (
-                element.parent.parent.elementType?.index?.toInt() == 1889 || // 1889 - array expression
-                    element.parent.parent.elementType?.index?.toInt() == 805
-                ) // 805 - array value
+    private fun shouldNotInspect(method: MethodReference, element: PsiElement) =
+        element.containsVariable()
+                || !method.isBuilderMethodForColumns()
+                || !element.isColumnIn(method)
+                || element.isInsideRegularFunction()
 }

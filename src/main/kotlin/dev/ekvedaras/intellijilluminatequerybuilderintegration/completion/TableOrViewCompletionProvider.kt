@@ -6,13 +6,15 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import org.jetbrains.annotations.NotNull
@@ -27,11 +29,11 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
         val project = method.project
 
-        if (shouldNotCompleteCurrentParam(method, parameters)) {
+        if (shouldNotComplete(method, parameters)) {
             return
         }
 
-        if (!LaravelUtils.isQueryBuilderMethod(method, project)) {
+        if (!method.isBuilderClassMethod(project)) {
             return
         }
 
@@ -75,8 +77,8 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun shouldNotCompleteCurrentParam(method: MethodReference, parameters: CompletionParameters) =
-        !LaravelUtils.BuilderTableMethods.contains(method.name) ||
-                MethodUtils.findParameterIndex(parameters.position) != 0 ||
-                (parameters.position.parent?.parent?.parent is FunctionReference && parameters.position.parent?.parent?.parent !is MethodReference)
+    private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
+        !method.isBuilderMethodByName()
+                || !parameters.isTableParam()
+                || parameters.isInsideRegularFunction()
 }

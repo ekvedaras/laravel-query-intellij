@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -48,18 +49,20 @@ class MethodUtils {
             return classes
         }
 
-        fun findParameterIndex(psiElement: PsiElement): Int {
-            val parent = psiElement.parent ?: return -1
+        fun CompletionParameters.findParamIndex(): Int =
+            this.position.findParamIndex()
+
+        fun PsiElement.findParamIndex(): Int {
+            val parent = this.parent ?: return -1
+
             return if (parent is ParameterList) {
-                ArrayUtil.indexOf(parent.parameters, psiElement)
-            } else findParameterIndex(parent)
+                ArrayUtil.indexOf(parent.parameters, this)
+            } else this.parent.findParamIndex()
         }
 
-        fun findParameters(psiElement: PsiElement?): ParameterList? {
-            return if (psiElement == null || psiElement is ParameterList)
-                psiElement as ParameterList?
-            else findParameters(psiElement.parent)
-        }
+        fun PsiElement.findParameterList(): ParameterList? =
+            if (this is ParameterList) this
+            else this.parent.findParameterList()
 
         fun findMethodsInTree(root: PsiElement): MutableList<MethodReference> {
             if (root.textMatches("return") || root.textMatches(" ")) {
