@@ -27,7 +27,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsVariable
 import org.jetbrains.annotations.NotNull
-import java.util.*
+import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     CompletionProvider<CompletionParameters>() {
@@ -182,8 +182,8 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
-        parameters.containsVariable()
-                || !method.isBuilderMethodForColumns()
-                || !parameters.isColumnIn(method)
-                || parameters.isInsideRegularFunction()
+        parameters.containsVariable() ||
+            !method.isBuilderMethodForColumns() ||
+            !parameters.isColumnIn(method) ||
+            parameters.isInsideRegularFunction()
 }

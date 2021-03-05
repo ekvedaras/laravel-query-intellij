@@ -5,7 +5,11 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
-import com.jetbrains.php.lang.psi.elements.impl.*
+import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl
+import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
+import com.jetbrains.php.lang.psi.elements.impl.ParenthesizedExpressionImpl
+import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
+import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
@@ -18,7 +22,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Co
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.referencesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.statementFirstPsiChild
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
-import java.util.*
+import java.util.Collections
 
 class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     private val aliasCollector = AliasCollector(reference)
@@ -110,9 +114,9 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
 
     private fun isNewModelInstance(methodReference: MethodReference) =
         methodReference.firstChild is ParenthesizedExpressionImpl &&
-                (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
-                    reference.project
-                )?.isChildOf(LaravelUtils.Model) == true
+            (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
+            reference.project
+        )?.isChildOf(LaravelUtils.Model) == true
 
     private fun isModelReference(methodReference: MethodReference): Boolean {
         return when (methodReference.firstPsiChild) {

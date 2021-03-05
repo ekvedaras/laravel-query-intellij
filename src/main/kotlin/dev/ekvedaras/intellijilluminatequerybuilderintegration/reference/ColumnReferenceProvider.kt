@@ -53,8 +53,8 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotInspect(method: MethodReference, element: PsiElement) =
-        element.containsVariable()
-                || !method.isBuilderMethodForColumns()
-                || !element.isColumnIn(method)
-                || element.isInsideRegularFunction()
+        element.containsVariable() ||
+            !method.isBuilderMethodForColumns() ||
+            !element.isColumnIn(method) ||
+            element.isInsideRegularFunction()
 }

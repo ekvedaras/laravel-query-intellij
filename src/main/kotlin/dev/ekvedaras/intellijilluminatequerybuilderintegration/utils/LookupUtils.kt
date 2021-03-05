@@ -57,17 +57,17 @@ class LookupUtils {
                     false,
                     alias
                         ?: "${
-                            if (withSchemaPrefix) {
-                                this.table?.dasParent?.name ?: ""
-                            } else {
-                                ""
-                            }
+                        if (withSchemaPrefix) {
+                            this.table?.dasParent?.name ?: ""
+                        } else {
+                            ""
+                        }
                         }.${
-                            if (withTablePrefix) {
-                                this.dasParent?.name ?: ""
-                            } else {
-                                ""
-                            }
+                        if (withTablePrefix) {
+                            this.dasParent?.name ?: ""
+                        } else {
+                            ""
+                        }
                         }".trim('.')
                 )
 
@@ -106,7 +106,7 @@ class LookupUtils {
             return this.withInsertHandler { context, lookup ->
                 context.document.deleteString(context.startOffset, context.tailOffset)
                 context.document.insertString(
-                    context.startOffset, "${lookupPrefix}${lookup.lookupString}${suffix}"
+                    context.startOffset, "${lookupPrefix}${lookup.lookupString}$suffix"
                 )
                 context.editor.caretModel.moveCaretRelatively(
                     lookupPrefix.length + lookup.lookupString.length + suffix.length,

@@ -52,9 +52,9 @@ class UnknownTableOrViewInspection : PhpInspection() {
             }
 
             private fun shouldNotInspect(method: MethodReference, expression: StringLiteralExpression) =
-                !method.isBuilderMethodByName()
-                        || !expression.isTableParam()
-                        || expression.isInsideRegularFunction()
+                !method.isBuilderMethodByName() ||
+                    !expression.isTableParam() ||
+                    expression.isInsideRegularFunction()
         }
     }
 }

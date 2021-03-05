@@ -4,7 +4,11 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
-import com.jetbrains.php.lang.psi.elements.impl.*
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstantReferenceImpl
+import com.jetbrains.php.lang.psi.elements.impl.GroupStatementImpl
+import com.jetbrains.php.lang.psi.elements.impl.ParameterListImpl
+import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl
+import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isInsideRelationClosure
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.getClass
@@ -33,11 +37,11 @@ class ModelRelationResolver(private val reference: DbReferenceExpression, privat
             PhpReturnImpl::class.java.name
         ) ?: return
         val firstParam = (
-                MethodUtils.firstChildOfType(
-                    returnStatement,
-                    ParameterListImpl::class.java.name
-                ) as? ParameterListImpl
-                )?.getParameter(0) ?: return
+            MethodUtils.firstChildOfType(
+                returnStatement,
+                ParameterListImpl::class.java.name
+            ) as? ParameterListImpl
+            )?.getParameter(0) ?: return
 
         when (firstParam) {
             is ClassConstantReferenceImpl -> {

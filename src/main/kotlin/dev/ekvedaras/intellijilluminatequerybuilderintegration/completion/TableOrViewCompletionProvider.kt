@@ -18,7 +18,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import org.jetbrains.annotations.NotNull
-import java.util.*
+import java.util.Collections
 
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
@@ -78,7 +78,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     }
 
     private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
-        !method.isBuilderMethodByName()
-                || !parameters.isTableParam()
-                || parameters.isInsideRegularFunction()
+        !method.isBuilderMethodByName() ||
+            !parameters.isTableParam() ||
+            parameters.isInsideRegularFunction()
 }

@@ -119,12 +119,12 @@ class UnknownColumnInspection : PhpInspection() {
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
-                expression.containsVariable()
-                        || expression.selectsAllColumns()
-                        || expression.isOperatorParam()
-                        || !method.isBuilderMethodForColumns()
-                        || !expression.isColumnIn(method)
-                        || expression.isInsideRegularFunction()
+                expression.containsVariable() ||
+                    expression.selectsAllColumns() ||
+                    expression.isOperatorParam() ||
+                    !method.isBuilderMethodForColumns() ||
+                    !expression.isColumnIn(method) ||
+                    expression.isInsideRegularFunction()
         }
     }
 }

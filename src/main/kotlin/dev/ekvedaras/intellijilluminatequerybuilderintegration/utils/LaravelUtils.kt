@@ -221,8 +221,8 @@ class LaravelUtils {
             this.position.isInsideRegularFunction()
 
         fun PsiElement.isInsideRegularFunction(): Boolean =
-            (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference)
-                    || (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
+            (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference) ||
+                (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
         fun PsiElement.isOperatorParam(): Boolean =
             this.findParameterList()?.parameters?.size == 3 && this.findParamIndex() == 1
@@ -231,8 +231,8 @@ class LaravelUtils {
             this.position.isInsidePhpArrayOrValue()
 
         fun PsiElement.isInsidePhpArrayOrValue(): Boolean =
-            this.parent.parent.isPhpArray()
-                    || this.parent.parent.isArrayValue()
+            this.parent.parent.isPhpArray() ||
+                this.parent.parent.isArrayValue()
 
         fun PsiElement.selectsAllColumns(): Boolean =
             this.textContains('*')
@@ -241,6 +241,6 @@ class LaravelUtils {
             this.position.isTableParam()
 
         fun PsiElement.isTableParam(): Boolean =
-            this.findParamIndex() == 0  // So far all functions accept table as the first argument
+            this.findParamIndex() == 0 // So far all functions accept table as the first argument
     }
 }
