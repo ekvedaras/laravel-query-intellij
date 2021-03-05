@@ -51,9 +51,9 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
         element.containsVariable() ||
-                !method.isBuilderMethodForColumns() ||
-                !element.isColumnIn(method) ||
-                element.isInsideRegularFunction() ||
-                (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-                !method.isBuilderClassMethod(project)
+            !method.isBuilderMethodForColumns() ||
+            !element.isColumnIn(method) ||
+            element.isInsideRegularFunction() ||
+            (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+            !method.isBuilderClassMethod(project)
 }

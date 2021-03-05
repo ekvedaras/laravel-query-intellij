@@ -25,6 +25,7 @@ class PsiUtils private constructor() {
         fun String.unquoteAndCleanup() = this.replace("IntellijIdeaRulezzz", "").trim('\'', '"').trim()
         fun Variable.referencesInParallel(): Stream<out PsiReference> =
             ReferencesSearch.search(this.originalElement).findAll().parallelStream()
+
         fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
         private fun PsiElement.typeAsInt(): Int = this.elementType?.index?.toInt() ?: 0
     }

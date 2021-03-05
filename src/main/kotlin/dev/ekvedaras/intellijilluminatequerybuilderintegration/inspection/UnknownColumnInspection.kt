@@ -114,13 +114,13 @@ class UnknownColumnInspection : PhpInspection() {
                 expression: StringLiteralExpression
             ) =
                 expression.containsVariable() ||
-                        expression.selectsAllColumns() ||
-                        expression.isOperatorParam() ||
-                        !method.isBuilderMethodForColumns() ||
-                        !expression.isColumnIn(method) ||
-                        expression.isInsideRegularFunction() ||
-                        (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-                        !method.isBuilderClassMethod(project)
+                    expression.selectsAllColumns() ||
+                    expression.isOperatorParam() ||
+                    !method.isBuilderMethodForColumns() ||
+                    !expression.isColumnIn(method) ||
+                    expression.isInsideRegularFunction() ||
+                    (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                    !method.isBuilderClassMethod(project)
         }
     }
 }

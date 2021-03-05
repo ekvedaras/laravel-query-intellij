@@ -33,7 +33,7 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
         !method.isBuilderMethodByName() ||
-                !element.isTableParam() ||
-                element.isInsideRegularFunction() ||
-                !method.isBuilderClassMethod(project)
+            !element.isTableParam() ||
+            element.isInsideRegularFunction() ||
+            !method.isBuilderClassMethod(project)
 }

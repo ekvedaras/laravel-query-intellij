@@ -54,9 +54,9 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 expression: StringLiteralExpression
             ) =
                 !method.isBuilderMethodByName() ||
-                        !expression.isTableParam() ||
-                        expression.isInsideRegularFunction() ||
-                        !method.isBuilderClassMethod(project)
+                    !expression.isTableParam() ||
+                    expression.isInsideRegularFunction() ||
+                    !method.isBuilderClassMethod(project)
         }
     }
 }

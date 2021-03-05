@@ -26,7 +26,6 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.containsVariable
-import org.jetbrains.annotations.NotNull
 import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
@@ -58,7 +57,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun completeForOnePart(
-        project: @NotNull Project,
+        project: Project,
         target: DbReferenceExpression,
         items: MutableList<LookupElementBuilder>,
         result: CompletionResultSet,
@@ -81,7 +80,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun addSchemaAndItsTables(
         items: MutableList<LookupElementBuilder>,
         schema: DasNamespace,
-        project: @NotNull Project,
+        project: Project,
         dataSource: DbDataSource,
         target: DbReferenceExpression
     ) {
@@ -98,7 +97,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result: CompletionResultSet,
         target: DbReferenceExpression,
         dataSource: DbDataSource,
-        project: @NotNull Project,
+        project: Project,
         items: MutableList<LookupElementBuilder>
     ) {
         result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
@@ -107,7 +106,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
 
             val table = dataSource.tables().find { table ->
                 table.name == tableAlias.value.first &&
-                        (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
+                    (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
             }
 
             if (table != null) {
@@ -123,7 +122,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun completeForTwoParts(
-        project: @NotNull Project,
+        project: Project,
         target: DbReferenceExpression,
         result: MutableList<LookupElementBuilder>
     ) {
@@ -139,7 +138,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun addTableColumns(
         target: DbReferenceExpression,
         result: MutableList<LookupElementBuilder>,
-        project: @NotNull Project
+        project: Project
     ) {
         target.table.parallelStream().forEach { table ->
             val alias = target.tablesAndAliases.entries.firstOrNull { it.value.first == table.name }?.key
@@ -153,7 +152,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun addTables(
         target: DbReferenceExpression,
         result: MutableList<LookupElementBuilder>,
-        project: @NotNull Project
+        project: Project
     ) {
         target.schema.parallelStream().forEach { schema ->
             schema.tablesInParallel().forEach { table ->
@@ -163,7 +162,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun completeForThreeParts(
-        project: @NotNull Project,
+        project: Project,
         target: DbReferenceExpression,
         result: MutableList<LookupElementBuilder>,
     ) {
@@ -176,9 +175,9 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         parameters.containsVariable() ||
-                !method.isBuilderMethodForColumns() ||
-                !parameters.isColumnIn(method) ||
-                parameters.isInsideRegularFunction() ||
-                (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-                !method.isBuilderClassMethod(project)
+            !method.isBuilderMethodForColumns() ||
+            !parameters.isColumnIn(method) ||
+            parameters.isInsideRegularFunction() ||
+            (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+            !method.isBuilderClassMethod(project)
 }

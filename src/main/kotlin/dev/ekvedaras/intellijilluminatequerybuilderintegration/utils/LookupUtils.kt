@@ -57,17 +57,17 @@ class LookupUtils private constructor() {
                     false,
                     alias
                         ?: "${
-                        if (withSchemaPrefix) {
-                            this.table?.dasParent?.name ?: ""
-                        } else {
-                            ""
-                        }
+                            if (withSchemaPrefix) {
+                                this.table?.dasParent?.name ?: ""
+                            } else {
+                                ""
+                            }
                         }.${
-                        if (withTablePrefix) {
-                            this.dasParent?.name ?: ""
-                        } else {
-                            ""
-                        }
+                            if (withTablePrefix) {
+                                this.dasParent?.name ?: ""
+                            } else {
+                                ""
+                            }
                         }".trim('.')
                 )
 

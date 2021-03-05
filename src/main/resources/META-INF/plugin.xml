@@ -11,9 +11,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-                serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
+            serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
         <projectService
-                serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
+            serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>

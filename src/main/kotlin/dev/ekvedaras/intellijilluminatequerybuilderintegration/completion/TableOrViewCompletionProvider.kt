@@ -75,7 +75,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         !method.isBuilderMethodByName() ||
-                !parameters.isTableParam() ||
-                parameters.isInsideRegularFunction() ||
-                !method.isBuilderClassMethod(project)
+            !parameters.isTableParam() ||
+            parameters.isInsideRegularFunction() ||
+            !method.isBuilderClassMethod(project)
 }
