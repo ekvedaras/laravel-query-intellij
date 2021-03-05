@@ -43,7 +43,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     }
 
     private fun collectMethodsAcrossVariableReferences(methods: MutableList<MethodReference>, method: MethodReference) {
-        val variable = method.parentOfType<Statement>()!!.firstPsiChild?.firstPsiChild
+        val variable = method.parentOfType<Statement>()?.firstPsiChild?.firstPsiChild
         if (variable !is VariableImpl) return
 
         variable.referencesInParallel().forEach {
@@ -70,7 +70,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                     // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
                     // $var->join('table', function (JoinClause $join) { $join->on() })
                     if (element.isJoinOrRelation(reference.project)) {
-                        element.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
+                        element.parent.parentOfType<Statement>()?.parentOfType<Statement>() ?: return
                     } else {
                         element.parent
                     }
@@ -87,12 +87,12 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
                 // $var->join('table', function (JoinClause $join) { $join->on() })
                 if (method.isJoinOrRelation(reference.project)) {
-                    method.parentOfType<Statement>()!!
-                        .parentOfType<Statement>()!!
-                        .parentOfType<Statement>()!!
-                        .firstChild
+                    method.parentOfType<Statement>()
+                        ?.parentOfType<Statement>()
+                        ?.parentOfType<Statement>()
+                        ?.firstChild ?: return
                 } else {
-                    method.parentOfType<Statement>()!!.firstChild
+                    method.parentOfType<Statement>()?.firstChild ?: return
                 }
             )
         )

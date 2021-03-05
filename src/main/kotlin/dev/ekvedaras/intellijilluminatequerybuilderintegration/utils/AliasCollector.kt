@@ -25,7 +25,10 @@ class AliasCollector(private val reference: DbReferenceExpression) {
         }
 
         reference.tablesAndAliases[alias] = table to referencedSchema1
-        reference.aliases[table] = alias to method.getParameter(0)!!
+
+        val firstParam = method.getParameter(0) ?: return
+
+        reference.aliases[table] = alias to firstParam
     }
 
     fun collectAliasFromMethodReference(
@@ -52,7 +55,8 @@ class AliasCollector(private val reference: DbReferenceExpression) {
         reference.tablesAndAliases[alias ?: referencedTable] = referencedTable to referencedSchema
 
         if (alias != null && method.getParameter(aliasParam) != null) {
-            reference.aliases[referencedTable] = alias to method.getParameter(aliasParam)!!
+            val firstParam = method.getParameter(aliasParam) ?: return
+            reference.aliases[referencedTable] = alias to firstParam
         }
     }
 }

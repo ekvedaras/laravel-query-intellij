@@ -35,7 +35,7 @@ class MethodUtils private constructor() {
 
             PhpIndex
                 .getInstance(project)
-                .completeType(project, method.classReference!!.declaredType, null)
+                .completeType(project, method.classReference?.declaredType ?: return listOf(), null)
                 .types
                 .toList()
                 .forEach {

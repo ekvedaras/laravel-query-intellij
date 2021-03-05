@@ -173,7 +173,7 @@ class LaravelUtils private constructor() {
             val tableField = this.fields.find { it.name == "table" }
 
             if (ClassUtils.fieldHasDefaultValue(tableField)) {
-                return tableField!!.defaultValue!!.text.unquoteAndCleanup()
+                return tableField?.defaultValue?.text?.unquoteAndCleanup() ?: this.asTableName()
             }
 
             return this.asTableName()

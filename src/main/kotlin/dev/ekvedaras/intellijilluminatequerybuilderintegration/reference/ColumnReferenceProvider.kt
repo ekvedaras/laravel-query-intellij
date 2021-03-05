@@ -32,7 +32,8 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         target.table.parallelStream().forEach {
             references += TableOrViewPsiReference(target, it)
 
-            if (target.aliases.containsKey(it.name)) {
+            val alias = target.aliases[it.name]
+            if (alias != null) {
                 references += TableAliasPsiReference(
                     element,
                     if (target.ranges.size >= 2 && target.schema.isNotEmpty()) {
@@ -40,7 +41,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
                     } else {
                         target.ranges.first()
                     },
-                    target.aliases[it.name]!!.second
+                    alias.second
                 )
             }
         }
