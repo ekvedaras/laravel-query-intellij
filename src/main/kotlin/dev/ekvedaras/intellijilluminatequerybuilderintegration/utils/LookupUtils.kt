@@ -44,8 +44,18 @@ class LookupUtils private constructor() {
             withTablePrefix: Boolean = false,
             withSchemaPrefix: Boolean = false,
             alias: String? = null
-        ): LookupElementBuilder =
-            LookupElementBuilder
+        ): LookupElementBuilder {
+            val prefix = if (withSchemaPrefix) {
+                this.table?.dasParent?.name ?: ""
+            } else {
+                ""
+            } + "." + if (withTablePrefix) {
+                this.dasParent?.name ?: ""
+            } else {
+                ""
+            }
+
+            return LookupElementBuilder
                 .create(this, this.name)
                 .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
                 .withTailText("  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}", true)
@@ -55,21 +65,9 @@ class LookupUtils private constructor() {
                 .withInsertHandler(
                     project,
                     false,
-                    alias
-                        ?: "${
-                            if (withSchemaPrefix) {
-                                this.table?.dasParent?.name ?: ""
-                            } else {
-                                ""
-                            }
-                        }.${
-                            if (withTablePrefix) {
-                                this.dasParent?.name ?: ""
-                            } else {
-                                ""
-                            }
-                        }".trim('.')
+                    alias ?: prefix.trim('.')
                 )
+        }
 
         fun buildForAlias(
             tableAlias: Map.Entry<String, Pair<String, String?>>,

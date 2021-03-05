@@ -17,7 +17,6 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils
-import org.jetbrains.annotations.NotNull
 import java.util.Collections
 
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -47,7 +46,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     }
 
     private fun populateWithOnePart(
-        project: @NotNull Project,
+        project: Project,
         result: MutableList<LookupElementBuilder>
     ) {
         project.dbDataSourcesInParallel().forEach { dataSource ->
@@ -62,7 +61,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     }
 
     private fun populateWithTwoParts(
-        project: @NotNull Project,
+        project: Project,
         target: DbReferenceExpression,
         result: MutableList<LookupElementBuilder>,
     ) {
