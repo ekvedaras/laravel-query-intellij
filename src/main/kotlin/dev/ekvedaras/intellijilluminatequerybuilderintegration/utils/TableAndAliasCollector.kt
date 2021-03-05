@@ -126,10 +126,8 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             ?.nextSibling
             ?.nextSibling as? ClassReferenceImpl
 
-        return methodReference.firstChild is ParenthesizedExpressionImpl &&
-            classReference
-                ?.getClass(reference.project)
-                ?.isChildOf(LaravelClasses.Model) == true
+        return methodReference.firstChild is ParenthesizedExpressionImpl
+            && classReference?.getClass(reference.project)?.isChildOf(LaravelClasses.Model) == true
     }
 
     private fun isModelReference(methodReference: MethodReference): Boolean {
