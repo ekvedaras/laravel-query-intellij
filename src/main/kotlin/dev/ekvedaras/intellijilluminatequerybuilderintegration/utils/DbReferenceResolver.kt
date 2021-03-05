@@ -137,21 +137,25 @@ private class ResolverForColumnMethods(
 
             dataSource.tablesInParallel().forEach { table ->
                 if (schemas.isEmpty() || schemas.contains(table.dasParent)) {
-                    if (table.name == reference.parts.first() || table.name == reference.parts.last()) {
-                        tables.add(table)
-
-                        table.columnsInParallel()
-                            .filter { it.name == reference.parts.last() }
-                            .forEach { columns.add(it) }
-                    } else if (schemas.isEmpty() && (reference.tablesAndAliases[reference.parts.first()]?.first == table.name || reference.tablesAndAliases[reference.parts.last()]?.first == table.name)) {
-                        tables.add(table)
-
-                        table.columnsInParallel()
-                            .filter { it.name == reference.parts.last() }
-                            .forEach { columns.add(it) }
-                    }
+                    addTablesAndTheirColumns(table)
                 }
             }
+        }
+    }
+
+    private fun addTablesAndTheirColumns(table: DasTable) {
+        if (table.name == reference.parts.first() || table.name == reference.parts.last()) {
+            tables.add(table)
+
+            table.columnsInParallel()
+                .filter { it.name == reference.parts.last() }
+                .forEach { columns.add(it) }
+        } else if (schemas.isEmpty() && (reference.tablesAndAliases[reference.parts.first()]?.first == table.name || reference.tablesAndAliases[reference.parts.last()]?.first == table.name)) {
+            tables.add(table)
+
+            table.columnsInParallel()
+                .filter { it.name == reference.parts.last() }
+                .forEach { columns.add(it) }
         }
     }
 
@@ -166,21 +170,23 @@ private class ResolverForColumnMethods(
 
             dataSource.tablesInParallel()
                 .filter { schemas.contains(it.dasParent) }
-                .forEach { table ->
-                    if (table.name == reference.parts[1]) {
-                        tables.add(table)
+                .forEach { addTableAndItsColumns(it) }
+        }
+    }
 
-                        table.columnsInParallel()
-                            .filter { it.name == reference.parts.last() }
-                            .forEach { columns.add(it) }
-                    } else if (reference.tablesAndAliases[reference.parts[1]]?.first == table.name) {
-                        tables.add(table)
+    private fun addTableAndItsColumns(table: DasTable) {
+        if (table.name == reference.parts[1]) {
+            tables.add(table)
 
-                        table.columnsInParallel()
-                            .filter { it.name == reference.parts.last() }
-                            .forEach { columns.add(it) }
-                    }
-                }
+            table.columnsInParallel()
+                .filter { it.name == reference.parts.last() }
+                .forEach { columns.add(it) }
+        } else if (reference.tablesAndAliases[reference.parts[1]]?.first == table.name) {
+            tables.add(table)
+
+            table.columnsInParallel()
+                .filter { it.name == reference.parts.last() }
+                .forEach { columns.add(it) }
         }
     }
 }
