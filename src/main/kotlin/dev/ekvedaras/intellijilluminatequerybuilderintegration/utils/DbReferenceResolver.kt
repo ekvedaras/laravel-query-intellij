@@ -8,7 +8,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUti
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tablesInParallel
-import java.util.*
+import java.util.Collections
 
 class DbReferenceResolver(private val reference: DbReferenceExpression) {
     fun resolve() {

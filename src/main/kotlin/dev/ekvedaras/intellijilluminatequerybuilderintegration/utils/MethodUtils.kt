@@ -4,15 +4,13 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiReference
-import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
-import com.jetbrains.php.lang.psi.elements.*
+import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.ParameterList
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isJoinOrRelation
-import java.util.stream.Stream
 
 class MethodUtils {
     companion object {
