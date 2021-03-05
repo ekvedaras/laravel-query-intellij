@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
@@ -20,15 +21,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
-        if (shouldNotInspect(method, element)) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
-        if (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
-        if (!method.isBuilderClassMethod(project)) {
+        if (shouldNotInspect(project, method, element)) {
             return PsiReference.EMPTY_ARRAY
         }
 
@@ -42,7 +35,11 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             if (target.aliases.containsKey(it.name)) {
                 references += TableAliasPsiReference(
                     element,
-                    if (target.ranges.size >= 2 && target.schema.isNotEmpty()) target.ranges[1] else target.ranges.first(),
+                    if (target.ranges.size >= 2 && target.schema.isNotEmpty()) {
+                        target.ranges[1]
+                    } else {
+                        target.ranges.first()
+                    },
                     target.aliases[it.name]!!.second
                 )
             }
@@ -52,9 +49,11 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         return references
     }
 
-    private fun shouldNotInspect(method: MethodReference, element: PsiElement) =
+    private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
         element.containsVariable() ||
-            !method.isBuilderMethodForColumns() ||
-            !element.isColumnIn(method) ||
-            element.isInsideRegularFunction()
+                !method.isBuilderMethodForColumns() ||
+                !element.isColumnIn(method) ||
+                element.isInsideRegularFunction() ||
+                (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                !method.isBuilderClassMethod(project)
 }

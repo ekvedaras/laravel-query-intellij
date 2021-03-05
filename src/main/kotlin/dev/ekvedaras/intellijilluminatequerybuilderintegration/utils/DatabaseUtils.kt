@@ -10,7 +10,7 @@ import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import java.util.stream.Stream
 
-class DatabaseUtils {
+class DatabaseUtils private constructor() {
     companion object {
         fun Project.dbDataSourcesInParallel(): Stream<out DbDataSource> =
             DbUtil.getDataSources(this).toList().parallelStream()
@@ -25,7 +25,9 @@ class DatabaseUtils {
             DasUtil.getTables(this).toList().parallelStream().filter { !it.isSystem }
 
         fun DasNamespace.tablesInParallel(): Stream<out DasTable> =
-            this.getDasChildren(ObjectKind.TABLE).toList().parallelStream().map { it as DasTable }.filter { !it.isSystem }
+            this.getDasChildren(ObjectKind.TABLE).toList().parallelStream()
+                .map { it as DasTable }
+                .filter { !it.isSystem }
 
         fun DasTable.columnsInParallel(): Stream<out DasColumn> =
             this.getDasChildren(ObjectKind.COLUMN).toList().parallelStream().map { it as DasColumn }

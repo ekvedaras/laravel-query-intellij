@@ -10,7 +10,7 @@ import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 
-class LookupUtils {
+class LookupUtils private constructor() {
     companion object {
         fun DasNamespace.buildLookup(project: Project, dataSource: DbDataSource): LookupElementBuilder =
             LookupElementBuilder

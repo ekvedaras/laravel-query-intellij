@@ -7,7 +7,7 @@ import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 
-class ClassUtils {
+class ClassUtils private constructor() {
     companion object {
         @JvmStatic
         fun PhpClassImpl.isChildOf(clazz: PhpClass): Boolean {
@@ -15,11 +15,7 @@ class ClassUtils {
                 return true
             }
 
-            if (superClass == null) {
-                return false
-            }
-
-            return (superClass as PhpClassImpl).isChildOf(clazz)
+            return superClass != null && (superClass as PhpClassImpl).isChildOf(clazz)
         }
 
         @JvmStatic
@@ -28,11 +24,7 @@ class ClassUtils {
                 return true
             }
 
-            if (superClass == null) {
-                return false
-            }
-
-            return (superClass as PhpClassImpl).isChildOf(clazz)
+            return superClass != null && (superClass as PhpClassImpl).isChildOf(clazz)
         }
 
         @JvmStatic

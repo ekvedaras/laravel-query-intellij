@@ -29,11 +29,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
         val project = method.project
 
-        if (shouldNotComplete(method, parameters)) {
-            return
-        }
-
-        if (!method.isBuilderClassMethod(project)) {
+        if (shouldNotComplete(project, method, parameters)) {
             return
         }
 
@@ -77,8 +73,9 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
+    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         !method.isBuilderMethodByName() ||
-            !parameters.isTableParam() ||
-            parameters.isInsideRegularFunction()
+                !parameters.isTableParam() ||
+                parameters.isInsideRegularFunction() ||
+                !method.isBuilderClassMethod(project)
 }

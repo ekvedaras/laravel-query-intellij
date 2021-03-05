@@ -12,7 +12,8 @@ class SchemaTableReferenceTest : BaseTestCase() {
         myFixture.configureByFile("inspection/knownSchema.php")
 
         val schema = DasUtil.getSchemas(db).first { it.name == "testProject1" }
-        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
+        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
+            ?: return fail("Failed to resolve DB schema")
 
         val usages = myFixture.findUsages(dbSchema)
 
@@ -27,7 +28,8 @@ class SchemaTableReferenceTest : BaseTestCase() {
         myFixture.configureByFile("inspection/knownTable.php")
 
         val table = DasUtil.getTables(db).first { it.name == "users" }
-        val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table) ?: return fail("Failed to resolve DB table")
+        val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
+            ?: return fail("Failed to resolve DB table")
 
         val usages = myFixture.findUsages(dbTable)
 
@@ -44,8 +46,10 @@ class SchemaTableReferenceTest : BaseTestCase() {
         val table = DasUtil.getTables(db).first { it.name == "users" }
         val schema = table.dasParent!!
 
-        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema) ?: return fail("Failed to resolve DB schema")
-        val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table) ?: return fail("Failed to resolve DB table")
+        val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
+            ?: return fail("Failed to resolve DB schema")
+        val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
+            ?: return fail("Failed to resolve DB table")
 
         val schemaUsages = myFixture.findUsages(dbSchema)
         val tableUsages = myFixture.findUsages(dbTable)
@@ -63,6 +67,9 @@ class SchemaTableReferenceTest : BaseTestCase() {
         TestCase.assertEquals(55 + schema.name.length + 1, tableUsages.first().navigationRange.startOffset)
 
         TestCase.assertEquals(55 + schema.name.length, schemaUsages.first().navigationRange.endOffset)
-        TestCase.assertEquals(55 + schema.name.length + 1 + table.name.length, tableUsages.first().navigationRange.endOffset)
+        TestCase.assertEquals(
+            55 + schema.name.length + 1 + table.name.length,
+            tableUsages.first().navigationRange.endOffset
+        )
     }
 }

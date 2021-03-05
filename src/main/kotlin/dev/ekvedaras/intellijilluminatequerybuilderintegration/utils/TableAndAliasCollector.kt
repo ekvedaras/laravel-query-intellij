@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
+import com.intellij.psi.PsiReference
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
@@ -14,7 +15,6 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenc
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveAliasParam
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.isJoinOrRelation
@@ -46,29 +46,36 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val variable = method.parentOfType<Statement>()!!.firstPsiChild?.firstPsiChild
         if (variable !is VariableImpl) return
 
-        variable.referencesInParallel().forEach loop@{ variableReference ->
-            val element = variableReference.statementFirstPsiChild() ?: return@loop
+        variable.referencesInParallel().forEach {
+            collectMethodsInVariableReference(it, methods)
+        }
+    }
 
-            // $var = query()->table();
-            if (element is AssignmentExpressionImpl && element.lastChild is MethodReference) {
-                methods.addAll(MethodUtils.findMethodsInTree(element.lastChild))
-                return@loop
-            }
+    private fun collectMethodsInVariableReference(
+        variableReference: PsiReference,
+        methods: MutableList<MethodReference>
+    ) {
+        val element = variableReference.statementFirstPsiChild() ?: return
 
-            // $var->where()
-            if (element is MethodReference) {
-                methods.addAll(
-                    MethodUtils.findMethodsInTree(
-                        // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
-                        // $var->join('table', function (JoinClause $join) { $join->on() })
-                        // TODO: this could go deep. Make it walk up the tree dynamically? Or 1 level up is enough?
-                        if (element.isJoinOrRelation(reference.project))
-                            element.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
-                        else
-                            element.parent
-                    )
+        // $var = query()->table();
+        if (element is AssignmentExpressionImpl && element.lastChild is MethodReference) {
+            methods.addAll(MethodUtils.findMethodsInTree(element.lastChild))
+            return
+        }
+
+        // $var->where()
+        if (element is MethodReference) {
+            methods.addAll(
+                MethodUtils.findMethodsInTree(
+                    // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
+                    // $var->join('table', function (JoinClause $join) { $join->on() })
+                    if (element.isJoinOrRelation(reference.project)) {
+                        element.parent.parentOfType<Statement>()!!.parentOfType<Statement>()!!
+                    } else {
+                        element.parent
+                    }
                 )
-            }
+            )
         }
     }
 
@@ -79,14 +86,14 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             MethodUtils.findMethodsInTree(
                 // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
                 // $var->join('table', function (JoinClause $join) { $join->on() })
-                // TODO: this could go deep. Make it walk up the tree dynamically? Or 1 level up is enough?
-                if (method.isJoinOrRelation(reference.project))
+                if (method.isJoinOrRelation(reference.project)) {
                     method.parentOfType<Statement>()!!
                         .parentOfType<Statement>()!!
                         .parentOfType<Statement>()!!
                         .firstChild
-                else
+                } else {
                     method.parentOfType<Statement>()!!.firstChild
+                }
             )
         )
     }
@@ -99,31 +106,35 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     fun resolveModelReference(methods: MutableList<MethodReference>): PhpTypedElement? {
         if (!methods.none { it.name == "from" }) return null
 
-        val modelReference: PhpTypedElement? = methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
-
-        if (modelReference != null) return modelReference
-
-        return methods.find { isNewModelInstance(it) } // TODO can this be improved with methods like firstPsiChild, nextPsiSibling ?
-            ?.firstChild
-            ?.firstChild
-            ?.nextSibling
-            ?.firstChild
-            ?.nextSibling
-            ?.nextSibling as? PhpTypedElement
+        // TODO can this be improved with methods like firstPsiChild, nextPsiSibling ?
+        return methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
+            ?: methods.find { isNewModelInstance(it) }
+                ?.firstChild
+                ?.firstChild
+                ?.nextSibling
+                ?.firstChild
+                ?.nextSibling
+                ?.nextSibling as? PhpTypedElement
     }
 
     private fun isNewModelInstance(methodReference: MethodReference) =
         methodReference.firstChild is ParenthesizedExpressionImpl &&
-            (methodReference.firstChild?.firstChild?.nextSibling?.firstChild?.nextSibling?.nextSibling as? ClassReferenceImpl)?.getClass(
-            reference.project
-        )?.isChildOf(LaravelUtils.Model) == true
+                (methodReference
+                    .firstChild
+                    ?.firstChild
+                    ?.nextSibling
+                    ?.firstChild
+                    ?.nextSibling
+                    ?.nextSibling as? ClassReferenceImpl)
+                    ?.getClass(reference.project)
+                    ?.isChildOf(LaravelClasses.Model) == true
 
     private fun isModelReference(methodReference: MethodReference): Boolean {
         return when (methodReference.firstPsiChild) {
             is ClassReferenceImpl -> (methodReference.firstChild as ClassReferenceImpl).getClass(reference.project)
-                .isChildOf(LaravelUtils.Model)
+                .isChildOf(LaravelClasses.Model)
             is VariableImpl ->
-                (methodReference.firstChild as VariableImpl).getClass(reference.project).isChildOf(LaravelUtils.Model)
+                (methodReference.firstChild as VariableImpl).getClass(reference.project).isChildOf(LaravelClasses.Model)
             else -> false
         }
     }
@@ -148,12 +159,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             }
         }
 
-        if (!method.canHaveAliasParam()) {
-            reference.tablesAndAliases[referencedTable] = referencedTable to referencedSchema
-            return
-        }
-
-        aliasCollector.resolveAliasFromParam(method, referencedTable, referencedSchema)
+        aliasCollector.collectAliasFromMethodReference(method, referencedTable, referencedSchema)
     }
 
     private fun extractTableAndSchema(method: MethodReference): Pair<String, String?> {

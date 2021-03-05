@@ -14,7 +14,10 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
 
-class ModelRelationResolver(private val reference: DbReferenceExpression, private val tableAndAliasCollector: TableAndAliasCollector) {
+class ModelRelationResolver(
+    private val reference: DbReferenceExpression,
+    private val tableAndAliasCollector: TableAndAliasCollector
+) {
     fun resolveModelAndRelationTables(methods: MutableList<MethodReference>, method: MethodReference) {
         val modelReference: PhpTypedElement = tableAndAliasCollector.resolveModelReference(methods) ?: return
         val model = modelReference.getClass(reference.project)
@@ -29,6 +32,7 @@ class ModelRelationResolver(private val reference: DbReferenceExpression, privat
         }
     }
 
+    @Suppress("ReturnCount")
     private fun resolveRelationTable(deepParent: PsiElement, model: PhpClass) {
         val relationName = deepParent.firstChild.text.unquoteAndCleanup()
         val relationMethod = model.methods.firstOrNull { it.name == relationName } ?: return

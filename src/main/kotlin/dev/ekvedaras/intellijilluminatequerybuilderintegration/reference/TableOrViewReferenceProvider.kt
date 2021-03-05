@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
@@ -17,11 +18,7 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
-        if (shouldNotInspect(method, element)) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
-        if (!method.isBuilderClassMethod(project)) {
+        if (shouldNotInspect(project, method, element)) {
             return PsiReference.EMPTY_ARRAY
         }
 
@@ -34,8 +31,9 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
         return references
     }
 
-    private fun shouldNotInspect(method: MethodReference, element: PsiElement) =
+    private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
         !method.isBuilderMethodByName() ||
-            !element.isTableParam() ||
-            element.isInsideRegularFunction()
+                !element.isTableParam() ||
+                element.isInsideRegularFunction() ||
+                !method.isBuilderClassMethod(project)
 }

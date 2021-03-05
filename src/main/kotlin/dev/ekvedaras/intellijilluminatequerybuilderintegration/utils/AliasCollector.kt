@@ -5,6 +5,7 @@ import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.models.DbReferenceExpression
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.canHaveAliasParam
 
 class AliasCollector(private val reference: DbReferenceExpression) {
     fun extractAliasFromString(
@@ -27,7 +28,20 @@ class AliasCollector(private val reference: DbReferenceExpression) {
         reference.aliases[table] = alias to method.getParameter(0)!!
     }
 
-    fun resolveAliasFromParam(
+    fun collectAliasFromMethodReference(
+        method: MethodReference,
+        referencedTable: String,
+        referencedSchema: String?
+    ) {
+        if (!method.canHaveAliasParam()) {
+            reference.tablesAndAliases[referencedTable] = referencedTable to referencedSchema
+            return
+        }
+
+        resolveAliasFromParam(method, referencedTable, referencedSchema)
+    }
+
+    private fun resolveAliasFromParam(
         method: MethodReference,
         referencedTable: String,
         referencedSchema: String?

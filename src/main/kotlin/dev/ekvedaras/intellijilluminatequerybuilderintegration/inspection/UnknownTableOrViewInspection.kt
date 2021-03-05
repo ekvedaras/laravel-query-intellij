@@ -2,6 +2,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -22,11 +23,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 val method = MethodUtils.resolveMethodReference(expression ?: return) ?: return
                 val project = method.project
 
-                if (shouldNotInspect(method, expression)) {
-                    return
-                }
-
-                if (!method.isBuilderClassMethod(project)) {
+                if (shouldNotInspect(project, method, expression)) {
                     return
                 }
 
@@ -51,10 +48,15 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 }
             }
 
-            private fun shouldNotInspect(method: MethodReference, expression: StringLiteralExpression) =
+            private fun shouldNotInspect(
+                project: Project,
+                method: MethodReference,
+                expression: StringLiteralExpression
+            ) =
                 !method.isBuilderMethodByName() ||
-                    !expression.isTableParam() ||
-                    expression.isInsideRegularFunction()
+                        !expression.isTableParam() ||
+                        expression.isInsideRegularFunction() ||
+                        !method.isBuilderClassMethod(project)
         }
     }
 }

@@ -2,6 +2,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
@@ -33,15 +34,7 @@ class UnknownColumnInspection : PhpInspection() {
                 val method = MethodUtils.resolveMethodReference(expression ?: return) ?: return
                 val project = method.project
 
-                if (shouldNotInspect(method, expression)) {
-                    return
-                }
-
-                if (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
-                    return
-                }
-
-                if (!method.isBuilderClassMethod(project)) {
+                if (shouldNotInspect(project, method, expression)) {
                     return
                 }
 
@@ -116,15 +109,18 @@ class UnknownColumnInspection : PhpInspection() {
             }
 
             private fun shouldNotInspect(
+                project: Project,
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
                 expression.containsVariable() ||
-                    expression.selectsAllColumns() ||
-                    expression.isOperatorParam() ||
-                    !method.isBuilderMethodForColumns() ||
-                    !expression.isColumnIn(method) ||
-                    expression.isInsideRegularFunction()
+                        expression.selectsAllColumns() ||
+                        expression.isOperatorParam() ||
+                        !method.isBuilderMethodForColumns() ||
+                        !expression.isColumnIn(method) ||
+                        expression.isInsideRegularFunction() ||
+                        (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                        !method.isBuilderClassMethod(project)
         }
     }
 }

@@ -150,7 +150,12 @@ private class ResolverForColumnMethods(
             table.columnsInParallel()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
-        } else if (schemas.isEmpty() && (reference.tablesAndAliases[reference.parts.first()]?.first == table.name || reference.tablesAndAliases[reference.parts.last()]?.first == table.name)) {
+        } else if (schemas.isEmpty() &&
+            (
+                reference.tablesAndAliases[reference.parts.first()]?.first == table.name ||
+                    reference.tablesAndAliases[reference.parts.last()]?.first == table.name
+                )
+        ) {
             tables.add(table)
 
             table.columnsInParallel()

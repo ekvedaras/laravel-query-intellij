@@ -4,7 +4,6 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
@@ -18,24 +17,26 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Co
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.isPhpArray
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.PsiUtils.Companion.unquoteAndCleanup
 
-class LaravelUtils {
+object LaravelClasses {
+    const val QueryBuilder = "\\Illuminate\\Database\\Query\\Builder"
+    const val EloquentBuilder = "\\Illuminate\\Database\\Eloquent\\Builder"
+    const val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
+    const val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
+    const val Model = "\\Illuminate\\Database\\Eloquent\\Model"
+}
+
+private const val PARAMS_WITH_OPERATOR = 3
+
+@Suppress("TooManyFunctions")
+class LaravelUtils private constructor() {
     companion object {
-        @JvmStatic
-        val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
-
-        @JvmStatic
-        val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
-
-        @JvmStatic
-        val Model = "\\Illuminate\\Database\\Eloquent\\Model"
-
         // <editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
         @JvmStatic
         val DatabaseBuilderClasses = listOf(
-            "\\Illuminate\\Database\\Query\\Builder",
-            "\\Illuminate\\Database\\Eloquent\\Builder",
-            JoinClause,
-            Relation,
+            LaravelClasses.QueryBuilder,
+            LaravelClasses.EloquentBuilder,
+            LaravelClasses.JoinClause,
+            LaravelClasses.Relation,
         )
         // </editor-fold>
 
@@ -50,7 +51,7 @@ class LaravelUtils {
         )
         // </editor-fold>
 
-        // <editor-fold desc="Query builder table methods param indexes where table alias is defined" defaultstate="collapsed">
+        // <editor-fold desc="Table methods param indexes where table alias is defined" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableAliasParams = hashMapOf(
             "from" to 1,
@@ -59,7 +60,7 @@ class LaravelUtils {
         )
         // </editor-fold>
 
-        // <editor-fold desc="Query builder methods and params where columns should be completed" defaultstate="collapsed">
+        // <editor-fold desc="Methods and params where columns should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableColumnsParams = mapOf(
             "select" to listOf(-1),
@@ -152,7 +153,7 @@ class LaravelUtils {
         )
         // </editor-fold>
 
-        // <editor-fold desc="Query builder methods where params may accept columns as array values" defaultstate="collapsed">
+        // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         val BuilderMethodsWithTableColumnsInArrayValues = listOf(
             "get", "select",
@@ -168,9 +169,6 @@ class LaravelUtils {
                 }
             }
 
-        fun modelClass(project: Project): PhpClass =
-            PhpIndex.getInstance(project).getClassesByFQN(Model).first()
-
         fun PhpClass.tableName(): String {
             val tableField = this.fields.find { it.name == "table" }
 
@@ -185,7 +183,7 @@ class LaravelUtils {
             this is ArrayHashElementImpl && this.parentOfType<MethodReferenceImpl>()?.name == "with"
 
         fun PhpClass.isJoinOrRelation(): Boolean =
-            this.fqn == JoinClause || this.fqn == Relation
+            this.fqn == LaravelClasses.JoinClause || this.fqn == LaravelClasses.Relation
 
         fun MethodReference.isBuilderMethodByName(): Boolean =
             BuilderTableMethods.contains(this.name)
@@ -225,7 +223,7 @@ class LaravelUtils {
                 (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
         fun PsiElement.isOperatorParam(): Boolean =
-            this.findParameterList()?.parameters?.size == 3 && this.findParamIndex() == 1
+            this.findParameterList()?.parameters?.size == PARAMS_WITH_OPERATOR && this.findParamIndex() == 1
 
         fun CompletionParameters.isInsidePhpArrayOrValue(): Boolean =
             this.position.isInsidePhpArrayOrValue()

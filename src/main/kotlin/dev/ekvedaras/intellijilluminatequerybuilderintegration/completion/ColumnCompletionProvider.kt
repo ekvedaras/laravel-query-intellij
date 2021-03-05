@@ -39,15 +39,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val method = MethodUtils.resolveMethodReference(parameters.position) ?: return
         val project = method.project
 
-        if (shouldNotComplete(method, parameters)) {
-            return
-        }
-
-        if (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) {
-            return
-        }
-
-        if (!method.isBuilderClassMethod(project)) {
+        if (shouldNotComplete(project, method, parameters)) {
             return
         }
 
@@ -114,7 +106,8 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             var lookup = LookupUtils.buildForAlias(tableAlias, dataSource)
 
             val table = dataSource.tables().find { table ->
-                table.name == tableAlias.value.first && (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
+                table.name == tableAlias.value.first &&
+                        (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
             }
 
             if (table != null) {
@@ -181,9 +174,11 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
-    private fun shouldNotComplete(method: MethodReference, parameters: CompletionParameters) =
+    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         parameters.containsVariable() ||
-            !method.isBuilderMethodForColumns() ||
-            !parameters.isColumnIn(method) ||
-            parameters.isInsideRegularFunction()
+                !method.isBuilderMethodForColumns() ||
+                !parameters.isColumnIn(method) ||
+                parameters.isInsideRegularFunction() ||
+                (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                !method.isBuilderClassMethod(project)
 }

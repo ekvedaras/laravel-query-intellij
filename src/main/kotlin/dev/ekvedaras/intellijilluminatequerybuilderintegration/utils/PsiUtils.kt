@@ -15,7 +15,7 @@ object ElementTypes {
     const val ArrayValue = 805
 }
 
-class PsiUtils {
+class PsiUtils private constructor() {
     companion object {
         fun PsiElement.containsVariable(): Boolean = this.textContains('$')
         fun CompletionParameters.containsVariable(): Boolean = this.position.containsVariable()

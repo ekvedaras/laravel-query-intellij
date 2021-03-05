@@ -12,7 +12,7 @@ import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils.Companion.isJoinOrRelation
 
-class MethodUtils {
+class MethodUtils private constructor() {
     companion object {
         fun resolveMethodReference(element: PsiElement?, depthLimit: Int = 10): MethodReference? {
             if (element == null || depthLimit <= 0) {
