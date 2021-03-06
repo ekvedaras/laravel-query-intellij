@@ -10,8 +10,6 @@ import com.intellij.database.model.DasTable
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
-import icons.DatabaseIcons
-import javax.swing.Icon
 
 class LookupUtils private constructor() {
     companion object {
