@@ -7,7 +7,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
-import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
@@ -24,8 +23,10 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayO
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
+import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.getIcon
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
+import icons.DatabaseIcons
 import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
@@ -102,22 +103,22 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     ) {
         result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
         target.tablesAndAliases.forEach { tableAlias ->
-            var lookup = LookupUtils.buildForAlias(tableAlias, dataSource)
+            val lookup = LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
 
-            val table = dataSource.tables().find { table ->
-                table.name == tableAlias.value.first &&
-                    (tableAlias.value.second == null || table.dasParent?.name == tableAlias.value.second)
+            val table = dataSource.tables().firstOrNull { dasTable ->
+                dasTable.name == tableAlias.value.first &&
+                    (tableAlias.value.second == null || dasTable.dasParent?.name == tableAlias.value.second)
             }
 
             if (table != null) {
-                lookup = lookup.withIcon(DasPsiWrappingSymbol(table, project).getIcon(false))
+                items.add(lookup.withIcon(table.getIcon(project)))
 
                 table.columnsInParallel().forEach { column ->
                     items.add(column.buildLookup(project))
                 }
+            } else {
+                items.add(lookup.withIcon(DatabaseIcons.Synonym))
             }
-
-            items.add(lookup)
         }
     }
 
@@ -141,7 +142,9 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         project: Project
     ) {
         target.table.parallelStream().forEach { table ->
-            val alias = target.tablesAndAliases.entries.firstOrNull { it.value.first == table.name }?.key
+            val alias = target.tablesAndAliases.entries
+                .filter { it.value.first != it.key }
+                .firstOrNull { it.value.first == table.name }?.key
 
             table.columnsInParallel().forEach { column ->
                 result.add(column.buildLookup(project, withTablePrefix = true, withSchemaPrefix = false, alias = alias))

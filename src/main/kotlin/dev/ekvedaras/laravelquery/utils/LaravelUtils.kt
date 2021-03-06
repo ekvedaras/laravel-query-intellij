@@ -37,6 +37,7 @@ class LaravelUtils private constructor() {
             LaravelClasses.EloquentBuilder,
             LaravelClasses.JoinClause,
             LaravelClasses.Relation,
+            LaravelClasses.Model,
         )
         // </editor-fold>
 

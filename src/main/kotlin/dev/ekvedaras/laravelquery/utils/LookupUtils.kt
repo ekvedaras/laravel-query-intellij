@@ -5,17 +5,20 @@ import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasNamespace
+import com.intellij.database.model.DasObject
 import com.intellij.database.model.DasTable
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
+import icons.DatabaseIcons
+import javax.swing.Icon
 
 class LookupUtils private constructor() {
     companion object {
         fun DasNamespace.buildLookup(project: Project, dataSource: DbDataSource): LookupElementBuilder =
             LookupElementBuilder
                 .create(this, this.name)
-                .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
+                .withIcon(this.getIcon(project))
                 .withTypeText(dataSource.name, true)
                 .withInsertHandler(project, true)
 
@@ -28,7 +31,7 @@ class LookupUtils private constructor() {
                 .create(this, this.name)
                 .withLookupString("${this.dasParent?.name}.${this.name}")
                 .withTypeText(this.dasParent?.name ?: "", true)
-                .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
+                .withIcon(this.getIcon(project))
                 .withInsertHandler(
                     project,
                     triggerCompletion,
@@ -57,7 +60,7 @@ class LookupUtils private constructor() {
 
             return LookupElementBuilder
                 .create(this, this.name)
-                .withIcon(DasPsiWrappingSymbol(this, project).getIcon(false))
+                .withIcon(this.getIcon(project))
                 .withTailText("  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}", true)
                 .withTypeText(this.comment ?: "", true)
                 .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
@@ -69,13 +72,13 @@ class LookupUtils private constructor() {
                 )
         }
 
-        fun buildForAlias(
+        fun buildForAliasOrTable(
             tableAlias: Map.Entry<String, Pair<String, String?>>,
             dataSource: DbDataSource
         ): LookupElementBuilder =
             LookupElementBuilder
                 .create(tableAlias.key)
-                .withTailText(if (tableAlias.value.second != null) " (${tableAlias.value.second})" else "", true)
+                .withTailText(if (tableAlias.value.second != null) "  (${tableAlias.value.second})" else "", true)
                 .withTypeText(dataSource.name, true)
                 .withInsertHandler(
                     DeclarativeInsertHandler.Builder()
@@ -84,6 +87,9 @@ class LookupUtils private constructor() {
                         .triggerAutoPopup()
                         .build()
                 )
+
+        fun DasObject.getIcon(project: Project) =
+            DasPsiWrappingSymbol(this, project).getIcon(false)
 
         private fun LookupElementBuilder.withInsertHandler(
             project: Project,
