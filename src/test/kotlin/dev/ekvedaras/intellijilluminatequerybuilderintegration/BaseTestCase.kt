@@ -1,5 +1,6 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration
 
+import java.io.File
 import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.database.Dbms
 import com.intellij.database.dataSource.LocalDataSource
@@ -12,7 +13,6 @@ import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.io.File
 
 abstract class BaseTestCase : BasePlatformTestCase() {
     override fun getTestDataPath(): String = "src/test/resources"
