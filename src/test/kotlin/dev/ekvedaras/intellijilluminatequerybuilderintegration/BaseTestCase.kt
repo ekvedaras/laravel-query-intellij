@@ -8,7 +8,10 @@ import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import com.intellij.psi.PsiFile
 import com.intellij.sql.database.SqlCommonTestUtils
+import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 abstract class BaseTestCase : BasePlatformTestCase() {
@@ -79,8 +82,21 @@ abstract class BaseTestCase : BasePlatformTestCase() {
         assertDoesntContain(strings, shouldNotContain.asList())
     }
 
+    protected fun assertInspection(@TestDataFile filePath: String, inspection: InspectionProfileEntry) {
+        myFixture.enableInspections(inspection)
+
+        // Delay is required otherwise tests randomly fail due to PSI tree changes during highlighting 🤷‍
+        runBlocking { delay(500L) }
+
+        myFixture.testHighlighting(filePath)
+    }
+
     protected fun assertInspection(file: PsiFile, inspection: InspectionProfileEntry) {
         myFixture.enableInspections(inspection)
+
+        // Delay is required otherwise tests randomly fail due to PSI tree changes during highlighting 🤷‍
+        runBlocking { delay(500L) }
+
         myFixture.testHighlighting(true, false, false, file.virtualFile)
     }
 }

@@ -4,82 +4,66 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 
 class DasObjectsInspectionTest : BaseTestCase() {
     fun testWarnsAboutUnknownSchema() {
-        val file = myFixture.configureByFile("inspection/unknownSchema.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/unknownSchema.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutUnknownTable() {
-        val file = myFixture.configureByFile("inspection/unknownTable.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/unknownTable.php", UnknownTableOrViewInspection())
     }
 
     fun testDoesNotWarnAboutKnownTable() {
-        val file = myFixture.configureByFile("inspection/knownTable.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/knownTable.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutUnknownSchemaTable() {
-        val file = myFixture.configureByFile("inspection/unknownSchemaTable.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/unknownSchemaTable.php", UnknownTableOrViewInspection())
     }
 
     fun testDoesNotWarnAboutKnownSchemaTable() {
-        val file = myFixture.configureByFile("inspection/knownSchemaTable.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/knownSchemaTable.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutTableFromOtherSchema() {
-        val file = myFixture.configureByFile("inspection/tableFromOtherSchema.php")
-        assertInspection(file!!, UnknownTableOrViewInspection())
+        assertInspection("inspection/tableFromOtherSchema.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutUnknownColumn() {
-        val file = myFixture.configureByFile("inspection/unknownColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/unknownColumn.php", UnknownColumnInspection())
     }
 
     fun testDoesNotWarnAboutKnownColumn() {
-        val file = myFixture.configureByFile("inspection/knownColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/knownColumn.php", UnknownColumnInspection())
     }
 
     fun testWarnsAboutUnknownTableColumn() {
-        val file = myFixture.configureByFile("inspection/unknownTableColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/unknownTableColumn.php", UnknownColumnInspection())
     }
 
     fun testDoesNotWarnAboutKnownTableColumn() {
-        val file = myFixture.configureByFile("inspection/knownTableColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/knownTableColumn.php", UnknownColumnInspection())
     }
 
     fun testWarnsAboutUnknownSchemaTableColumn() {
-        val file = myFixture.configureByFile("inspection/unknownSchemaTableColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/unknownSchemaTableColumn.php", UnknownColumnInspection())
     }
 
     fun testDoesNotWarnAboutKnownSchemaTableColumn() {
-        val file = myFixture.configureByFile("inspection/knownSchemaTableColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/knownSchemaTableColumn.php", UnknownColumnInspection())
     }
 
     fun testWarnsAboutUnknownAliasColumn() {
-        val file = myFixture.configureByFile("inspection/unknownAliasColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/unknownAliasColumn.php", UnknownColumnInspection())
     }
 
     fun testDoesNotWarnAboutKnownAliasColumn() {
-        val file = myFixture.configureByFile("inspection/knownAliasColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/knownAliasColumn.php", UnknownColumnInspection())
     }
 
     fun testWarnsAboutColumnFromOtherTable() {
-        val file = myFixture.configureByFile("inspection/columnFromOtherTable.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/columnFromOtherTable.php", UnknownColumnInspection())
     }
 
     fun testWarnsAboutUnknownTableAndColumn() {
-        val file = myFixture.configureByFile("inspection/unknownTableAndColumn.php")
-        assertInspection(file!!, UnknownColumnInspection())
+        assertInspection("inspection/unknownTableAndColumn.php", UnknownColumnInspection())
     }
 }

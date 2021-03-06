@@ -83,6 +83,7 @@ tasks {
         getByName<KotlinCompile>(it) {
             kotlinOptions.jvmTarget = "1.8"
             kotlinOptions.useIR = true
+            kotlinOptions.apiVersion = "1.3"
         }
     }
 
