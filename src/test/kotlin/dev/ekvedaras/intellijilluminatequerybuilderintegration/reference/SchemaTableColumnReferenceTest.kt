@@ -9,7 +9,8 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import junit.framework.TestCase
 
-class SchemaTableColumnReferenceTest : BaseTestCase() {
+@Suppress("Deprecation")
+internal class SchemaTableColumnReferenceTest : BaseTestCase() {
     fun testResolvesColumnReference() {
         myFixture.configureByFile("inspection/knownColumn.php")
 
@@ -62,11 +63,12 @@ class SchemaTableColumnReferenceTest : BaseTestCase() {
         )
     }
 
+    @Suppress("ReturnCount")
     fun testResolvesSchemaAndTableAndColumnReferences() {
         myFixture.configureByFile("inspection/knownSchemaTableColumn.php")
 
         val table = DasUtil.getTables(db).first { it.name == "users" }
-        val schema = table.dasParent!!
+        val schema = table.dasParent ?: return fail("Failed to load table schema")
         val column = table.getDasChildren(ObjectKind.COLUMN).first { it.name == "id" }
 
         val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)

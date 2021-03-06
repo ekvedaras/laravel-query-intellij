@@ -7,7 +7,7 @@ import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownColumnInspection
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownTableOrViewInspection
 
-class EdgeCasesTest : BaseTestCase() {
+internal class EdgeCasesTest : BaseTestCase() {
     fun testClassCastException1() {
         myFixture.configureByFile("edgeCases/classCastException1.php")
         myFixture.completeBasic()

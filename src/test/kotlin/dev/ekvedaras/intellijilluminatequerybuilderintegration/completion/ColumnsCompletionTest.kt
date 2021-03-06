@@ -6,7 +6,8 @@ import com.intellij.database.util.DasUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 
-class ColumnsCompletionTest : BaseTestCase() {
+@Suppress("Deprecation")
+internal class ColumnsCompletionTest : BaseTestCase() {
     private fun completeFor(
         from: String,
         prefix: String,
@@ -27,10 +28,10 @@ class ColumnsCompletionTest : BaseTestCase() {
         val expected = columns.map { it.name } + // All selected table columns
             listOf(
                 table.name, // Table itself
-                table.dasParent!!.name // Table schema
+                table.dasParent?.name ?: return fail("Failed to load table schema") // Table schema
             )
 
-        val notExpected = schemas.filter { it != table.dasParent!!.name } + // All other schemas
+        val notExpected = schemas.filter { it != table.dasParent?.name ?: it } + // All other schemas
             schemaTables.values.flatten().filter { it != table.name } // All other tables
 
         LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
@@ -45,8 +46,8 @@ class ColumnsCompletionTest : BaseTestCase() {
 
     fun testCompletesSchemaTables() {
         val schema = schemas.first()
-        val table = schemaTables[schema]!!.first()
-        val expected = schemaTables[schema]!!
+        val table = schemaTables[schema]?.first() ?: return fail("Failed to find first table")
+        val expected = schemaTables[schema] ?: return fail("Failed to find schema tables")
 
         val notExpected = schemas.filterNot { it == schema } + // All other schemas
             schemaTables.entries.filterNot { it.key == schema }.map { it.value }
@@ -146,7 +147,7 @@ class ColumnsCompletionTest : BaseTestCase() {
 
     fun testCompletesColumnsAndSchemasTablesAfterSmartSearch() {
         val schema = schemas.first()
-        val table = schemaTables[schema]!!.first()
+        val table = schemaTables[schema]?.first() ?: return fail("Failed to find first table")
         val expected = schemasAndTables + DasUtil.getTables(db).first { it.name == table }
             .getDasChildren(ObjectKind.COLUMN).map { it.name }
 

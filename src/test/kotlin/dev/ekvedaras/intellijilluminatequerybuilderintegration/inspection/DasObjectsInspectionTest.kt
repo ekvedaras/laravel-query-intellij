@@ -2,7 +2,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection
 
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 
-class DasObjectsInspectionTest : BaseTestCase() {
+internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testWarnsAboutUnknownSchema() {
         assertInspection("inspection/unknownSchema.php", UnknownTableOrViewInspection())
     }

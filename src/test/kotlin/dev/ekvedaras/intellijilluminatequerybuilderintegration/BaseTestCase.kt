@@ -1,6 +1,5 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration
 
-import java.io.File
 import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.database.Dbms
 import com.intellij.database.dataSource.LocalDataSource
@@ -11,10 +10,12 @@ import com.intellij.psi.PsiFile
 import com.intellij.sql.database.SqlCommonTestUtils
 import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-abstract class BaseTestCase : BasePlatformTestCase() {
+@Suppress("UnnecessaryAbstractClass")
+internal abstract class BaseTestCase : BasePlatformTestCase() {
     override fun getTestDataPath(): String = "src/test/resources"
     lateinit var db: LocalDataSource
     lateinit var schemas: List<String>

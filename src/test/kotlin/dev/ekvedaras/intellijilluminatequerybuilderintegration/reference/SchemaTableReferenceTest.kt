@@ -7,7 +7,7 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import junit.framework.TestCase
 
-class SchemaTableReferenceTest : BaseTestCase() {
+internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesSchemaReference() {
         myFixture.configureByFile("inspection/knownSchema.php")
 
@@ -44,7 +44,7 @@ class SchemaTableReferenceTest : BaseTestCase() {
         myFixture.configureByFile("inspection/knownSchemaTable.php")
 
         val table = DasUtil.getTables(db).first { it.name == "users" }
-        val schema = table.dasParent!!
+        val schema = table.dasParent ?: return fail("Failed to load table schema")
 
         val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
             ?: return fail("Failed to resolve DB schema")

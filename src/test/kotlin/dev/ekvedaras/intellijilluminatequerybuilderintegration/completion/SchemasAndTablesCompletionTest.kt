@@ -3,7 +3,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.completion
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.utils.LaravelUtils
 
-class SchemasAndTablesCompletionTest : BaseTestCase() {
+internal class SchemasAndTablesCompletionTest : BaseTestCase() {
     private fun completeAllFor(method: String) {
         myFixture.configureByText(
             "test.php",
@@ -34,8 +34,8 @@ class SchemasAndTablesCompletionTest : BaseTestCase() {
             LaravelUtils.BuilderTableMethods.forEach {
                 completeTablesFor(schema, it)
 
-                assertEquals(schemaTables[schema]!!.size, myFixture.lookupElementStrings?.size)
-                assertCompletion(*schemaTables[schema]!!.toTypedArray())
+                assertEquals(schemaTables[schema]?.size, myFixture.lookupElementStrings?.size)
+                assertCompletion(*schemaTables[schema]?.toTypedArray() ?: return fail("Failed to get schema tables"))
             }
         }
     }
