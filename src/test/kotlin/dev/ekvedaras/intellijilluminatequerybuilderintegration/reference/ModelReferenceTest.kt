@@ -3,6 +3,7 @@ package dev.ekvedaras.intellijilluminatequerybuilderintegration.reference
 import com.intellij.database.util.DasUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 
+@Suppress("Deprecation")
 internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameFromModelTableProperty() {
         myFixture.configureByFile("model/modelWithTableProperty.php")

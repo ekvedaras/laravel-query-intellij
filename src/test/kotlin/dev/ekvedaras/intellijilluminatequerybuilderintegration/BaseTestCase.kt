@@ -14,7 +14,7 @@ import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-@Suppress("UnnecessaryAbstractClass")
+@Suppress("UnnecessaryAbstractClass", "Deprecation")
 internal abstract class BaseTestCase : BasePlatformTestCase() {
     override fun getTestDataPath(): String = "src/test/resources"
     lateinit var db: LocalDataSource

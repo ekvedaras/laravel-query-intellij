@@ -6,7 +6,10 @@ import com.intellij.database.util.DbUtil
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownColumnInspection
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownTableOrViewInspection
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
+@Suppress("Deprecation")
 internal class EdgeCasesTest : BaseTestCase() {
     fun testClassCastException1() {
         myFixture.configureByFile("edgeCases/classCastException1.php")
@@ -16,6 +19,7 @@ internal class EdgeCasesTest : BaseTestCase() {
 
     fun testClassCastException2() {
         myFixture.configureByFile("edgeCases/classCastException2.php")
+        runBlocking { delay(500L) }
         myFixture.completeBasic()
         assertCompletion("email")
     }

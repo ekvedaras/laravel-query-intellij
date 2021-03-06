@@ -7,6 +7,7 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.intellijilluminatequerybuilderintegration.BaseTestCase
 import junit.framework.TestCase
 
+@Suppress("Deprecation")
 internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesSchemaReference() {
         myFixture.configureByFile("inspection/knownSchema.php")

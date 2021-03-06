@@ -134,9 +134,9 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     private fun isModelReference(methodReference: MethodReference): Boolean {
         return when (methodReference.firstPsiChild) {
             is ClassReferenceImpl -> (methodReference.firstChild as ClassReferenceImpl).getClass(reference.project)
-                .isChildOf(LaravelClasses.Model)
+                ?.isChildOf(LaravelClasses.Model) ?: false
             is VariableImpl ->
-                (methodReference.firstChild as VariableImpl).getClass(reference.project).isChildOf(LaravelClasses.Model)
+                (methodReference.firstChild as VariableImpl).getClass(reference.project)?.isChildOf(LaravelClasses.Model) ?: false
             else -> false
         }
     }

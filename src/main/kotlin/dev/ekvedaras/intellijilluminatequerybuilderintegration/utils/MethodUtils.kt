@@ -95,8 +95,8 @@ class MethodUtils private constructor() {
         fun MethodReference.isJoinOrRelation(project: Project): Boolean =
             resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
 
-        fun PhpTypedElement.getClass(project: Project): PhpClassImpl =
-            PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.first()).first() as PhpClassImpl
+        fun PhpTypedElement.getClass(project: Project): PhpClassImpl? =
+            PhpIndex.getInstance(project).getClassesByFQN(this.declaredType.types.firstOrNull() ?: "").firstOrNull() as? PhpClassImpl
 
         private fun findMethodsInTree(root: PsiElement, list: MutableList<MethodReference>) {
             for (child in root.children) {

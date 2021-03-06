@@ -1,6 +1,7 @@
 package dev.ekvedaras.intellijilluminatequerybuilderintegration.utils
 
 import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -26,7 +27,12 @@ class PsiUtils private constructor() {
         fun Variable.referencesInParallel(): Stream<out PsiReference> =
             ReferencesSearch.search(this.originalElement).findAll().parallelStream()
 
-        fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
+        fun PsiReference.statementFirstPsiChild(): PsiElement? =
+            if (ApplicationManager.getApplication().isReadAccessAllowed) {
+                this.element.parentOfType<Statement>()?.firstPsiChild
+            } else {
+                null
+            }
         private fun PsiElement.typeAsInt(): Int = this.elementType?.index?.toInt() ?: 0
     }
 }

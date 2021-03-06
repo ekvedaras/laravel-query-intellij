@@ -20,7 +20,7 @@ class ModelRelationResolver(
 ) {
     fun resolveModelAndRelationTables(methods: MutableList<MethodReference>, method: MethodReference) {
         val modelReference: PhpTypedElement = tableAndAliasCollector.resolveModelReference(methods) ?: return
-        val model = modelReference.getClass(reference.project)
+        val model = modelReference.getClass(reference.project) ?: return
 
         tableAndAliasCollector.resolveTableName(model)
 
