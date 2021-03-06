@@ -3,6 +3,7 @@ package dev.ekvedaras.laravelquery.models
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -42,8 +43,10 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             ranges.add(TextRange.from(if (ranges.isNotEmpty()) ranges.last().endOffset + 1 else 1, part.length))
         }
 
-        if (type == Type.Column) TableAndAliasCollector(this).collect()
+        ApplicationManager.getApplication().runReadAction {
+            if (type == Type.Column) TableAndAliasCollector(this).collect()
 
-        DbReferenceResolver(this).resolve()
+            DbReferenceResolver(this).resolve()
+        }
     }
 }

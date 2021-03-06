@@ -19,7 +19,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.isJoinOrRelation
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsAlias
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.referencesInParallel
+import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.statementFirstPsiChild
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import java.util.Collections
@@ -46,7 +46,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val variable = method.parentOfType<Statement>()?.firstPsiChild?.firstPsiChild
         if (variable !is VariableImpl) return
 
-        variable.referencesInParallel().forEach {
+        variable.references().forEach {
             collectMethodsInVariableReference(it, methods)
         }
     }

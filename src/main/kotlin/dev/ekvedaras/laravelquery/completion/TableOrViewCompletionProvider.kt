@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -73,7 +74,8 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     }
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
-        !method.isBuilderMethodByName() ||
+        !ApplicationManager.getApplication().isReadAccessAllowed ||
+            !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
             parameters.isInsideRegularFunction() ||
             !method.isBuilderClassMethod(project)

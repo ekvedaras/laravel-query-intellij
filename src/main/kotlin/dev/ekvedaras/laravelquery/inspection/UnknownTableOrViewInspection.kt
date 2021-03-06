@@ -2,6 +2,7 @@ package dev.ekvedaras.laravelquery.inspection
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
@@ -53,7 +54,8 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
-                !method.isBuilderMethodByName() ||
+                !ApplicationManager.getApplication().isReadAccessAllowed ||
+                    !method.isBuilderMethodByName() ||
                     !expression.isTableParam() ||
                     expression.isInsideRegularFunction() ||
                     !method.isBuilderClassMethod(project)

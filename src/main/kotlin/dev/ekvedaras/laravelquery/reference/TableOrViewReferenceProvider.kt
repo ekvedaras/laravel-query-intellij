@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.reference
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -32,7 +33,8 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
-        !method.isBuilderMethodByName() ||
+        !ApplicationManager.getApplication().isReadAccessAllowed ||
+            !method.isBuilderMethodByName() ||
             !element.isTableParam() ||
             element.isInsideRegularFunction() ||
             !method.isBuilderClassMethod(project)

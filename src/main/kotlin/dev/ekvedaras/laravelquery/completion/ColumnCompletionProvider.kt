@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.psi.DbDataSource
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -177,7 +178,8 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
-        parameters.containsVariable() ||
+        !ApplicationManager.getApplication().isReadAccessAllowed ||
+            parameters.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
             !parameters.isColumnIn(method) ||
             parameters.isInsideRegularFunction() ||

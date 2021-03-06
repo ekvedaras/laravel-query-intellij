@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.reference
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
@@ -51,7 +52,8 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
-        element.containsVariable() ||
+        !ApplicationManager.getApplication().isReadAccessAllowed ||
+            element.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
             !element.isColumnIn(method) ||
             element.isInsideRegularFunction() ||

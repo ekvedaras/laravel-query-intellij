@@ -2,6 +2,7 @@ package dev.ekvedaras.laravelquery.inspection
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
@@ -113,7 +114,8 @@ class UnknownColumnInspection : PhpInspection() {
                 method: MethodReference,
                 expression: StringLiteralExpression
             ) =
-                expression.containsVariable() ||
+                !ApplicationManager.getApplication().isReadAccessAllowed ||
+                    expression.containsVariable() ||
                     expression.selectsAllColumns() ||
                     expression.isOperatorParam() ||
                     !method.isBuilderMethodForColumns() ||
