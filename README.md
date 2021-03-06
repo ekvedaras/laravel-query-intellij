@@ -31,6 +31,12 @@ This plugin provides database integration for Laravel query builder.
 
 <!-- Plugin description end -->
 
+## Future plans
+
+* Support for Schema builder
+* Dynamic nested levels support (in closures)
+* Support for queries inside model scope methods 
+
 ## Installation
 
 - Using IDE built-in plugin system:

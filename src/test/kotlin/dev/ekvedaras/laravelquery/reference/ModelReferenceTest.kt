@@ -49,6 +49,7 @@ internal class ModelReferenceTest : BaseTestCase() {
                     .map { it.name } // Columns of other table
 
         myFixture.completeBasic()
+
         assertCompletion(*expected.toList().toTypedArray())
         assertNoCompletion(*notExpected.toList().toTypedArray())
     }
