@@ -1,6 +1,6 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# intellij-illuminate-query-builder-integration Changelog
+# Laravel Query Changelog
 
 ## [Unreleased]
 ### Added

@@ -1,1 +1,1 @@
-rootProject.name = "intellij-illuminate-query-builder-integration"
+rootProject.name = "laravel-query"

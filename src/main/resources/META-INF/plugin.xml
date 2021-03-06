@@ -1,6 +1,6 @@
 <idea-plugin>
-    <id>dev.ekvedaras.intellijilluminatequerybuilderintegration</id>
-    <name>Illuminate Query Builder Integration</name>
+    <id>dev.ekvedaras.laravelquery</id>
+    <name>Laravel Query</name>
     <vendor email="kvedarasernestas@gmail.com" url="https://ekvedaras.github.io">Ernestas Kvedaras</vendor>
 
     <!-- Product and plugin compatibility requirements -->
@@ -11,19 +11,19 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-            serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyApplicationService"/>
+            serviceImplementation="dev.ekvedaras.laravelquery.services.MyApplicationService"/>
         <projectService
-            serviceImplementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.services.MyProjectService"/>
+            serviceImplementation="dev.ekvedaras.laravelquery.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.TableOrViewCompletionContributor"/>
+                                implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"/>
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.completion.ColumnCompletionContributor"/>
+                                implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"/>
 
         <psi.referenceContributor language="PHP"
-                                  implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.TableOrViewReferenceContributor"/>
+                                  implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>
         <psi.referenceContributor language="PHP"
-                                  implementation="dev.ekvedaras.intellijilluminatequerybuilderintegration.reference.ColumnReferenceContributor"/>
+                                  implementation="dev.ekvedaras.laravelquery.reference.ColumnReferenceContributor"/>
 
         <localInspection language="PHP"
                          groupPath="PHP"
@@ -32,7 +32,7 @@
                          enabledByDefault="true"
                          bundle="messages.MyBundle"
                          key="unknownTableOrViewDisplayName"
-                         implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownTableOrViewInspection"
+                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection"
         />
         <localInspection language="PHP"
                          groupPath="PHP"
@@ -41,10 +41,9 @@
                          enabledByDefault="true"
                          bundle="messages.MyBundle"
                          key="unknownColumnDisplayName"
-                         implementationClass="dev.ekvedaras.intellijilluminatequerybuilderintegration.inspection.UnknownColumnInspection"
+                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection"
         />
     </extensions>
-
 
     <applicationListeners>
     </applicationListeners>
