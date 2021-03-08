@@ -104,21 +104,25 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     ) {
         result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
         target.tablesAndAliases.forEach { tableAlias ->
-            val lookup = LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
-
             val table = dataSource.tables().firstOrNull { dasTable ->
                 dasTable.name == tableAlias.value.first &&
                     (tableAlias.value.second == null || dasTable.dasParent?.name == tableAlias.value.second)
             }
 
             if (table != null) {
-                items.add(lookup.withIcon(table.getIcon(project)))
+                items.add(
+                    LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
+                        .withIcon(table.getIcon(project))
+                )
 
                 table.columnsInParallel().forEach { column ->
                     items.add(column.buildLookup(project))
                 }
             } else {
-                items.add(lookup.withIcon(DatabaseIcons.Synonym))
+                items.add(
+                    LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
+                        .withIcon(DatabaseIcons.Synonym)
+                )
             }
         }
     }

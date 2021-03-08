@@ -26,7 +26,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column)
+        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column, false)
         var references = arrayOf<PsiReference>()
 
         target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }

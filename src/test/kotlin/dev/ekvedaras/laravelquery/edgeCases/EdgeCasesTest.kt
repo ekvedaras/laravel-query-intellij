@@ -56,4 +56,10 @@ internal class EdgeCasesTest : BaseTestCase() {
         myFixture.completeBasic()
         assertEmpty(myFixture.lookupElementStrings?.toList() ?: listOf<String>())
     }
+
+    fun testJoinClause() {
+        myFixture.configureByFile("edgeCases/joinClause.php")
+        myFixture.completeBasic()
+        assertCompletion("billable_id", "billable_type")
+    }
 }

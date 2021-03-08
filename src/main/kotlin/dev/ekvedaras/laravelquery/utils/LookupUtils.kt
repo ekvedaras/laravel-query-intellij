@@ -60,7 +60,7 @@ class LookupUtils private constructor() {
                 .create(this, this.name)
                 .withIcon(this.getIcon(project))
                 .withTailText("  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}", true)
-                .withTypeText(this.comment ?: "", true)
+                .withTypeText("${this.comment ?: ""} ${this.tableName}", true)
                 .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
                 .withLookupString("${this.tableName}.${this.name}")
                 .withInsertHandler(

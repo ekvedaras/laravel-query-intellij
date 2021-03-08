@@ -6,8 +6,10 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.Query
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
+import org.jetbrains.annotations.NotNull
 
 object ElementTypes {
     const val PhpArray = 1889
@@ -22,8 +24,8 @@ class PsiUtils private constructor() {
         fun PsiElement.isPhpArray(): Boolean = this.typeAsInt() == ElementTypes.PhpArray
         fun PsiElement.isArrayValue(): Boolean = this.typeAsInt() == ElementTypes.ArrayValue
         fun String.unquoteAndCleanup() = this.replace("IntellijIdeaRulezzz", "").trim('\'', '"').trim()
-        fun Variable.references(): Collection<PsiReference> =
-            ReferencesSearch.search(this.originalElement).findAll()
+        fun Variable.references(): @NotNull Query<PsiReference> =
+            ReferencesSearch.search(this.originalElement)
 
         fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
         private fun PsiElement.typeAsInt(): Int = this.elementType?.index?.toInt() ?: 0
