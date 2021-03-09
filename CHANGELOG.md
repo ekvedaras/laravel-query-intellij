@@ -4,11 +4,15 @@
 
 ## [Unreleased]
 
-## 0.0.2
+## [0.0.3]
+### Updated
+- Remove upper limit for IDE version to allow EAP builds.
+
+## [0.0.2]
 ### Fixed
 - Stack overflow inside JoinClause closure.
 
-## 0.0.1
+## [0.0.1]
 ### Added
 - Initial release. Main features:
     - Table and column completion and inspection on query builder methods

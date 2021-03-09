@@ -11,7 +11,7 @@
 
 This plugin provides database integration for Laravel query builder.
 
-![Demo](https://user-images.githubusercontent.com/3586184/110367905-90300980-8048-11eb-8976-7fe2689ee92c.gif)
+![Demo](https://user-images.githubusercontent.com/3586184/110513603-b4522000-8106-11eb-9678-985bf286bf4f.gif)
 
 **Don't forget to connect your database in order for this to work.**
 See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#connect-to-mysql-database> for instructions.
@@ -31,6 +31,7 @@ See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#conne
 * Dynamic nested levels support (in closures)
 * Support for queries inside model scope methods
 * Improve sorting
+* Improve reference resolving based on context
 
 ## Installation
 
