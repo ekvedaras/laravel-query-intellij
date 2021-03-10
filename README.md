@@ -4,14 +4,12 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 
-<img src="src/main/resources/META-INF/pluginIcon.svg" width="192" height="192"/>
+<img src="https://raw.githubusercontent.com/ekvedaras/laravel-query-intellij/main/src/main/resources/META-INF/pluginIcon.svg" width="192" height="192"/>
 
 <!-- Plugin description -->
 ## Laravel + DataGrip = ♥️
 
 This plugin provides database integration for Laravel query builder.
-
-![Demo](https://user-images.githubusercontent.com/3586184/110513603-b4522000-8106-11eb-9678-985bf286bf4f.gif)
 
 **Don't forget to connect your database in order for this to work.**
 See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#connect-to-mysql-database> for instructions.
@@ -22,6 +20,8 @@ See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#conne
 * Table name resolving from model for eloquent builder methods
 * Model relation table name resolving for eloquent builder relation closure methods
 * Text linking with database elements for navigation and refactoring
+
+<img src="https://user-images.githubusercontent.com/3586184/110513603-b4522000-8106-11eb-9678-985bf286bf4f.gif" alt="Demo" width="350" height="353"/>
 
 <!-- Plugin description end -->
 
