@@ -36,6 +36,9 @@ class ModelRelationResolver(
     private fun resolveRelationTable(deepParent: PsiElement, model: PhpClass) {
         val relationName = deepParent.firstChild.text.unquoteAndCleanup()
         val relationMethod = model.methods.firstOrNull { it.name == relationName } ?: return
+        if (relationMethod.lastChild !is GroupStatementImpl) {
+            return
+        }
         val returnStatement = MethodUtils.firstChildOfType(
             relationMethod.lastChild as GroupStatementImpl,
             PhpReturnImpl::class.java.name
