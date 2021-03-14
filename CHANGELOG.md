@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Column reference resolving is now context aware, so it will not resolve to all columns of the same name if it knows the table.
 
 ## [0.0.4]
 ### Fixed

@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.utils.DbReferenceResolver
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import dev.ekvedaras.laravelquery.utils.TableAndAliasCollector
 
-class DbReferenceExpression(val expression: PsiElement, val type: Type, val resolveAliases: Boolean = true) {
+class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     companion object {
         enum class Type {
             Table,
@@ -46,8 +46,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type, val reso
 
         if (!DumbService.isDumb(project) && ApplicationManager.getApplication().isReadAccessAllowed) {
             ApplicationManager.getApplication().runReadAction {
-                if (resolveAliases) TableAndAliasCollector(this).collect()
-
+                TableAndAliasCollector(this).collect()
                 DbReferenceResolver(this).resolve()
             }
         }

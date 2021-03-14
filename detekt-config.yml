@@ -9,4 +9,4 @@ formatting:
 
 style:
   ReturnCount:
-    max: 3
+    max: 5

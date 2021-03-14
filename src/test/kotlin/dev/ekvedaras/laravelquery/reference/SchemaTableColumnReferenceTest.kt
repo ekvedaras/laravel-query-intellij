@@ -29,6 +29,23 @@ internal class SchemaTableColumnReferenceTest : BaseTestCase() {
         TestCase.assertEquals(82 + column.name.length, usages.first().navigationRange.endOffset)
     }
 
+    fun testItDoesNotResolveColumnsFromOtherTablesBecauseOfTheContext() {
+        myFixture.configureByFile("inspection/knownColumn.php")
+
+        val columnFromOtherTable = DasUtil.getTables(db)
+            .first { it.name == "customers" }
+            .getDasChildren(ObjectKind.COLUMN)
+            .first { it.name == "id" }
+        val dbColumnFromOtherTable = DbImplUtil.findElement(
+            DbUtil.getDataSources(project).first(),
+            columnFromOtherTable
+        ) ?: return fail("Failed to resolve DB column from other table")
+
+        val otherUsages = myFixture.findUsages(dbColumnFromOtherTable)
+
+        UsefulTestCase.assertSize(0, otherUsages)
+    }
+
     fun testResolvesTableAndColumnReference() {
         myFixture.configureByFile("inspection/knownTableColumn.php")
 

@@ -7,6 +7,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.rd.util.addUnique
+import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
@@ -18,7 +20,15 @@ import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 
 class ColumnReferenceProvider : PsiReferenceProvider() {
+    companion object {
+        val isResolving = mutableListOf<PsiElement>()
+    }
+
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+        if (isResolving.contains(element)) {
+            return PsiReference.EMPTY_ARRAY
+        }
+
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
@@ -26,7 +36,9 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column, false)
+        isResolving.addUnique(Lifetime.Eternal, element)
+
+        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column)
         var references = arrayOf<PsiReference>()
 
         target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }
@@ -46,7 +58,16 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
                 )
             }
         }
-        target.column.parallelStream().forEach { references += ColumnPsiReference(target, it) }
+        target.column.parallelStream()
+            .filter {
+                target.tablesAndAliases.isEmpty() ||
+                    target.tablesAndAliases.containsKey(it.tableName) ||
+                    target.tablesAndAliases.containsValue(it.tableName to null) ||
+                    target.tablesAndAliases.containsValue(it.tableName to it.dasParent?.dasParent?.name)
+            }
+            .forEach { references += ColumnPsiReference(target, it) }
+
+        isResolving.remove(element)
 
         return references
     }
