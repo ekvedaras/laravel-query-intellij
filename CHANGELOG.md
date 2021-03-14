@@ -5,6 +5,8 @@
 ## [Unreleased]
 ### Added
 - Resolve table name from model when inside model's scope method
+
+## [0.0.5]
 ### Fixed
 - Column reference resolving is now context aware, so it will not resolve to all columns of the same name if it knows the table.
 
