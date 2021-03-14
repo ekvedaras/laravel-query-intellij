@@ -9,12 +9,14 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.AssignmentExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.ClassReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.ParenthesizedExpressionImpl
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.isJoinOrRelation
@@ -115,6 +117,10 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 ?.firstChild
                 ?.nextSibling
                 ?.nextSibling as? PhpTypedElement
+            ?: methods.find { // Inside scope method inside model
+                it.isBuilderClassMethod(it.project) &&
+                    it.parentOfType<PhpClassImpl>()?.isChildOf(LaravelClasses.Model) ?: false
+            }?.parentOfType<PhpClassImpl>() as? PhpTypedElement
     }
 
     private fun isNewModelInstance(methodReference: MethodReference): Boolean {

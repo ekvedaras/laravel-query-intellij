@@ -29,7 +29,6 @@ See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#conne
 
 * Support for Schema builder
 * Dynamic nested levels support (in closures)
-* Support for queries inside model scope methods
 * Improve sorting
 
 ## Installation
