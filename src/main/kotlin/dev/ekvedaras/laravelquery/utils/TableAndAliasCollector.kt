@@ -12,14 +12,14 @@ import com.jetbrains.php.lang.psi.elements.impl.ParenthesizedExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
+import com.jetbrains.rd.util.addUnique
+import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
-import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.getClass
-import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.isJoinOrRelation
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsAlias
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.statementFirstPsiChild
@@ -61,43 +61,46 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
 
         // $var = query()->table();
         if (element is AssignmentExpressionImpl && element.lastChild is MethodReference) {
-            methods.addAll(MethodUtils.findMethodsInTree(element.lastChild))
+            MethodUtils.findMethodsInTree(element.lastChild).forEach { methods.addUnique(Lifetime.Eternal, it) }
             return
         }
 
         // $var->where()
         if (element is MethodReference) {
-            methods.addAll(
-                MethodUtils.findMethodsInTree(
-                    // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
-                    // $var->join('table', function (JoinClause $join) { $join->on() })
-                    if (element.isJoinOrRelation(reference.project)) {
-                        element.parent.parentOfType<Statement>()?.parentOfType<Statement>() ?: return
-                    } else {
-                        element.parent
-                    }
-                )
-            )
+            MethodUtils.findMethodsInTree(
+                // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
+                // $var->join('table', function (JoinClause $join) { $join->on() })
+                if (element.isJoinOrRelation(reference.project)) {
+                    element.parent.parentOfType<Statement>()?.parentOfType<Statement>() ?: return
+                } else {
+                    element.parent
+                }
+            ).forEach { methods.addUnique(Lifetime.Eternal, it) }
         }
     }
 
     private fun collectMethodsInCurrentTree(methods: MutableList<MethodReference>, method: MethodReference) {
-        if (methods.isNotEmpty()) return
-
-        methods.addAll(
+        // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
+        // $var->join('table', function (JoinClause $join) { $join->on() })
+        if (method.isJoinOrRelation(reference.project)) {
             MethodUtils.findMethodsInTree(
-                // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
-                // $var->join('table', function (JoinClause $join) { $join->on() })
-                if (method.isJoinOrRelation(reference.project)) {
-                    method.parentOfType<Statement>()
-                        ?.parentOfType<Statement>()
-                        ?.parentOfType<Statement>()
-                        ?.firstChild ?: return
-                } else {
-                    method.parentOfType<Statement>()?.firstChild ?: return
-                }
-            )
-        )
+                method.parentOfType<Statement>()
+                    ?.parentOfType<Statement>()
+                    ?.parentOfType<Statement>()
+                    ?.firstPsiChild
+            ).forEach { methods.addUnique(Lifetime.Eternal, it) }
+        } else {
+            MethodUtils.findMethodsInTree(method.firstChildOfParentStatement()).forEach {
+                methods.addUnique(Lifetime.Eternal, it)
+            }
+        }
+
+        // Mode::when(true, function (Builder $query) { $query->where(''); });
+        if (method.isInsideModelQueryClosure(reference.project)) {
+            MethodUtils.findMethodsInTree(method.getParentOfClosure()).forEach {
+                methods.addUnique(Lifetime.Eternal, it)
+            }
+        }
     }
 
     fun resolveTableName(model: PhpClass) {

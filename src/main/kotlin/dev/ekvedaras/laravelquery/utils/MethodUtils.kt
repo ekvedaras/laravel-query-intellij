@@ -4,12 +4,17 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
+import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
+import com.jetbrains.php.lang.psi.elements.Statement
+import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
+import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isJoinOrRelation
 
 class MethodUtils private constructor() {
@@ -47,27 +52,15 @@ class MethodUtils private constructor() {
             return classes
         }
 
-        fun CompletionParameters.findParamIndex(): Int =
-            this.position.findParamIndex()
+        fun findMethodsInTree(root: PsiElement?): MutableList<MethodReference> {
+            val list = mutableListOf<MethodReference>()
+            if (root == null) {
+                return list
+            }
 
-        fun PsiElement.findParamIndex(): Int {
-            val parent = this.parent ?: return -1
-
-            return if (parent is ParameterList) {
-                ArrayUtil.indexOf(parent.parameters, this)
-            } else this.parent.findParamIndex()
-        }
-
-        fun PsiElement.findParameterList(): ParameterList? =
-            if (this is ParameterList) this
-            else this.parent.findParameterList()
-
-        fun findMethodsInTree(root: PsiElement): MutableList<MethodReference> {
             if (root.textMatches("return") || root.textMatches(" ")) {
                 return findMethodsInTree(root.nextSibling)
             }
-
-            val list = mutableListOf<MethodReference>()
 
             if (root is MethodReference) {
                 list.add(root)
@@ -92,15 +85,11 @@ class MethodUtils private constructor() {
             return null
         }
 
-        fun MethodReference.isJoinOrRelation(project: Project): Boolean =
-            resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
+        private fun findMethodsInTree(root: PsiElement?, list: MutableList<MethodReference>) {
+            if (root == null) {
+                return
+            }
 
-        fun PhpTypedElement.getClass(project: Project): PhpClassImpl? =
-            PhpIndex.getInstance(project)
-                .getClassesByFQN(this.declaredType.types.firstOrNull() ?: "")
-                .firstOrNull() as? PhpClassImpl
-
-        private fun findMethodsInTree(root: PsiElement, list: MutableList<MethodReference>) {
             for (child in root.children) {
                 if (child is MethodReference) {
                     list.add(child)
@@ -110,3 +99,38 @@ class MethodUtils private constructor() {
         }
     }
 }
+
+fun CompletionParameters.findParamIndex(): Int =
+    this.position.findParamIndex()
+
+fun PsiElement.findParamIndex(): Int {
+    val parent = this.parent ?: return -1
+
+    return if (parent is ParameterList) {
+        ArrayUtil.indexOf(parent.parameters, this)
+    } else this.parent.findParamIndex()
+}
+
+fun PsiElement.findParameterList(): ParameterList? =
+    if (this is ParameterList) this
+    else this.parent.findParameterList()
+
+fun MethodReference.isJoinOrRelation(project: Project): Boolean =
+    MethodUtils.resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
+
+fun MethodReference.isInsideModelQueryClosure(project: Project): Boolean =
+    (this.getParentOfClosure()?.classReference as? MethodReference)
+        ?.classReference
+        ?.getClass(project)
+        ?.isChildOf(LaravelClasses.Model) == true
+
+fun MethodReference.firstChildOfParentStatement(): PhpPsiElement? =
+    this.parentOfType<Statement>()?.firstPsiChild
+
+fun MethodReference.getParentOfClosure(): MethodReference? =
+    this.parentOfType<FunctionImpl>()?.parentOfType()
+
+fun PhpTypedElement.getClass(project: Project): PhpClassImpl? =
+    PhpIndex.getInstance(project)
+        .getClassesByFQN(this.declaredType.types.firstOrNull() ?: "")
+        .firstOrNull() as? PhpClassImpl

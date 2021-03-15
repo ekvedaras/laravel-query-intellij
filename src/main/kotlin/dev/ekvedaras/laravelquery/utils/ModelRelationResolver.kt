@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRelationClosure
-import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.getClass
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 
 class ModelRelationResolver(

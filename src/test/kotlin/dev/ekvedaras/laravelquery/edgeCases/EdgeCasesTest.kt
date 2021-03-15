@@ -62,4 +62,11 @@ internal class EdgeCasesTest : BaseTestCase() {
         myFixture.completeBasic()
         assertCompletion("billable_id", "billable_type")
     }
+
+    fun testWhenClause() {
+        myFixture.configureByFile("edgeCases/whenClause.php")
+        myFixture.completeBasic()
+        assertCompletion("first_name", "last_name")
+        assertNoCompletion("trial_ends_at")
+    }
 }

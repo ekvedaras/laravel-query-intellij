@@ -52,9 +52,7 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
     private fun caretAfterArgs(at: Int, prefix: String = ""): String {
         var args = ""
 
-        for (arg in 0 until at) {
-            args += "'',"
-        }
+        repeat((0 until at).count()) { args += "''," }
 
         args += "'$prefix<caret>'"
 
