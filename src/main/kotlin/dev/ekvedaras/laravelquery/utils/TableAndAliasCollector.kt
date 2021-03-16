@@ -71,7 +71,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
                 // $var->join('table', function (JoinClause $join) { $join->on() })
                 if (element.isJoinOrRelation(reference.project)) {
-                    element.parent.parentOfType<Statement>()?.parentOfType<Statement>() ?: return
+                    element.parent?.parentOfType<Statement>()?.parentOfType<Statement>() ?: return
                 } else {
                     element.parent
                 }

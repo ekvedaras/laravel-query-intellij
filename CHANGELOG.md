@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Rare error when resolving parent PSI element.
+
 ## [1.0.1]
 ### Fixed
 - Resolve table name from model when inside closure like for example inside when() method. #16

@@ -108,12 +108,14 @@ fun PsiElement.findParamIndex(): Int {
 
     return if (parent is ParameterList) {
         ArrayUtil.indexOf(parent.parameters, this)
-    } else this.parent.findParamIndex()
+    } else {
+        this.parent?.findParamIndex() ?: -1
+    }
 }
 
 fun PsiElement.findParameterList(): ParameterList? =
     if (this is ParameterList) this
-    else this.parent.findParameterList()
+    else this.parent?.findParameterList()
 
 fun MethodReference.isJoinOrRelation(project: Project): Boolean =
     MethodUtils.resolveMethodClasses(this, project).any { it.isJoinOrRelation() }
