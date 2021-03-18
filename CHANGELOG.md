@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [1.0.2]
 ### Fixed
 - Rare error when resolving parent PSI element.
 ### Updated
