@@ -6,8 +6,6 @@
 ## [1.0.2]
 ### Fixed
 - Rare error when resolving parent PSI element.
-### Updated
-- Change the lowest possible build to `192`. #17
 
 ## [1.0.1]
 ### Fixed
