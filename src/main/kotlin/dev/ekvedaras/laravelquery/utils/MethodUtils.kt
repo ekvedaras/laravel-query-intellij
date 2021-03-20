@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isJoinOrRelation
@@ -46,7 +47,12 @@ class MethodUtils private constructor() {
                 .forEach {
                     PhpIndex.getInstance(project)
                         .getClassesByFQN(it)
-                        .forEach { clazz -> classes.add(clazz as PhpClassImpl) }
+                        .forEach classLoop@{ clazz ->
+                            when (clazz) {
+                                is PhpClassAliasImpl -> classes.add(clazz.original as PhpClassImpl)
+                                is PhpClassImpl -> classes.add(clazz)
+                            }
+                        }
                 }
 
             return classes

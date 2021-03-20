@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Fixed
 - Rare error when resolving parent PSI element.
+- Exceptions when dealing with `PhpClassAlias`. #21
 
 ## [1.0.1]
 ### Fixed
