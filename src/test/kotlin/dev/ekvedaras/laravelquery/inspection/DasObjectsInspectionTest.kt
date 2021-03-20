@@ -66,4 +66,8 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testWarnsAboutUnknownTableAndColumn() {
         assertInspection("inspection/unknownTableAndColumn.php", UnknownColumnInspection())
     }
+
+    fun testDoesNotWarnAboutOperatorInJoinCallWithOperator() {
+        assertInspection("inspection/joinWithOperator.php", UnknownColumnInspection())
+    }
 }

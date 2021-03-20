@@ -6,6 +6,7 @@
 ### Fixed
 - Rare error when resolving parent PSI element.
 - Exceptions when dealing with `PhpClassAlias`. #21
+- Operator param detection. #20
 
 ## [1.0.1]
 ### Fixed

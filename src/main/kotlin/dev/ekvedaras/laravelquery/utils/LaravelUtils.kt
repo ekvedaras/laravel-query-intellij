@@ -23,8 +23,6 @@ object LaravelClasses {
     const val Model = "\\Illuminate\\Database\\Eloquent\\Model"
 }
 
-private const val PARAMS_WITH_OPERATOR = 3
-
 @Suppress("TooManyFunctions")
 class LaravelUtils private constructor() {
     companion object {
@@ -154,11 +152,26 @@ class LaravelUtils private constructor() {
 
         // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
-        val BuilderMethodsWithTableColumnsInArrayValues = listOf(
+        private val BuilderMethodsWithTableColumnsInArrayValues = listOf(
             "get", "select",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
         )
+        // </editor-fold>
+
+        // <editor-fold desc="Possible operators" defaultstate="collapsed">
+        @JvmStatic
+        private val Operators = listOf<CharSequence>(
+            "=", "<", ">", "<=", ">=", "<>", "!=", "<=>",
+            "like", "like binary", "not like", "like",
+            "&", "|", "^", "<<", ">>",
+            "rlike", "not rlike", "regexp", "not regexp",
+            "~", "~*", "!~", "!~*", "similar to",
+            "not similar to", "not ilike", "~~*", "!~~*",
+        )
+
+        @JvmStatic
+        private val OperatorPositions = listOf(1, 2)
         // </editor-fold>
 
         fun MethodReference.isBuilderClassMethod(project: Project): Boolean =
@@ -222,7 +235,9 @@ class LaravelUtils private constructor() {
                 (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
         fun PsiElement.isOperatorParam(): Boolean =
-            this.findParameterList()?.parameters?.size == PARAMS_WITH_OPERATOR && this.findParamIndex() == 1
+            OperatorPositions.contains(this.findParamIndex()) && Operators.any {
+                this.textMatches("'$it'") || this.textMatches("\"$it\"")
+            }
 
         fun CompletionParameters.isInsidePhpArrayOrValue(): Boolean =
             this.position.isInsidePhpArrayOrValue()
