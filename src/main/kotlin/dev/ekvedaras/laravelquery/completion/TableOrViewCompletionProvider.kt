@@ -3,7 +3,7 @@ package dev.ekvedaras.laravelquery.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
@@ -34,7 +34,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
-        val items = Collections.synchronizedList(mutableListOf<LookupElementBuilder>())
+        val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         when (target.parts.size) {
             1 -> populateWithOnePart(project, items)
@@ -44,11 +44,13 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         result.addAllElements(
             items.distinctBy { it.lookupString }
         )
+
+        result.stopHere()
     }
 
     private fun populateWithOnePart(
         project: Project,
-        result: MutableList<LookupElementBuilder>
+        result: MutableList<LookupElement>
     ) {
         project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.schemasInParallel().forEach { schema ->
@@ -64,7 +66,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
     private fun populateWithTwoParts(
         project: Project,
         target: DbReferenceExpression,
-        result: MutableList<LookupElementBuilder>,
+        result: MutableList<LookupElement>,
     ) {
         target.schema.parallelStream().forEach { schema ->
             schema.tablesInParallel().forEach { table ->

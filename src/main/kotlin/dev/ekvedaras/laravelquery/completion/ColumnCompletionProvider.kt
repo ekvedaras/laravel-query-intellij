@@ -3,7 +3,7 @@ package dev.ekvedaras.laravelquery.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.application.ApplicationManager
@@ -24,10 +24,8 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayO
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
-import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.getIcon
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
-import icons.DatabaseIcons
 import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
@@ -45,7 +43,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
-        val items = Collections.synchronizedList(mutableListOf<LookupElementBuilder>())
+        val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         when (target.parts.size) {
             1 -> completeForOnePart(project, target, items, result)
@@ -56,12 +54,14 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result.addAllElements(
             items.distinctBy { it.lookupString }
         )
+
+        result.stopHere()
     }
 
     private fun completeForOnePart(
         project: Project,
         target: DbReferenceExpression,
-        items: MutableList<LookupElementBuilder>,
+        items: MutableList<LookupElement>,
         result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
@@ -80,7 +80,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     }
 
     private fun addSchemaAndItsTables(
-        items: MutableList<LookupElementBuilder>,
+        items: MutableList<LookupElement>,
         schema: DasNamespace,
         project: Project,
         dataSource: DbDataSource,
@@ -100,7 +100,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         target: DbReferenceExpression,
         dataSource: DbDataSource,
         project: Project,
-        items: MutableList<LookupElementBuilder>
+        items: MutableList<LookupElement>
     ) {
         result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
         target.tablesAndAliases.forEach { tableAlias ->
@@ -112,7 +112,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             if (table != null) {
                 items.add(
                     LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
-                        .withIcon(table.getIcon(project))
+                    //.withIcon(table.getIcon(project))
                 )
 
                 table.columnsInParallel().forEach { column ->
@@ -121,7 +121,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             } else {
                 items.add(
                     LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
-                        .withIcon(DatabaseIcons.Synonym)
+                    //.withIcon(DatabaseIcons.Synonym)
                 )
             }
         }
@@ -130,7 +130,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun completeForTwoParts(
         project: Project,
         target: DbReferenceExpression,
-        result: MutableList<LookupElementBuilder>
+        result: MutableList<LookupElement>
     ) {
         project.dbDataSourcesInParallel().forEach {
             if (target.schema.isNotEmpty()) {
@@ -143,7 +143,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
 
     private fun addTableColumns(
         target: DbReferenceExpression,
-        result: MutableList<LookupElementBuilder>,
+        result: MutableList<LookupElement>,
         project: Project
     ) {
         target.table.parallelStream().forEach { table ->
@@ -159,7 +159,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
 
     private fun addTables(
         target: DbReferenceExpression,
-        result: MutableList<LookupElementBuilder>,
+        result: MutableList<LookupElement>,
         project: Project
     ) {
         target.schema.parallelStream().forEach { schema ->
@@ -172,7 +172,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     private fun completeForThreeParts(
         project: Project,
         target: DbReferenceExpression,
-        result: MutableList<LookupElementBuilder>,
+        result: MutableList<LookupElement>,
     ) {
         target.table.parallelStream().forEach { table ->
             table.columnsInParallel().forEach { column ->

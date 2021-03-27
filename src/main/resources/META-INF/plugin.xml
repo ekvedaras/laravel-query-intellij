@@ -1,3 +1,4 @@
+<!--suppress PluginXmlValidity -->
 <idea-plugin>
     <id>dev.ekvedaras.laravelquery</id>
     <name>Laravel Query</name>
@@ -16,9 +17,11 @@
             serviceImplementation="dev.ekvedaras.laravelquery.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"/>
+                                implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"
+                                order="first"/>
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"/>
+                                implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"
+                                order="first"/>
 
         <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>

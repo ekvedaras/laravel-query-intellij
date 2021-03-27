@@ -2,6 +2,8 @@ package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.DeclarativeInsertHandler
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasNamespace
@@ -13,39 +15,50 @@ import com.intellij.sql.symbols.DasPsiWrappingSymbol
 
 class LookupUtils private constructor() {
     companion object {
-        fun DasNamespace.buildLookup(project: Project, dataSource: DbDataSource): LookupElementBuilder =
-            LookupElementBuilder
-                .create(this, this.name)
-                .withIcon(this.getIcon(project))
-                .withTypeText(dataSource.name, true)
-                .withInsertHandler(project, true)
+        fun DasNamespace.buildLookup(project: Project, dataSource: DbDataSource): LookupElement =
+            PrioritizedLookupElement.withGrouping(
+                PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                        .create(this, this.name)
+                        .withIcon(this.getIcon(project))
+                        .withTypeText(dataSource.name, true)
+                        .withInsertHandler(project, true),
+                    1.0
+                ), 1
+            )
 
         fun DasTable.buildLookup(
             project: Project,
             withTablePrefix: Boolean = false,
             triggerCompletion: Boolean = false
-        ): LookupElementBuilder =
-            LookupElementBuilder
-                .create(this, this.name)
-                .withLookupString("${this.dasParent?.name}.${this.name}")
-                .withTypeText(this.dasParent?.name ?: "", true)
-                .withIcon(this.getIcon(project))
-                .withInsertHandler(
-                    project,
-                    triggerCompletion,
-                    if (withTablePrefix) {
-                        this.dasParent?.name ?: ""
-                    } else {
-                        ""
-                    }
-                )
+        ): LookupElement =
+            PrioritizedLookupElement.withGrouping(
+                PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                        .create(this, this.name)
+                        .withLookupString("${this.dasParent?.name}.${this.name}")
+                        .withTypeText(this.dasParent?.name ?: "", true)
+                        .withIcon(this.getIcon(project))
+                        .withInsertHandler(
+                            project,
+                            triggerCompletion,
+                            if (withTablePrefix) {
+                                this.dasParent?.name ?: ""
+                            } else {
+                                ""
+                            }
+                        ),
+                    2.0
+                ),
+                2
+            )
 
         fun DasColumn.buildLookup(
             project: Project,
             withTablePrefix: Boolean = false,
             withSchemaPrefix: Boolean = false,
             alias: String? = null
-        ): LookupElementBuilder {
+        ): LookupElement {
             val prefix = if (withSchemaPrefix) {
                 this.table?.dasParent?.name ?: ""
             } else {
@@ -56,35 +69,53 @@ class LookupUtils private constructor() {
                 ""
             }
 
-            return LookupElementBuilder
-                .create(this, this.name)
-                .withIcon(this.getIcon(project))
-                .withTailText("  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}", true)
-                .withTypeText("${this.comment ?: ""} ${this.tableName}", true)
-                .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
-                .withLookupString("${this.tableName}.${this.name}")
-                .withInsertHandler(
-                    project,
-                    false,
-                    alias ?: prefix.trim('.')
-                )
+            return PrioritizedLookupElement.withGrouping(
+                PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                        .create(this, this.name)
+                        .withIcon(this.getIcon(project))
+                        .withTailText(
+                            "  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}",
+                            true
+                        )
+                        .withTypeText("${this.comment ?: ""} ${this.tableName}", true)
+                        .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
+                        .withLookupString("${this.tableName}.${this.name}")
+                        .withInsertHandler(
+                            project,
+                            false,
+                            alias ?: prefix.trim('.')
+                        ),
+                    4.0
+                ),
+                4
+            )
         }
 
         fun buildForAliasOrTable(
             tableAlias: Map.Entry<String, Pair<String, String?>>,
             dataSource: DbDataSource
-        ): LookupElementBuilder =
-            LookupElementBuilder
-                .create(tableAlias.key)
-                .withTailText(if (tableAlias.value.second != null) "  (${tableAlias.value.second})" else "", true)
-                .withTypeText(dataSource.name, true)
-                .withInsertHandler(
-                    DeclarativeInsertHandler.Builder()
-                        .disableOnCompletionChars(".")
-                        .insertOrMove(".")
-                        .triggerAutoPopup()
-                        .build()
-                )
+        ): LookupElement =
+            PrioritizedLookupElement.withGrouping(
+                PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder
+                        .create(tableAlias.key)
+                        .withTailText(
+                            if (tableAlias.value.second != null) "  (${tableAlias.value.second})" else "",
+                            true
+                        )
+                        .withTypeText(dataSource.name, true)
+                        .withInsertHandler(
+                            DeclarativeInsertHandler.Builder()
+                                .disableOnCompletionChars(".")
+                                .insertOrMove(".")
+                                .triggerAutoPopup()
+                                .build()
+                        ),
+                    3.0
+                ),
+                3
+            )
 
         fun DasObject.getIcon(project: Project) =
             DasPsiWrappingSymbol(this, project).getIcon(false)
