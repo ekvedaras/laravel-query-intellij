@@ -5,6 +5,8 @@
 ## [Unreleased]
 ### Updated
 - Slightly improve completion sorting.
+### Added
+- Support for `DB::table()`
 
 ## [1.0.2]
 ### Fixed

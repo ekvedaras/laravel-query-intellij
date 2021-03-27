@@ -69,4 +69,32 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertCompletion("first_name", "last_name")
         assertNoCompletion("trial_ends_at")
     }
+
+    fun testDbTable() {
+        myFixture.configureByFile("edgeCases/dbTable.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "testProject2")
+        assertNoCompletion("created_at")
+    }
+
+    fun testDbFacadeAliasTable() {
+        myFixture.configureByFile("edgeCases/dbFacadeAliasTable.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "testProject2")
+        assertNoCompletion("created_at")
+    }
+
+    fun testDbTableColumn() {
+        myFixture.configureByFile("edgeCases/dbTableColumn.php")
+        myFixture.completeBasic()
+        assertCompletion("first_name", "last_name")
+        assertNoCompletion("trial_ends_at")
+    }
+
+    fun testDbTableAliasColumn() {
+        myFixture.configureByFile("edgeCases/dbTableAliasColumn.php")
+        myFixture.completeBasic()
+        assertCompletion("first_name", "last_name")
+        assertNoCompletion("trial_ends_at")
+    }
 }

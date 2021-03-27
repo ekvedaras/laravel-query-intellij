@@ -12,9 +12,15 @@ import com.intellij.database.model.DasTable
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
+import icons.DatabaseIcons
 
 class LookupUtils private constructor() {
     companion object {
+        private const val NamespacePriority = 1
+        private const val TablePriority = 2
+        private const val AliasPriority = 3
+        private const val ColumnPriority = 4
+
         fun DasNamespace.buildLookup(project: Project, dataSource: DbDataSource): LookupElement =
             PrioritizedLookupElement.withGrouping(
                 PrioritizedLookupElement.withPriority(
@@ -23,8 +29,9 @@ class LookupUtils private constructor() {
                         .withIcon(this.getIcon(project))
                         .withTypeText(dataSource.name, true)
                         .withInsertHandler(project, true),
-                    1.0
-                ), 1
+                    NamespacePriority.toDouble()
+                ),
+                NamespacePriority
             )
 
         fun DasTable.buildLookup(
@@ -48,9 +55,9 @@ class LookupUtils private constructor() {
                                 ""
                             }
                         ),
-                    2.0
+                    TablePriority.toDouble()
                 ),
-                2
+                TablePriority
             )
 
         fun DasColumn.buildLookup(
@@ -86,20 +93,23 @@ class LookupUtils private constructor() {
                             false,
                             alias ?: prefix.trim('.')
                         ),
-                    4.0
+                    ColumnPriority.toDouble()
                 ),
-                4
+                ColumnPriority
             )
         }
 
         fun buildForAliasOrTable(
+            project: Project,
             tableAlias: Map.Entry<String, Pair<String, String?>>,
-            dataSource: DbDataSource
+            dataSource: DbDataSource,
+            table: DasTable?
         ): LookupElement =
             PrioritizedLookupElement.withGrouping(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
                         .create(tableAlias.key)
+                        .withIcon(table?.getIcon(project) ?: DatabaseIcons.Synonym)
                         .withTailText(
                             if (tableAlias.value.second != null) "  (${tableAlias.value.second})" else "",
                             true
@@ -112,9 +122,9 @@ class LookupUtils private constructor() {
                                 .triggerAutoPopup()
                                 .build()
                         ),
-                    3.0
+                    AliasPriority.toDouble()
                 ),
-                3
+                AliasPriority
             )
 
         fun DasObject.getIcon(project: Project) =

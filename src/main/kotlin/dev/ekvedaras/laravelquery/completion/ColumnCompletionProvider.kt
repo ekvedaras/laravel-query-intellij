@@ -109,20 +109,12 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
                     (tableAlias.value.second == null || dasTable.dasParent?.name == tableAlias.value.second)
             }
 
-            if (table != null) {
-                items.add(
-                    LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
-                    //.withIcon(table.getIcon(project))
-                )
+            items.add(
+                LookupUtils.buildForAliasOrTable(project, tableAlias, dataSource, table)
+            )
 
-                table.columnsInParallel().forEach { column ->
-                    items.add(column.buildLookup(project))
-                }
-            } else {
-                items.add(
-                    LookupUtils.buildForAliasOrTable(tableAlias, dataSource)
-                    //.withIcon(DatabaseIcons.Synonym)
-                )
+            table?.columnsInParallel()?.forEach { column ->
+                items.add(column.buildLookup(project))
             }
         }
     }

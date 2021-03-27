@@ -21,6 +21,8 @@ object LaravelClasses {
     const val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
     const val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
     const val Model = "\\Illuminate\\Database\\Eloquent\\Model"
+    const val DbFacade = "\\Illuminate\\Support\\Facades\\DB"
+    const val DbFacadeAlias = "\\DB"
 }
 
 @Suppress("TooManyFunctions")
@@ -34,6 +36,8 @@ class LaravelUtils private constructor() {
             LaravelClasses.JoinClause,
             LaravelClasses.Relation,
             LaravelClasses.Model,
+            LaravelClasses.DbFacade,
+            LaravelClasses.DbFacadeAlias,
         )
         // </editor-fold>
 
@@ -45,6 +49,7 @@ class LaravelUtils private constructor() {
             "leftJoin", "leftJoinWhere",
             "rightJoin", "rightJoinWhere",
             "crossJoin",
+            "table",
         )
         // </editor-fold>
 
@@ -54,6 +59,7 @@ class LaravelUtils private constructor() {
             "from" to 1,
             "fromSub" to 1,
             "selectSub" to 1,
+            "table" to 1,
         )
         // </editor-fold>
 

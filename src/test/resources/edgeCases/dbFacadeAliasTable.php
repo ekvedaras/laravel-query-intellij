@@ -1,0 +1,1 @@
+<?php \DB::table('<caret>');

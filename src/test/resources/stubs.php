@@ -1674,5 +1674,16 @@ class DB {
     public static function query()
     {
     }
+
+    /**
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public static function table(string $table)
+    {
+    }
 }
+}
+
+namespace {
+    class DB extends \Illuminate\Support\Facades\DB {}
 }
