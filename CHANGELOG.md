@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Schema builder integration
+
 ## [1.0.3]
 ### Updated
 - Slightly improve completion sorting.

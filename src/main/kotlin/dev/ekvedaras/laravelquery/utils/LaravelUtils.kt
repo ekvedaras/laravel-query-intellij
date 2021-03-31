@@ -47,6 +47,15 @@ class LaravelUtils private constructor() {
         )
         // </editor-fold>
 
+        // <editor-fold desc="Classes where completing schema makes no sense" defaultstate="collapsed">
+        @JvmStatic
+        val DontCompleteSchemaFor = listOf(
+            LaravelClasses.SchemaBuilder,
+            LaravelClasses.SchemaFacade,
+            LaravelClasses.SchemaFacadeAlias,
+        )
+        // </editor-fold>
+
         // <editor-fold desc="Query builder methods where table name should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableMethods = listOf(
@@ -189,6 +198,13 @@ class LaravelUtils private constructor() {
         fun MethodReference.isBuilderClassMethod(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
                 DatabaseBuilderClasses.any {
+                    clazz.isChildOf(it)
+                }
+            }
+
+        fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                DontCompleteSchemaFor.none {
                     clazz.isChildOf(it)
                 }
             }

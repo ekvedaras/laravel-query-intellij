@@ -16,9 +16,10 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMet
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
-import java.util.Collections
+import java.util.*
 
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
@@ -37,7 +38,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         when (target.parts.size) {
-            1 -> populateWithOnePart(project, items)
+            1 -> populateWithOnePart(project, method, items)
             else -> populateWithTwoParts(project, target, items)
         }
 
@@ -50,11 +51,14 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
     private fun populateWithOnePart(
         project: Project,
+        method: MethodReference,
         result: MutableList<LookupElement>
     ) {
         project.dbDataSourcesInParallel().forEach { dataSource ->
-            dataSource.schemasInParallel().forEach { schema ->
-                result.add(schema.buildLookup(project, dataSource))
+            if (method.shouldCompleteSchemas(project)) {
+                dataSource.schemasInParallel().forEach { schema ->
+                    result.add(schema.buildLookup(project, dataSource))
+                }
             }
 
             dataSource.tablesInParallel().forEach { table ->
