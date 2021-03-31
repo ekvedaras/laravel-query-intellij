@@ -18,11 +18,14 @@ import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 object LaravelClasses {
     const val QueryBuilder = "\\Illuminate\\Database\\Query\\Builder"
     const val EloquentBuilder = "\\Illuminate\\Database\\Eloquent\\Builder"
+    const val SchemaBuilder = "\\Illuminate\\Database\\Schema\\Builder"
     const val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
     const val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
     const val Model = "\\Illuminate\\Database\\Eloquent\\Model"
     const val DbFacade = "\\Illuminate\\Support\\Facades\\DB"
     const val DbFacadeAlias = "\\DB"
+    const val SchemaFacade = "\\Illuminate\\Support\\Facades\\Schema"
+    const val SchemaFacadeAlias = "\\Schema"
 }
 
 @Suppress("TooManyFunctions")
@@ -33,11 +36,14 @@ class LaravelUtils private constructor() {
         val DatabaseBuilderClasses = listOf(
             LaravelClasses.QueryBuilder,
             LaravelClasses.EloquentBuilder,
+            LaravelClasses.SchemaBuilder,
             LaravelClasses.JoinClause,
             LaravelClasses.Relation,
             LaravelClasses.Model,
             LaravelClasses.DbFacade,
             LaravelClasses.DbFacadeAlias,
+            LaravelClasses.SchemaFacade,
+            LaravelClasses.SchemaFacadeAlias,
         )
         // </editor-fold>
 
