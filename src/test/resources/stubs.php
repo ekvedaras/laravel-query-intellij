@@ -1643,7 +1643,163 @@ class JoinClause extends Builder {
 }
 }
 
+namespace Illuminate\Database\Schema {
+class Builder {
+    /**
+     * Create a database in the schema.
+     *
+     * @param string $name
+     * @return bool
+     * @static
+     */
+    public static function createDatabase($name)
+    {
+    }
+
+    /**
+     * Drop a database from the schema if the database exists.
+     *
+     * @param string $name
+     * @return bool
+     * @static
+     */
+    public static function dropDatabaseIfExists($name)
+    {
+    }
+
+    /**
+     * Determine if the given table exists.
+     *
+     * @param string $table
+     * @return bool
+     * @static
+     */
+    public static function hasTable($table)
+    {
+    }
+
+    /**
+     * Get the column listing for a given table.
+     *
+     * @param string $table
+     * @return array
+     * @static
+     */
+    public static function getColumnListing($table)
+    {
+    }
+
+    /**
+     * Determine if the given table has a given column.
+     *
+     * @param string $table
+     * @param string $column
+     * @return bool
+     * @static
+     */
+    public static function hasColumn($table, $column)
+    {
+    }
+
+    /**
+     * Determine if the given table has given columns.
+     *
+     * @param string $table
+     * @param array $columns
+     * @return bool
+     * @static
+     */
+    public static function hasColumns($table, $columns)
+    {
+    }
+
+    /**
+     * Get the data type for the given column name.
+     *
+     * @param string $table
+     * @param string $column
+     * @return string
+     * @static
+     */
+    public static function getColumnType($table, $column)
+    {
+    }
+
+    /**
+     * Modify a table on the schema.
+     *
+     * @param string $table
+     * @param \Closure $callback
+     * @return void
+     * @static
+     */
+    public static function table($table, $callback)
+    {
+    }
+
+    /**
+     * Create a new table on the schema.
+     *
+     * @param string $table
+     * @param \Closure $callback
+     * @return void
+     * @static
+     */
+    public static function create($table, $callback)
+    {
+    }
+
+    /**
+     * Drop a table from the schema.
+     *
+     * @param string $table
+     * @return void
+     * @static
+     */
+    public static function drop($table)
+    {
+    }
+
+    /**
+     * Drop a table from the schema if it exists.
+     *
+     * @param string $table
+     * @return void
+     * @static
+     */
+    public static function dropIfExists($table)
+    {
+    }
+
+    /**
+     * Drop columns from a table schema.
+     *
+     * @param string $table
+     * @param string|array $columns
+     * @return void
+     * @static
+     */
+    public static function dropColumns($table, $columns)
+    {
+    }
+
+    /**
+     * Rename a table on the schema.
+     *
+     * @param string $from
+     * @param string $to
+     * @return void
+     * @static
+     */
+    public static function rename($from, $to)
+    {
+    }
+}
+}
+
 namespace Illuminate\Support\Facades {
+class Schema extends \Illuminate\Database\Schema\Builder {}
+
 /**
  * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null)
  * @method static \Illuminate\Database\Query\Builder table(string $table, string $as = null)
@@ -1686,4 +1842,5 @@ class DB {
 
 namespace {
     class DB extends \Illuminate\Support\Facades\DB {}
+    class Schema extends \Illuminate\Support\Facades\Schema {}
 }
