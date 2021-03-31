@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [1.0.3]
 ### Updated
 - Slightly improve completion sorting.
 ### Added
