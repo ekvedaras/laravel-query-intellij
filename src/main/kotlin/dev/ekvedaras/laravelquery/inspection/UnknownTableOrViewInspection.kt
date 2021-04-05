@@ -14,6 +14,7 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 
@@ -58,7 +59,8 @@ class UnknownTableOrViewInspection : PhpInspection() {
                     !method.isBuilderMethodByName() ||
                     !expression.isTableParam() ||
                     expression.isInsideRegularFunction() ||
-                    !method.isBuilderClassMethod(project)
+                    !method.isBuilderClassMethod(project) ||
+                    method.isSchemaBuilderMethod(project)
         }
     }
 }

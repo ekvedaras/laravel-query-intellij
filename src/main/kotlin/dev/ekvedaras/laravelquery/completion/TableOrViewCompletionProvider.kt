@@ -16,10 +16,11 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMet
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlySchemas
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
-import java.util.*
+import java.util.Collections
 
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
@@ -54,10 +55,14 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         method: MethodReference,
         result: MutableList<LookupElement>
     ) {
-        project.dbDataSourcesInParallel().forEach { dataSource ->
+        project.dbDataSourcesInParallel().forEach dataSources@{ dataSource ->
             if (method.shouldCompleteSchemas(project)) {
                 dataSource.schemasInParallel().forEach { schema ->
                     result.add(schema.buildLookup(project, dataSource))
+                }
+
+                if (method.shouldCompleteOnlySchemas()) {
+                    return@dataSources
                 }
             }
 

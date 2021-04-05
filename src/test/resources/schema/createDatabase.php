@@ -1,0 +1,1 @@
+<?php Schema::createDatabase('<caret>');

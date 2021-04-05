@@ -42,14 +42,15 @@ class LaravelUtils private constructor() {
             LaravelClasses.Model,
             LaravelClasses.DbFacade,
             LaravelClasses.DbFacadeAlias,
+            LaravelClasses.SchemaBuilder,
             LaravelClasses.SchemaFacade,
             LaravelClasses.SchemaFacadeAlias,
         )
         // </editor-fold>
 
-        // <editor-fold desc="Classes where completing schema makes no sense" defaultstate="collapsed">
+        // <editor-fold desc="\Illuminate\Database schema builder classes" defaultstate="collapsed">
         @JvmStatic
-        val DontCompleteSchemaFor = listOf(
+        val SchemaBuilderClasses = listOf(
             LaravelClasses.SchemaBuilder,
             LaravelClasses.SchemaFacade,
             LaravelClasses.SchemaFacadeAlias,
@@ -64,7 +65,17 @@ class LaravelUtils private constructor() {
             "leftJoin", "leftJoinWhere",
             "rightJoin", "rightJoinWhere",
             "crossJoin",
-            "table",
+            "table", "hasTable", "getColumnListing",
+            "hasColumn", "hasColumns", "getColumnType",
+            "table", "create", "drop", "dropIfExists",
+            "dropColumns", "rename", "createDatabase", "dropDatabaseIfExists",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Schema builder methods where schema name should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderSchemaMethods = listOf(
+            "createDatabase", "dropDatabaseIfExists"
         )
         // </editor-fold>
 
@@ -168,6 +179,10 @@ class LaravelUtils private constructor() {
             "updateOrInsert" to listOf(0, 1),
             "update" to listOf(0),
             "on" to listOf(0, 1, 2),
+            "hasColumn" to listOf(1),
+            "hasColumns" to listOf(1),
+            "getColumnType" to listOf(1),
+            "dropColumns" to listOf(1),
         )
         // </editor-fold>
 
@@ -177,6 +192,7 @@ class LaravelUtils private constructor() {
             "get", "select",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
+            "hasColumns", "dropColumns",
         )
         // </editor-fold>
 
@@ -203,11 +219,17 @@ class LaravelUtils private constructor() {
             }
 
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =
+            this.shouldCompleteOnlySchemas() || !this.isSchemaBuilderMethod(project)
+
+        fun MethodReference.isSchemaBuilderMethod(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
-                DontCompleteSchemaFor.none {
+                SchemaBuilderClasses.any {
                     clazz.isChildOf(it)
                 }
             }
+
+        fun MethodReference.shouldCompleteOnlySchemas(): Boolean =
+            BuilderSchemaMethods.contains(this.name)
 
         fun PhpClass.tableName(): String {
             val tableField = this.fields.find { it.name == "table" }
