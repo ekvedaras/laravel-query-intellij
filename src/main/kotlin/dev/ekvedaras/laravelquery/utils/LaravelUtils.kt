@@ -19,6 +19,7 @@ object LaravelClasses {
     const val QueryBuilder = "\\Illuminate\\Database\\Query\\Builder"
     const val EloquentBuilder = "\\Illuminate\\Database\\Eloquent\\Builder"
     const val SchemaBuilder = "\\Illuminate\\Database\\Schema\\Builder"
+    const val Blueprint = "\\Illuminate\\Database\\Schema\\Blueprint"
     const val JoinClause = "\\Illuminate\\Database\\Query\\JoinClause"
     const val Relation = "\\Illuminate\\Database\\Eloquent\\Relations\\Relation"
     const val Model = "\\Illuminate\\Database\\Eloquent\\Model"
@@ -230,6 +231,11 @@ class LaravelUtils private constructor() {
 
         fun MethodReference.shouldCompleteOnlySchemas(): Boolean =
             BuilderSchemaMethods.contains(this.name)
+
+        fun MethodReference.isBlueprintMethod(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                clazz.isChildOf(LaravelClasses.Blueprint)
+            }
 
         fun PhpClass.tableName(): String {
             val tableField = this.fields.find { it.name == "table" }
