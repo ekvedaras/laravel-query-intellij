@@ -17,8 +17,10 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParalle
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
@@ -30,6 +32,8 @@ import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
     CompletionProvider<CompletionParameters>() {
+    private var onlyColumns = false
+
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
@@ -46,7 +50,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         when (target.parts.size) {
-            1 -> completeForOnePart(project, target, items, result)
+            1 -> completeForOnePart(project, target, items, method, result)
             2 -> completeForTwoParts(project, target, items)
             else -> completeForThreeParts(project, target, items)
         }
@@ -62,15 +66,19 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         project: Project,
         target: DbReferenceExpression,
         items: MutableList<LookupElement>,
+        method: MethodReference,
         result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
+        onlyColumns = method.isBlueprintMethod(project) || method.isColumnDefinitionMethod(project)
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
-            dataSource.schemasInParallel().filter {
-                shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)
-            }.forEach { schema ->
-                addSchemaAndItsTables(items, schema, project, dataSource, target)
+            if (!onlyColumns) {
+                dataSource.schemasInParallel().filter {
+                    shouldCompleteAll || schemas.isEmpty() || schemas.contains(it.name)
+                }.forEach { schema ->
+                    addSchemaAndItsTables(items, schema, project, dataSource, target)
+                }
             }
 
             if (target.tablesAndAliases.isNotEmpty()) {
@@ -109,9 +117,11 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
                     (tableAlias.value.second == null || dasTable.dasParent?.name == tableAlias.value.second)
             }
 
-            items.add(
-                LookupUtils.buildForAliasOrTable(project, tableAlias, dataSource, table)
-            )
+            if (!onlyColumns) {
+                items.add(
+                    LookupUtils.buildForAliasOrTable(project, tableAlias, dataSource, table)
+                )
+            }
 
             table?.columnsInParallel()?.forEach { column ->
                 items.add(column.buildLookup(project))

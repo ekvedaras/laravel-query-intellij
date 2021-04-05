@@ -29,6 +29,7 @@ import java.util.Collections
 class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     private val aliasCollector = AliasCollector(reference)
     private val relationResolver = ModelRelationResolver(reference, this)
+    private val schemaTableResolver = SchemaTableResolver(reference)
 
     fun collect() {
         val method = MethodUtils.resolveMethodReference(reference.expression) ?: return
@@ -38,6 +39,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         collectMethodsInCurrentTree(methods, method)
 
         relationResolver.resolveModelAndRelationTables(methods, method)
+        schemaTableResolver.resolve(methods, method)
 
         methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }

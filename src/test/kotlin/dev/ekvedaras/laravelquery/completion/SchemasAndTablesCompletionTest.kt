@@ -24,8 +24,13 @@ internal class SchemasAndTablesCompletionTest : BaseTestCase() {
         LaravelUtils.BuilderTableMethods.forEach { method ->
             completeAllFor(method)
 
-            assertEquals(schemasAndTables.size, myFixture.lookupElementStrings?.size)
-            assertCompletion(*schemasAndTables.toTypedArray())
+            if (LaravelUtils.BuilderSchemaMethods.contains(method)) {
+                assertEquals(schemas.size, myFixture.lookupElementStrings?.size)
+                assertCompletion(*schemas.toTypedArray())
+            } else {
+                assertEquals(schemasAndTables.size, myFixture.lookupElementStrings?.size)
+                assertCompletion(*schemasAndTables.toTypedArray())
+            }
         }
     }
 

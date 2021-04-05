@@ -27,6 +27,7 @@ object LaravelClasses {
     const val DbFacadeAlias = "\\DB"
     const val SchemaFacade = "\\Illuminate\\Support\\Facades\\Schema"
     const val SchemaFacadeAlias = "\\Schema"
+    const val ColumnDefinition = "\\Illuminate\\Database\\Schema\\ColumnDefinition"
 }
 
 @Suppress("TooManyFunctions")
@@ -46,6 +47,8 @@ class LaravelUtils private constructor() {
             LaravelClasses.SchemaBuilder,
             LaravelClasses.SchemaFacade,
             LaravelClasses.SchemaFacadeAlias,
+            LaravelClasses.Blueprint,
+            LaravelClasses.ColumnDefinition,
         )
         // </editor-fold>
 
@@ -183,7 +186,84 @@ class LaravelUtils private constructor() {
             "hasColumn" to listOf(1),
             "hasColumns" to listOf(1),
             "getColumnType" to listOf(1),
+            "dropColumn" to listOf(0),
             "dropColumns" to listOf(1),
+            "dropConstrainedForeignId" to listOf(0),
+            "renameColumn" to listOf(0),
+            "dropSoftDeletes" to listOf(0),
+            "dropSoftDeletesTz" to listOf(0),
+            "unique" to listOf(0),
+            "index" to listOf(0),
+            "spatialIndex" to listOf(0),
+            "foreign" to listOf(0),
+            "indexCommand" to listOf(1),
+            "createIndexName" to listOf(1),
+            "after" to listOf(0),
+            "removeColumn" to listOf(0),
+            "primary" to listOf(0),
+            "unique" to listOf(0),
+            "index" to listOf(0),
+            "spatialIndex" to listOf(0),
+            "foreign" to listOf(0),
+            "id" to listOf(0),
+            "increments" to listOf(0),
+            "integerIncrements" to listOf(0),
+            "tinyIncrements" to listOf(0),
+            "mediumIncrements" to listOf(0),
+            "bigIncrements" to listOf(0),
+            "char" to listOf(0),
+            "string" to listOf(0),
+            "text" to listOf(0),
+            "mediumText" to listOf(0),
+            "longText" to listOf(0),
+            "integer" to listOf(0),
+            "tinyInteger" to listOf(0),
+            "smallInteger" to listOf(0),
+            "mediumInteger" to listOf(0),
+            "bigInteger" to listOf(0),
+            "unsignedInteger" to listOf(0),
+            "unsignedTinyInteger" to listOf(0),
+            "unsignedSmallInteger" to listOf(0),
+            "unsignedMediumInteger" to listOf(0),
+            "unsignedBigInteger" to listOf(0),
+            "foreignId" to listOf(0),
+            "foreignIdFor" to listOf(1),
+            "float" to listOf(0),
+            "double" to listOf(0),
+            "decimal" to listOf(0),
+            "unsignedFloat" to listOf(0),
+            "unsignedDouble" to listOf(0),
+            "unsignedDecimal" to listOf(0),
+            "boolean" to listOf(0),
+            "enum" to listOf(0),
+            "set" to listOf(0),
+            "json" to listOf(0),
+            "jsonb" to listOf(0),
+            "date" to listOf(0),
+            "dateTime" to listOf(0),
+            "dateTimeTz" to listOf(0),
+            "time" to listOf(0),
+            "timeTz" to listOf(0),
+            "timestamp" to listOf(0),
+            "timestampTz" to listOf(0),
+            "softDeletes" to listOf(0),
+            "softDeletesTz" to listOf(0),
+            "year" to listOf(0),
+            "binary" to listOf(0),
+            "uuid" to listOf(0),
+            "foreignUuid" to listOf(0),
+            "ipAddress" to listOf(0),
+            "macAddress" to listOf(0),
+            "geometry" to listOf(0),
+            "point" to listOf(0),
+            "lineString" to listOf(0),
+            "polygon" to listOf(0),
+            "geometryCollection" to listOf(0),
+            "multiPoint" to listOf(0),
+            "multiLineString" to listOf(0),
+            "multiPolygon" to listOf(0),
+            "multiPolygonZ" to listOf(0),
+            "computed" to listOf(0),
         )
         // </editor-fold>
 
@@ -193,7 +273,9 @@ class LaravelUtils private constructor() {
             "get", "select",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
-            "hasColumns", "dropColumns",
+            "hasColumns", "dropColumns", "dropColumns",
+            "primary", "unique", "index", "spatialIndex", "foreign",
+            "indexCommand", "createIndexName",
         )
         // </editor-fold>
 
@@ -235,6 +317,11 @@ class LaravelUtils private constructor() {
         fun MethodReference.isBlueprintMethod(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
                 clazz.isChildOf(LaravelClasses.Blueprint)
+            }
+
+        fun MethodReference.isColumnDefinitionMethod(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                clazz.isChildOf(LaravelClasses.ColumnDefinition)
             }
 
         fun PhpClass.tableName(): String {

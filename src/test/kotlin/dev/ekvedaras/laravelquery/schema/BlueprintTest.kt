@@ -6,8 +6,9 @@ import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
+import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
 import dev.ekvedaras.laravelquery.reference.ColumnPsiReference
-import dev.ekvedaras.laravelquery.reference.SchemaPsiReference
 import dev.ekvedaras.laravelquery.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
@@ -35,6 +36,17 @@ internal class BlueprintTest : BaseTestCase() {
         assertNoCompletion(*schemaTables.values.flatten().toTypedArray())
     }
 
+    fun testCompletesColumnsForAfter() {
+        val table = DasUtil.getTables(db).first { it.name == "users" }
+
+        myFixture.configureByFile("schema/after.php")
+        myFixture.completeBasic()
+
+        assertCompletion(*table.getDasChildren(ObjectKind.COLUMN).map { it.name }.toList().toTypedArray())
+        assertNoCompletion(*schemas.toTypedArray())
+        assertNoCompletion(*schemaTables.values.flatten().toTypedArray())
+    }
+
     fun testResolvesStringColumnReference() {
         myFixture.configureByFile("schema/string.php")
 
@@ -48,8 +60,8 @@ internal class BlueprintTest : BaseTestCase() {
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(ColumnPsiReference::class.java, usages.first().referenceClass)
         TestCase.assertTrue(usages.first().element?.textMatches("'email'") ?: false)
-        TestCase.assertEquals(30, usages.first().navigationRange.startOffset)
-        TestCase.assertEquals(30 + column.name.length, usages.first().navigationRange.endOffset)
+        TestCase.assertEquals(107, usages.first().navigationRange.startOffset)
+        TestCase.assertEquals(107 + column.name.length, usages.first().navigationRange.endOffset)
     }
 
     fun testResolvesTableReference() {
@@ -64,7 +76,15 @@ internal class BlueprintTest : BaseTestCase() {
         UsefulTestCase.assertSize(1, usages)
         TestCase.assertEquals(TableOrViewPsiReference::class.java, usages.first().referenceClass)
         TestCase.assertTrue(usages.first().element?.textMatches("'failed_jobs'") ?: false)
-        TestCase.assertEquals(21, usages.first().navigationRange.startOffset)
-        TestCase.assertEquals(21 + table.name.length, usages.first().navigationRange.endOffset)
+        TestCase.assertEquals(107, usages.first().navigationRange.startOffset)
+        TestCase.assertEquals(107 + table.name.length, usages.first().navigationRange.endOffset)
+    }
+
+    fun testDoesNotWarnAboutUnknownColumn() {
+        assertInspection("schema/unknownColumn.php", UnknownColumnInspection())
+    }
+
+    fun testDoesNotWarnAboutUnknownTable() {
+        assertInspection("schema/unknownBlueprintTable.php", UnknownTableOrViewInspection())
     }
 }

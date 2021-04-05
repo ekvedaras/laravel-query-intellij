@@ -13,12 +13,14 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isOperatorParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.selectsAllColumns
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
@@ -122,7 +124,9 @@ class UnknownColumnInspection : PhpInspection() {
                     !expression.isColumnIn(method) ||
                     expression.isInsideRegularFunction() ||
                     (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-                    !method.isBuilderClassMethod(project)
+                    !method.isBuilderClassMethod(project) ||
+                    method.isSchemaBuilderMethod(project) ||
+                    method.isBlueprintMethod(project)
         }
     }
 }
