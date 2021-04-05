@@ -387,7 +387,8 @@ class LaravelUtils private constructor() {
 
         fun PsiElement.isInsidePhpArrayOrValue(): Boolean =
             (this.parent?.parent?.isPhpArray() ?: false) ||
-                (this.parent?.parent?.isArrayValue() ?: false)
+                (this.parent?.parent?.isArrayValue() ?: false) ||
+                this.parent?.parent is ArrayHashElementImpl?
 
         fun PsiElement.selectsAllColumns(): Boolean =
             this.textContains('*')
