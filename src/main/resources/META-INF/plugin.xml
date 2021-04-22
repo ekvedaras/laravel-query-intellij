@@ -22,6 +22,9 @@
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"
                                 order="first"/>
+        <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"
+                                order="first"/>
 
         <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>

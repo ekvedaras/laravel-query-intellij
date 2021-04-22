@@ -1,11 +1,13 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import java.util.Collections
@@ -15,12 +17,15 @@ class DbReferenceResolver(private val reference: DbReferenceExpression) {
         val schemas = Collections.synchronizedList(reference.schema)
         val tables = Collections.synchronizedList(reference.table)
         val columns = Collections.synchronizedList(reference.column)
+        val indexes = Collections.synchronizedList(reference.index)
 
         when (reference.type) {
             DbReferenceExpression.Companion.Type.Table ->
                 ResolverForTableMethods(reference, schemas, tables).resolve()
             DbReferenceExpression.Companion.Type.Column ->
                 ResolverForColumnMethods(reference, schemas, tables, columns).resolve()
+            DbReferenceExpression.Companion.Type.Index ->
+                ResolverForIndexMethods(reference, indexes).resolve()
         }
     }
 }
@@ -192,6 +197,23 @@ private class ResolverForColumnMethods(
             table.columnsInParallel()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
+        }
+    }
+}
+
+private class ResolverForIndexMethods(
+    private val reference: DbReferenceExpression,
+    private val indexes: MutableList<DasIndex>,
+) {
+    fun resolve() {
+        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            dataSource.tablesInParallel().filter {
+                reference.tablesAndAliases.containsKey(it.name)
+            }.filter {
+                reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
+            }.forEach { table ->
+                table.indexesInParallel().forEach { indexes.add(it) }
+            }
         }
     }
 }

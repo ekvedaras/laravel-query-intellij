@@ -267,6 +267,15 @@ class LaravelUtils private constructor() {
         )
         // </editor-fold>
 
+        // <editor-fold desc="Methods and params where indexes should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableIndexesParams = mapOf(
+            "primary" to listOf(0),
+            "unique" to listOf(0),
+            "index" to listOf(0),
+        )
+        // </editor-fold>
+
         // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         private val BuilderMethodsWithTableColumnsInArrayValues = listOf(
@@ -346,17 +355,29 @@ class LaravelUtils private constructor() {
         fun MethodReference.isBuilderMethodForColumns(): Boolean =
             BuilderTableColumnsParams.containsKey(this.name)
 
+        fun MethodReference.isBuilderMethodForIndexes(): Boolean =
+            BuilderTableIndexesParams.containsKey(this.name)
+
         fun MethodReference.isColumnParam(parameters: CompletionParameters): Boolean =
             this.isColumnParam(parameters.position)
 
         fun MethodReference.isColumnParam(position: PsiElement): Boolean =
             this.isColumnParam(position.findParamIndex())
 
+        fun MethodReference.isIndexParam(position: PsiElement): Boolean =
+            this.isIndexParam(position.findParamIndex())
+
         fun MethodReference.hasColumnsInAllParams(): Boolean =
             this.isColumnParam(-1)
 
+        fun MethodReference.hasIndexesInAllParams(): Boolean =
+            this.isIndexParam(-1)
+
         fun MethodReference.isColumnParam(index: Int): Boolean =
             BuilderTableColumnsParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.isIndexParam(index: Int): Boolean =
+            BuilderTableIndexesParams[this.name]?.contains(index) ?: false
 
         fun MethodReference.canHaveAliasParam(): Boolean =
             BuilderTableAliasParams.containsKey(this.name)
@@ -366,6 +387,12 @@ class LaravelUtils private constructor() {
 
         fun PsiElement.isColumnIn(method: MethodReference): Boolean =
             method.isColumnParam(this) || method.hasColumnsInAllParams()
+
+        fun CompletionParameters.isIndexIn(method: MethodReference): Boolean =
+            this.position.isIndexIn(method)
+
+        fun PsiElement.isIndexIn(method: MethodReference): Boolean =
+            method.isIndexParam(this) || method.hasIndexesInAllParams()
 
         fun MethodReference.canHaveColumnsInArrayValues(): Boolean =
             BuilderMethodsWithTableColumnsInArrayValues.contains(this.name)

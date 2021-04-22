@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasObject
 import com.intellij.database.model.DasTable
@@ -97,6 +98,21 @@ class LookupUtils private constructor() {
                 ),
                 ColumnPriority
             )
+        }
+
+        fun DasIndex.buildLookup(project: Project): LookupElement {
+            return LookupElementBuilder
+                .create(this, this.name)
+                .withIcon(this.getIcon(project))
+                .withTypeText(
+                    "  ${if (this.isUnique) " unique" else ""} ${if (this.isFunctionBased) " function" else ""}",
+                    true
+                )
+                .withTailText("${this.comment ?: ""} ${this.columnsRef.names().joinToString(", ")}", true)
+                .withInsertHandler(
+                    project,
+                    false,
+                )
         }
 
         fun buildForAliasOrTable(
