@@ -19,7 +19,7 @@ import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 import java.util.Collections
 
-class IndexCompletionProvider() : CompletionProvider<CompletionParameters>() {
+class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
