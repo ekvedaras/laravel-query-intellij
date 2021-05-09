@@ -4,12 +4,18 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.database.model.DasIndex
+import com.intellij.database.model.ObjectKind
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isIndexIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
@@ -32,7 +38,7 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
             return
         }
 
-        val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
+        val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Index)
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         complete(project, target, items)
@@ -49,9 +55,9 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
         target: DbReferenceExpression,
         result: MutableList<LookupElement>,
     ) {
-        target.table.parallelStream().forEach { table ->
-            table.indexesInParallel().forEach { index ->
-                result.add(index.buildLookup(project))
+        project.dbDataSourcesInParallel().forEach { dataSource ->
+            dataSource.tablesInParallel().filter { target.tablesAndAliases.contains(it.name) }.forEach { table ->
+                table.indexesInParallel().forEach { result.add(it.buildLookup(project)) }
             }
         }
     }
@@ -62,5 +68,5 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
             !method.isBuilderMethodForIndexes() ||
             !parameters.isIndexIn(method) ||
             parameters.isInsideRegularFunction() ||
-            !method.isSchemaBuilderMethod(project)
+            !method.isBlueprintMethod(project)
 }

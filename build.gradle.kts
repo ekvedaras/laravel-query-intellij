@@ -85,6 +85,10 @@ tasks {
         jvmTarget = "11"
     }
 
+    runIde {
+        ideDirectory("/Users/unxp/Library/Application Support/JetBrains/Toolbox/apps/PhpStorm/ch-0/211.7036.8/PhpStorm.app/Contents")
+    }
+
     patchPluginXml {
         version(properties("pluginVersion"))
         sinceBuild(properties("pluginSinceBuild"))
@@ -93,7 +97,8 @@ tasks {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(
             closure {
-                File("./README.md").readText().lines().run {
+
+                File(projectDir, "README.md").readText().lines().run {
                     val start = "<!-- Plugin description -->"
                     val end = "<!-- Plugin description end -->"
 

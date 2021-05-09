@@ -270,9 +270,24 @@ class LaravelUtils private constructor() {
         // <editor-fold desc="Methods and params where indexes should be completed" defaultstate="collapsed">
         @JvmStatic
         val BuilderTableIndexesParams = mapOf(
-            "primary" to listOf(0),
-            "unique" to listOf(0),
-            "index" to listOf(0),
+            "index" to listOf(1),
+            "dropIndex" to listOf(0),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where unique indexes should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableUniqueIndexesParams = mapOf(
+            "unique" to listOf(1),
+            "dropUnique" to listOf(0),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where keys should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableKeysParams = mapOf(
+            "primary" to listOf(1),
+            "dropPrimary" to listOf(0),
         )
         // </editor-fold>
 
