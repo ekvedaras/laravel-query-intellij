@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [1.1.0]
 ### Added
 - Schema builder integration
 
