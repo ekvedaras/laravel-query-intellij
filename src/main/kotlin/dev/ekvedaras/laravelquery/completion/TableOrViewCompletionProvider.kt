@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
@@ -89,5 +89,5 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
             parameters.isInsideRegularFunction() ||
-            !method.isBuilderClassMethod(project)
+            !method.isInteresting(project)
 }

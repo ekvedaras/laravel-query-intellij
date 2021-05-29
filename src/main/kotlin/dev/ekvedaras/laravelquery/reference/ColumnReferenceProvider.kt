@@ -11,7 +11,7 @@ import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
@@ -79,5 +79,5 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             !element.isColumnIn(method) ||
             element.isInsideRegularFunction() ||
             (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-            !method.isBuilderClassMethod(project)
+            !method.isInteresting(project)
 }

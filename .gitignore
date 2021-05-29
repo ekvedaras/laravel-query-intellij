@@ -1,5 +1,6 @@
 .gradle
 .idea
 build
+.run/Run PhpStorm with Plugin.run.xml
 out
 coverage

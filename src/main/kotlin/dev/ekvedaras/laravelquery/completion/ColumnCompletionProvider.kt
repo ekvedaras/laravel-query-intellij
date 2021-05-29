@@ -18,7 +18,7 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
@@ -190,5 +190,5 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             !parameters.isColumnIn(method) ||
             parameters.isInsideRegularFunction() ||
             (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-            !method.isBuilderClassMethod(project)
+            !method.isInteresting(project)
 }

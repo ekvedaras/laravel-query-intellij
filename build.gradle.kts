@@ -75,7 +75,7 @@ tasks {
         getByName<KotlinCompile>(it) {
             kotlinOptions.jvmTarget = "1.8"
             kotlinOptions.useIR = true
-            kotlinOptions.apiVersion = "1.3"
+            kotlinOptions.apiVersion = "1.4"
         }
     }
 
@@ -83,9 +83,11 @@ tasks {
         jvmTarget = "11"
     }
 
-//    runIde {
-//        ideDir.set(File("/Users/unxp/Library/Application Support/JetBrains/Toolbox/apps/PhpStorm/ch-0/211.7036.8/PhpStorm.app/Contents"))
-//    }
+    runIde {
+        if (environment.contains("IDE_DIR")) {
+            ideDir.set(File(environment["IDE_DIR"].toString()))
+        }
+    }
 
     patchPluginXml {
         version.set(properties("pluginVersion"))

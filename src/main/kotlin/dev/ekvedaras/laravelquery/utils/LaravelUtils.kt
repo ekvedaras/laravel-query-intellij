@@ -35,10 +35,9 @@ class LaravelUtils private constructor() {
     companion object {
         // <editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
         @JvmStatic
-        val DatabaseBuilderClasses = listOf(
+        val InterestingClasses = listOf(
             LaravelClasses.QueryBuilder,
             LaravelClasses.EloquentBuilder,
-            LaravelClasses.SchemaBuilder,
             LaravelClasses.JoinClause,
             LaravelClasses.Relation,
             LaravelClasses.Model,
@@ -318,9 +317,9 @@ class LaravelUtils private constructor() {
         private val OperatorPositions = listOf(1, 2)
         // </editor-fold>
 
-        fun MethodReference.isBuilderClassMethod(project: Project): Boolean =
+        fun MethodReference.isInteresting(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
-                DatabaseBuilderClasses.any {
+                InterestingClasses.any {
                     clazz.isChildOf(it)
                 }
             }

@@ -18,7 +18,7 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsAlias
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
@@ -123,7 +123,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 ?.nextSibling
                 ?.nextSibling as? PhpTypedElement
             ?: methods.find { // Inside scope method inside model
-                it.isBuilderClassMethod(it.project) &&
+                it.isInteresting(it.project) &&
                     it.parentOfType<PhpClassImpl>()?.isChildOf(LaravelClasses.Model) ?: false
             }?.parentOfType<PhpClassImpl>() as? PhpTypedElement
     }

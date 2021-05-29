@@ -14,7 +14,7 @@ import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
@@ -124,7 +124,7 @@ class UnknownColumnInspection : PhpInspection() {
                     !expression.isColumnIn(method) ||
                     expression.isInsideRegularFunction() ||
                     (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-                    !method.isBuilderClassMethod(project) ||
+                    !method.isInteresting(project) ||
                     method.isSchemaBuilderMethod(project) ||
                     method.isBlueprintMethod(project)
         }
