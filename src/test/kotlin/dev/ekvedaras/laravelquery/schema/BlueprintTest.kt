@@ -12,10 +12,9 @@ import dev.ekvedaras.laravelquery.reference.ColumnPsiReference
 import dev.ekvedaras.laravelquery.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
-@Suppress("Deprecation")
 internal class BlueprintTest : BaseTestCase() {
     fun testCompletesColumnsForRename() {
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
 
         myFixture.configureByFile("schema/renameColumn.php")
         myFixture.completeBasic()
@@ -26,7 +25,7 @@ internal class BlueprintTest : BaseTestCase() {
     }
 
     fun testCompletesColumnsForUniqueIndex() {
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
 
         myFixture.configureByFile("schema/unique.php")
         myFixture.completeBasic()
@@ -37,7 +36,7 @@ internal class BlueprintTest : BaseTestCase() {
     }
 
     fun testCompletesColumnsForAfter() {
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
 
         myFixture.configureByFile("schema/after.php")
         myFixture.completeBasic()
@@ -50,7 +49,7 @@ internal class BlueprintTest : BaseTestCase() {
     fun testResolvesStringColumnReference() {
         myFixture.configureByFile("schema/string.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val column = table.getDasChildren(ObjectKind.COLUMN).first { it.name == "email" }
         val dbColumn = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), column)
             ?: return fail("Failed to resolve DB column")
@@ -67,7 +66,7 @@ internal class BlueprintTest : BaseTestCase() {
     fun testResolvesTableReference() {
         myFixture.configureByFile("schema/rename.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "failed_jobs" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "failed_jobs" }
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
             ?: return fail("Failed to resolve DB table")
 

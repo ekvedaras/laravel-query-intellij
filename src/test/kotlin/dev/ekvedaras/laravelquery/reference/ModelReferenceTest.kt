@@ -3,16 +3,15 @@ package dev.ekvedaras.laravelquery.reference
 import com.intellij.database.util.DasUtil
 import dev.ekvedaras.laravelquery.BaseTestCase
 
-@Suppress("Deprecation")
 internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameFromModelTableProperty() {
         myFixture.configureByFile("model/modelWithTableProperty.php")
 
-        val table = DasUtil.getTables(db)
+        val table = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }
             .firstOrNull() ?: return fail("Did not find any tables.")
         val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(db)
+        val otherTable = DasUtil.getTables(dataSource())
             .filterNot { it.name == "users" }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
@@ -32,11 +31,11 @@ internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameFromModelTablePropertyAndCompletesColumnsOnStaticWhere() {
         myFixture.configureByFile("model/modelWhere.php")
 
-        val table = DasUtil.getTables(db)
+        val table = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }
             .firstOrNull() ?: return fail("Did not find any tables.")
         val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(db)
+        val otherTable = DasUtil.getTables(dataSource())
             .filterNot { it.name == "users" }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
@@ -57,11 +56,11 @@ internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameModelName() {
         myFixture.configureByFile("model/modelWithoutTableProperty.php")
 
-        val table = DasUtil.getTables(db)
+        val table = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }
             .firstOrNull() ?: return fail("Did not find any tables.")
         val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(db)
+        val otherTable = DasUtil.getTables(dataSource())
             .filterNot { it.name == "users" }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
@@ -81,18 +80,18 @@ internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveRelationTableName() {
         myFixture.configureByFile("model/modelWithRelation.php")
 
-        val users = DasUtil.getTables(db)
+        val users = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }
             .firstOrNull() ?: return fail("Did not find users table.")
 
-        val customers = DasUtil.getTables(db)
+        val customers = DasUtil.getTables(dataSource())
             .filter { it.name == "customers" }
             .firstOrNull() ?: return fail("Did not find customers table.")
 
         val usersColumns = DasUtil.getColumns(users).map { it.name }
         val customersColumns = DasUtil.getColumns(customers).map { it.name }
 
-        val otherTable = DasUtil.getTables(db)
+        val otherTable = DasUtil.getTables(dataSource())
             .filterNot { it.name == "users" || it.name == "customers" }
             .lastOrNull() ?: return fail("Did not find any tables.")
 
@@ -112,11 +111,11 @@ internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameInsideScopeMethod() {
         myFixture.configureByFile("model/modelInsideScope.php")
 
-        val table = DasUtil.getTables(db)
+        val table = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }
             .firstOrNull() ?: return fail("Did not find any tables.")
         val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(db)
+        val otherTable = DasUtil.getTables(dataSource())
             .filterNot { it.name == "users" }
             .lastOrNull() ?: return fail("Did not find any tables.")
 

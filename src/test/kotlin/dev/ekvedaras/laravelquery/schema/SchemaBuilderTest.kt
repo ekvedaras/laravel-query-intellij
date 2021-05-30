@@ -10,7 +10,6 @@ import dev.ekvedaras.laravelquery.reference.SchemaPsiReference
 import dev.ekvedaras.laravelquery.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
-@Suppress("Deprecation")
 internal class SchemaBuilderTest : BaseTestCase() {
     fun testCompletesTables() {
         myFixture.configureByFile("schema/table.php")
@@ -55,7 +54,7 @@ internal class SchemaBuilderTest : BaseTestCase() {
     fun testResolvesTableReference() {
         myFixture.configureByFile("schema/knownTable.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
             ?: return fail("Failed to resolve DB table")
 

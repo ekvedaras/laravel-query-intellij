@@ -4,6 +4,7 @@ import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.database.Dbms
 import com.intellij.database.dataSource.LocalDataSource
 import com.intellij.database.dataSource.LocalDataSourceManager
+import com.intellij.database.model.DasDataSource
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import com.intellij.psi.PsiFile
@@ -48,6 +49,8 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
 
         super.tearDown()
     }
+
+    protected fun dataSource() : DasDataSource = db as DasDataSource
 
     private fun caretAfterArgs(at: Int, prefix: String = ""): String {
         var args = ""

@@ -9,7 +9,6 @@ import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
 import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
 
-@Suppress("Deprecation")
 internal class EdgeCasesTest : BaseTestCase() {
     fun testClassCastException1() {
         myFixture.configureByFile("edgeCases/classCastException1.php")
