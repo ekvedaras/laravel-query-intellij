@@ -15,9 +15,11 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isIndexIn
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
@@ -47,7 +49,9 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
             items.distinctBy { it.lookupString }
         )
 
-        result.stopHere()
+        if (!(parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues())) {
+            result.stopHere()
+        }
     }
 
     private fun complete(
@@ -65,6 +69,7 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             parameters.containsVariable() ||
+            parameters.isInsidePhpArrayOrValue() ||
             !method.isBuilderMethodForIndexes() ||
             !parameters.isIndexIn(method) ||
             parameters.isInsideRegularFunction() ||

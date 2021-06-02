@@ -17,13 +17,13 @@
             serviceImplementation="dev.ekvedaras.laravelquery.services.MyProjectService"/>
 
         <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"
+                                order="first"/>
+        <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"
                                 order="first"/>
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"
-                                order="first"/>
-        <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"
                                 order="first"/>
 
         <psi.referenceContributor language="PHP"

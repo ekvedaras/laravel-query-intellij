@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.reference.ColumnPsiReference
 import dev.ekvedaras.laravelquery.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
-internal class BlueprintTest : BaseTestCase() {
+internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
     fun testCompletesColumnsForRename() {
         val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
 

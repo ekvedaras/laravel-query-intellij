@@ -202,6 +202,7 @@ class LaravelUtils private constructor() {
             "primary" to listOf(0),
             "unique" to listOf(0),
             "index" to listOf(0),
+            "dropIndex" to listOf(0),
             "spatialIndex" to listOf(0),
             "foreign" to listOf(0),
             "id" to listOf(0),
@@ -298,7 +299,15 @@ class LaravelUtils private constructor() {
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
             "hasColumns", "dropColumns", "dropColumns",
             "primary", "unique", "index", "spatialIndex", "foreign",
+            "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
             "indexCommand", "createIndexName",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods where params only accept columns as array values" defaultstate="collapsed">
+        @JvmStatic
+        private val BuilderMethodsWithTableColumnsOnlyInArrayValues = listOf(
+            "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
         )
         // </editor-fold>
 
@@ -410,6 +419,9 @@ class LaravelUtils private constructor() {
 
         fun MethodReference.canHaveColumnsInArrayValues(): Boolean =
             BuilderMethodsWithTableColumnsInArrayValues.contains(this.name)
+
+        fun MethodReference.canOnlyHaveColumnsInArrayValues(): Boolean =
+            BuilderMethodsWithTableColumnsOnlyInArrayValues.contains(this.name)
 
         fun CompletionParameters.isInsideRegularFunction(): Boolean =
             this.position.isInsideRegularFunction()
