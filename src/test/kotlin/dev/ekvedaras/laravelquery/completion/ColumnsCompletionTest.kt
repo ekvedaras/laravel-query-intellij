@@ -52,7 +52,7 @@ internal class ColumnsCompletionTest : BaseTestCase() {
             schemaTables.entries.filterNot { it.key == schema }.map { it.value }
                 .flatten() // Tables of other schemas
 
-        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value } .forEach { entry ->
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
             entry.value.forEach { param ->
                 completeFor(table, "$schema.", entry.key, param)
 

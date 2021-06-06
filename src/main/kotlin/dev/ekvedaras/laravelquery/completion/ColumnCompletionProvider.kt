@@ -72,7 +72,9 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-        onlyColumns = method.isBlueprintMethod(project) || method.isColumnDefinitionMethod(project) || method.shouldCompleteOnlyColumns()
+        onlyColumns = method.isBlueprintMethod(project) ||
+            method.isColumnDefinitionMethod(project) ||
+            method.shouldCompleteOnlyColumns()
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
             if (!onlyColumns) {
@@ -185,7 +187,11 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
-    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters): Boolean {
+    private fun shouldNotComplete(
+        project: Project,
+        method: MethodReference,
+        parameters: CompletionParameters
+    ): Boolean {
         val allowArray = method.name?.startsWith("where") ?: false
 
         return !ApplicationManager.getApplication().isReadAccessAllowed ||

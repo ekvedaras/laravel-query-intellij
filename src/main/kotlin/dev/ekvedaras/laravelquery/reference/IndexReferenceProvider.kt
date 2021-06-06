@@ -10,13 +10,10 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForForeignKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForUniqueIndexes
@@ -73,15 +70,15 @@ class IndexReferenceProvider : PsiReferenceProvider() {
             element.containsVariable() ||
             (
                 !method.isBuilderMethodForIndexes() &&
-                !method.isBuilderMethodForUniqueIndexes() &&
-                !method.isBuilderMethodForKeys() &&
-                !method.isBuilderMethodForForeignKeys()
+                    !method.isBuilderMethodForUniqueIndexes() &&
+                    !method.isBuilderMethodForKeys() &&
+                    !method.isBuilderMethodForForeignKeys()
                 ) ||
             (
                 !element.isIndexIn(method) &&
-                !element.isUniqueIndexIn(method) &&
-                !element.isKeyIn(method) &&
-                !element.isForeignKeyIn(method)
+                    !element.isUniqueIndexIn(method) &&
+                    !element.isKeyIn(method) &&
+                    !element.isForeignKeyIn(method)
                 ) ||
             element.isInsideRegularFunction() ||
             element.isInsidePhpArrayOrValue() ||

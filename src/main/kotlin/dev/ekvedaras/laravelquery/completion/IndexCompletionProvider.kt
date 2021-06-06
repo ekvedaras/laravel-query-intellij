@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.database.model.DasTable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
@@ -34,6 +35,7 @@ import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 import java.util.Collections
+import java.util.function.Consumer
 
 class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
@@ -80,66 +82,39 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
         val tables = target.tablesAndAliases.map { it.value.first }.distinct()
 
         when {
-            method.isForIndexes() ->
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel().filter {
-                        schemas.isEmpty() || schemas.contains(it.name)
-                    }.forEach { schema ->
-                        schema.tablesInParallel().filter {
-                            tables.contains(it.name)
-                        }.forEach { table ->
-                            table.indexesInParallel().filter {
-                                !it.isUnique
-                            }.forEach {
-                                result.add(it.buildLookup(project))
-                            }
-                        }
-                    }
-                }
-            method.isForUniqueIndexes() ->
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel().filter {
-                        schemas.isEmpty() || schemas.contains(it.name)
-                    }.forEach { schema ->
-                        schema.tablesInParallel().filter {
-                            tables.contains(it.name)
-                        }.forEach { table ->
-                            table.indexesInParallel().filter {
-                                it.isUnique
-                            }.forEach {
-                                result.add(it.buildLookup(project))
-                            }
-                        }
-                    }
-                }
-            method.isForKeys() ->
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel().filter {
-                        schemas.isEmpty() || schemas.contains(it.name)
-                    }.forEach { schema ->
-                        schema.tablesInParallel().filter {
-                            tables.contains(it.name)
-                        }.forEach { table ->
-                            table.keysInParallel().forEach {
-                                result.add(it.buildLookup(project))
-                            }
-                        }
-                    }
-                }
-            else ->
-                project.dbDataSourcesInParallel().forEach { dataSource ->
-                    dataSource.schemasInParallel().filter {
-                        schemas.isEmpty() || schemas.contains(it.name)
-                    }.forEach { schema ->
-                        schema.tablesInParallel().filter {
-                            tables.contains(it.name)
-                        }.forEach { table ->
-                            table.foreignKeysInParallel().forEach {
-                                result.add(it.buildLookup(project))
-                            }
-                        }
-                    }
-                }
+            method.isForIndexes() -> completeFor(project, schemas, tables) { table ->
+                table.indexesInParallel()
+                    .filter { !it.isUnique }
+                    .forEach { result.add(it.buildLookup(project)) }
+            }
+            method.isForUniqueIndexes() -> completeFor(project, schemas, tables) { table ->
+                table.indexesInParallel()
+                    .filter { it.isUnique }
+                    .forEach { result.add(it.buildLookup(project)) }
+            }
+            method.isForKeys() -> completeFor(project, schemas, tables) { table ->
+                table.keysInParallel().forEach { result.add(it.buildLookup(project)) }
+            }
+            else -> completeFor(project, schemas, tables) { table ->
+                table.foreignKeysInParallel().forEach { result.add(it.buildLookup(project)) }
+            }
+        }
+    }
+
+    private fun completeFor(
+        project: Project,
+        schemas: List<String>,
+        tables: List<String>,
+        scanTableUsing: Consumer<DasTable>
+    ) {
+        project.dbDataSourcesInParallel().forEach { dataSource ->
+            dataSource.schemasInParallel().filter {
+                schemas.isEmpty() || schemas.contains(it.name)
+            }.forEach { schema ->
+                schema.tablesInParallel()
+                    .filter { tables.contains(it.name) }
+                    .forEach(scanTableUsing)
+            }
         }
     }
 

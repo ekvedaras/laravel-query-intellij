@@ -12,7 +12,12 @@ internal class BlueprintIndexesTest : BaseTestCase() {
         myFixture.configureByFile("schema/dropUniqueIndex.php")
         myFixture.completeBasic()
 
-        assertCompletion(*table.getDasChildren(ObjectKind.INDEX).filter { (it as DasIndex).isUnique }.map { it.name }.toList().toTypedArray())
+        assertCompletion(
+            *table.getDasChildren(ObjectKind.INDEX)
+                .filter { (it as DasIndex).isUnique }
+                .map { it.name }
+                .toList().toTypedArray()
+        )
         assertNoCompletion(*table.getDasChildren(ObjectKind.COLUMN).map { it.name }.toList().toTypedArray())
         assertNoCompletion(*schemas.toTypedArray())
         assertNoCompletion(*schemaTables.values.flatten().toTypedArray())

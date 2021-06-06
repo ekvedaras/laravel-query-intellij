@@ -318,6 +318,7 @@ class LaravelUtils private constructor() {
             "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
             "indexCommand", "createIndexName",
         )
+
         // </editor-fold>
         //
         // <editor-fold desc="Methods where only columns should be completed" defaultstate="collapsed">
@@ -555,7 +556,7 @@ class LaravelUtils private constructor() {
             (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference) ||
                 (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
-        fun PsiElement.isOperatorParam(allowArray : Boolean = false): Boolean =
+        fun PsiElement.isOperatorParam(allowArray: Boolean = false): Boolean =
             OperatorPositions.contains(this.findParamIndex(allowArray)) && Operators.any {
                 this.textMatches("'$it'") || this.textMatches("\"$it\"")
             }
