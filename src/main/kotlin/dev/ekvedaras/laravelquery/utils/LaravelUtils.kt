@@ -35,10 +35,9 @@ class LaravelUtils private constructor() {
     companion object {
         // <editor-fold desc="\Illuminate\Database query builder classes" defaultstate="collapsed">
         @JvmStatic
-        val DatabaseBuilderClasses = listOf(
+        val InterestingClasses = listOf(
             LaravelClasses.QueryBuilder,
             LaravelClasses.EloquentBuilder,
-            LaravelClasses.SchemaBuilder,
             LaravelClasses.JoinClause,
             LaravelClasses.Relation,
             LaravelClasses.Model,
@@ -203,7 +202,11 @@ class LaravelUtils private constructor() {
             "primary" to listOf(0),
             "unique" to listOf(0),
             "index" to listOf(0),
-            "spatialIndex" to listOf(0),
+            "dropIndex" to listOf(0),
+            "dropUnique" to listOf(0),
+            "dropPrimary" to listOf(0),
+            "dropForeign" to listOf(0),
+            "dropSpatialIndex" to listOf(0),
             "foreign" to listOf(0),
             "id" to listOf(0),
             "increments" to listOf(0),
@@ -264,18 +267,102 @@ class LaravelUtils private constructor() {
             "multiPolygon" to listOf(0),
             "multiPolygonZ" to listOf(0),
             "computed" to listOf(0),
+            "create" to listOf(0),
+            "update" to listOf(0),
+            "fill" to listOf(0),
+            "updateOrCreate" to listOf(0, 1),
+            "updateOrInsert" to listOf(0, 1),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where indexes should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableIndexesParams = mapOf(
+            "index" to listOf(1),
+            "dropIndex" to listOf(0),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where unique indexes should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableUniqueIndexesParams = mapOf(
+            "unique" to listOf(1),
+            "dropUnique" to listOf(0),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where keys should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableKeysParams = mapOf(
+            "primary" to listOf(1),
+            "dropPrimary" to listOf(0),
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods and params where foreign keys should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val BuilderTableForeignKeysParams = mapOf(
+            "foreign" to listOf(0),
+            "dropForeign" to listOf(0),
         )
         // </editor-fold>
 
         // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         private val BuilderMethodsWithTableColumnsInArrayValues = listOf(
-            "get", "select",
+            "get", "select", "create", "update", "fill",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
             "hasColumns", "dropColumns", "dropColumns",
             "primary", "unique", "index", "spatialIndex", "foreign",
+            "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
             "indexCommand", "createIndexName",
+        )
+
+        // </editor-fold>
+        //
+        // <editor-fold desc="Methods where only columns should be completed" defaultstate="collapsed">
+        @JvmStatic
+        private val MethodsWhereOnlyColumnsShouldBeCompleted = listOf(
+            "create", "update", "fill",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods where params only accept columns as array values" defaultstate="collapsed">
+        @JvmStatic
+        private val BuilderMethodsWithTableColumnsOnlyInArrayValues = listOf(
+            "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods that work with indexes" defaultstate="collapsed">
+        @JvmStatic
+        private val BlueprintMethodsForIndexes = listOf(
+            "index", "spacialIndex",
+            "dropIndex", "dropSpatialIndex",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods that work with indexes" defaultstate="collapsed">
+        @JvmStatic
+        private val BlueprintMethodsForUniqueIndexes = listOf(
+            "unique", "dropUnique",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods that work with keys" defaultstate="collapsed">
+        @JvmStatic
+        private val BlueprintMethodsForKeys = listOf(
+            "primary",
+            "dropPrimary",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="Methods that work with foreign keys" defaultstate="collapsed">
+        @JvmStatic
+        private val BlueprintMethodsForForeignKeys = listOf(
+            "foreign",
+            "dropForeign",
         )
         // </editor-fold>
 
@@ -294,11 +381,16 @@ class LaravelUtils private constructor() {
         private val OperatorPositions = listOf(1, 2)
         // </editor-fold>
 
-        fun MethodReference.isBuilderClassMethod(project: Project): Boolean =
+        fun MethodReference.isInteresting(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
-                DatabaseBuilderClasses.any {
+                InterestingClasses.any {
                     clazz.isChildOf(it)
                 }
+            }
+
+        fun MethodReference.isEloquentModel(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                clazz.isChildOf(LaravelClasses.Model)
             }
 
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =
@@ -313,6 +405,9 @@ class LaravelUtils private constructor() {
 
         fun MethodReference.shouldCompleteOnlySchemas(): Boolean =
             BuilderSchemaMethods.contains(this.name)
+
+        fun MethodReference.shouldCompleteOnlyColumns(): Boolean =
+            MethodsWhereOnlyColumnsShouldBeCompleted.contains(this.name)
 
         fun MethodReference.isBlueprintMethod(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
@@ -346,29 +441,113 @@ class LaravelUtils private constructor() {
         fun MethodReference.isBuilderMethodForColumns(): Boolean =
             BuilderTableColumnsParams.containsKey(this.name)
 
-        fun MethodReference.isColumnParam(parameters: CompletionParameters): Boolean =
-            this.isColumnParam(parameters.position)
+        fun MethodReference.isBuilderMethodForIndexes(): Boolean =
+            BuilderTableIndexesParams.containsKey(this.name)
 
-        fun MethodReference.isColumnParam(position: PsiElement): Boolean =
-            this.isColumnParam(position.findParamIndex())
+        fun MethodReference.isBuilderMethodForUniqueIndexes(): Boolean =
+            BuilderTableUniqueIndexesParams.containsKey(this.name)
+
+        fun MethodReference.isBuilderMethodForKeys(): Boolean =
+            BuilderTableKeysParams.containsKey(this.name)
+
+        fun MethodReference.isBuilderMethodForForeignKeys(): Boolean =
+            BuilderTableForeignKeysParams.containsKey(this.name)
+
+        fun MethodReference.isColumnParam(position: PsiElement, allowArray: Boolean): Boolean =
+            this.isColumnParam(position.findParamIndex(allowArray))
+
+        fun MethodReference.isIndexParam(position: PsiElement): Boolean =
+            this.isIndexParam(position.findParamIndex())
+
+        fun MethodReference.isUniqueIndexParam(position: PsiElement): Boolean =
+            this.isUniqueIndexParam(position.findParamIndex())
+
+        fun MethodReference.isKeyParam(position: PsiElement): Boolean =
+            this.isKeyParam(position.findParamIndex())
+
+        fun MethodReference.isForeignKeyParam(position: PsiElement): Boolean =
+            this.isForeignKeyParam(position.findParamIndex())
 
         fun MethodReference.hasColumnsInAllParams(): Boolean =
             this.isColumnParam(-1)
 
+        fun MethodReference.hasIndexesInAllParams(): Boolean =
+            this.isIndexParam(-1)
+
+        fun MethodReference.hasUniqueIndexesInAllParams(): Boolean =
+            this.isUniqueIndexParam(-1)
+
+        fun MethodReference.hasKeysInAllParams(): Boolean =
+            this.isKeyParam(-1)
+
+        fun MethodReference.hasForeignKeysInAllParams(): Boolean =
+            this.isForeignKeyParam(-1)
+
         fun MethodReference.isColumnParam(index: Int): Boolean =
             BuilderTableColumnsParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.isIndexParam(index: Int): Boolean =
+            BuilderTableIndexesParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.isUniqueIndexParam(index: Int): Boolean =
+            BuilderTableUniqueIndexesParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.isKeyParam(index: Int): Boolean =
+            BuilderTableKeysParams[this.name]?.contains(index) ?: false
+
+        fun MethodReference.isForeignKeyParam(index: Int): Boolean =
+            BuilderTableForeignKeysParams[this.name]?.contains(index) ?: false
 
         fun MethodReference.canHaveAliasParam(): Boolean =
             BuilderTableAliasParams.containsKey(this.name)
 
-        fun CompletionParameters.isColumnIn(method: MethodReference): Boolean =
-            this.position.isColumnIn(method)
+        fun CompletionParameters.isColumnIn(method: MethodReference, allowArray: Boolean): Boolean =
+            this.position.isColumnIn(method, allowArray)
 
-        fun PsiElement.isColumnIn(method: MethodReference): Boolean =
-            method.isColumnParam(this) || method.hasColumnsInAllParams()
+        fun PsiElement.isColumnIn(method: MethodReference, allowArray: Boolean): Boolean =
+            method.isColumnParam(this, allowArray) || method.hasColumnsInAllParams()
+
+        fun CompletionParameters.isIndexIn(method: MethodReference): Boolean =
+            this.position.isIndexIn(method)
+
+        fun PsiElement.isIndexIn(method: MethodReference): Boolean =
+            method.isIndexParam(this) || method.hasIndexesInAllParams()
+
+        fun CompletionParameters.isUniqueIndexIn(method: MethodReference): Boolean =
+            this.position.isUniqueIndexIn(method)
+
+        fun PsiElement.isUniqueIndexIn(method: MethodReference): Boolean =
+            method.isUniqueIndexParam(this) || method.hasUniqueIndexesInAllParams()
+
+        fun CompletionParameters.isKeyIn(method: MethodReference): Boolean =
+            this.position.isKeyIn(method)
+
+        fun PsiElement.isKeyIn(method: MethodReference): Boolean =
+            method.isKeyParam(this) || method.hasKeysInAllParams()
+
+        fun CompletionParameters.isForeignKeyIn(method: MethodReference): Boolean =
+            this.position.isForeignKeyIn(method)
+
+        fun PsiElement.isForeignKeyIn(method: MethodReference): Boolean =
+            method.isForeignKeyParam(this) || method.hasForeignKeysInAllParams()
 
         fun MethodReference.canHaveColumnsInArrayValues(): Boolean =
             BuilderMethodsWithTableColumnsInArrayValues.contains(this.name)
+
+        fun MethodReference.canOnlyHaveColumnsInArrayValues(): Boolean =
+            BuilderMethodsWithTableColumnsOnlyInArrayValues.contains(this.name)
+
+        fun MethodReference.isForIndexes(): Boolean =
+            BlueprintMethodsForIndexes.contains(this.name)
+
+        fun MethodReference.isForUniqueIndexes(): Boolean =
+            BlueprintMethodsForUniqueIndexes.contains(this.name)
+
+        fun MethodReference.isForKeys(): Boolean =
+            BlueprintMethodsForKeys.contains(this.name)
+
+        fun MethodReference.isForForeignKeys(): Boolean =
+            BlueprintMethodsForForeignKeys.contains(this.name)
 
         fun CompletionParameters.isInsideRegularFunction(): Boolean =
             this.position.isInsideRegularFunction()
@@ -377,8 +556,8 @@ class LaravelUtils private constructor() {
             (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference) ||
                 (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
-        fun PsiElement.isOperatorParam(): Boolean =
-            OperatorPositions.contains(this.findParamIndex()) && Operators.any {
+        fun PsiElement.isOperatorParam(allowArray: Boolean = false): Boolean =
+            OperatorPositions.contains(this.findParamIndex(allowArray)) && Operators.any {
                 this.textMatches("'$it'") || this.textMatches("\"$it\"")
             }
 

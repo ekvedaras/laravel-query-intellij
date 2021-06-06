@@ -12,10 +12,12 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlySchemas
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
@@ -38,9 +40,13 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        when (target.parts.size) {
-            1 -> populateWithOnePart(project, method, items)
-            else -> populateWithTwoParts(project, target, items)
+        if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            ApplicationManager.getApplication().runReadAction {
+                when (target.parts.size) {
+                    1 -> populateWithOnePart(project, method, items)
+                    else -> populateWithTwoParts(project, target, items)
+                }
+            }
         }
 
         result.addAllElements(
@@ -88,6 +94,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
+            (method.isEloquentModel(project) && method.shouldCompleteOnlyColumns()) ||
             parameters.isInsideRegularFunction() ||
-            !method.isBuilderClassMethod(project)
+            !method.isInteresting(project)
 }

@@ -17,13 +17,15 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParalle
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderClassMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
@@ -49,10 +51,14 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        when (target.parts.size) {
-            1 -> completeForOnePart(project, target, items, method, result)
-            2 -> completeForTwoParts(project, target, items)
-            else -> completeForThreeParts(project, target, items)
+        if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            ApplicationManager.getApplication().runReadAction {
+                when (target.parts.size) {
+                    1 -> completeForOnePart(project, target, items, method, result)
+                    2 -> completeForTwoParts(project, target, items)
+                    else -> completeForThreeParts(project, target, items)
+                }
+            }
         }
 
         result.addAllElements(
@@ -70,7 +76,9 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-        onlyColumns = method.isBlueprintMethod(project) || method.isColumnDefinitionMethod(project)
+        onlyColumns = method.isBlueprintMethod(project) ||
+            method.isColumnDefinitionMethod(project) ||
+            method.shouldCompleteOnlyColumns()
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
             if (!onlyColumns) {
@@ -183,12 +191,20 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
-    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
-        !ApplicationManager.getApplication().isReadAccessAllowed ||
+    private fun shouldNotComplete(
+        project: Project,
+        method: MethodReference,
+        parameters: CompletionParameters
+    ): Boolean {
+        val allowArray = method.name?.startsWith("where") ?: false
+
+        return !ApplicationManager.getApplication().isReadAccessAllowed ||
             parameters.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
-            !parameters.isColumnIn(method) ||
+            !parameters.isColumnIn(method, allowArray) ||
             parameters.isInsideRegularFunction() ||
             (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-            !method.isBuilderClassMethod(project)
+            (!parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues()) ||
+            !method.isInteresting(project)
+    }
 }

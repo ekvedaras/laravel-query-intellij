@@ -1,8 +1,11 @@
 package dev.ekvedaras.laravelquery.models
 
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasForeignKey
+import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
+import com.intellij.database.model.DasTableKey
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -11,12 +14,16 @@ import com.intellij.psi.PsiElement
 import dev.ekvedaras.laravelquery.utils.DbReferenceResolver
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import dev.ekvedaras.laravelquery.utils.TableAndAliasCollector
+import org.apache.commons.lang.StringUtils.substringBefore
 
 class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     companion object {
         enum class Type {
             Table,
             Column,
+            Index,
+            Key,
+            ForeignKey,
         }
     }
 
@@ -28,6 +35,9 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     var schema = mutableListOf<DasNamespace>()
     var table = mutableListOf<DasTable>()
     var column = mutableListOf<DasColumn>()
+    var index = mutableListOf<DasIndex>()
+    var key = mutableListOf<DasTableKey>()
+    var foreignKey = mutableListOf<DasForeignKey>()
     var alias: String? = null
 
     val parts = mutableListOf<String>()

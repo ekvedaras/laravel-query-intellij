@@ -8,12 +8,11 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
 import junit.framework.TestCase
 
-@Suppress("Deprecation")
 internal class SchemaTableColumnReferenceTest : BaseTestCase() {
     fun testResolvesColumnReference() {
         myFixture.configureByFile("inspection/knownColumn.php")
 
-        val column = DasUtil.getTables(db)
+        val column = DasUtil.getTables(dataSource())
             .first { it.name == "users" }
             .getDasChildren(ObjectKind.COLUMN)
             .first { it.name == "id" }
@@ -32,7 +31,7 @@ internal class SchemaTableColumnReferenceTest : BaseTestCase() {
     fun testItDoesNotResolveColumnsFromOtherTablesBecauseOfTheContext() {
         myFixture.configureByFile("inspection/knownColumn.php")
 
-        val columnFromOtherTable = DasUtil.getTables(db)
+        val columnFromOtherTable = DasUtil.getTables(dataSource())
             .first { it.name == "customers" }
             .getDasChildren(ObjectKind.COLUMN)
             .first { it.name == "id" }
@@ -49,7 +48,7 @@ internal class SchemaTableColumnReferenceTest : BaseTestCase() {
     fun testResolvesTableAndColumnReference() {
         myFixture.configureByFile("inspection/knownTableColumn.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val column = table.getDasChildren(ObjectKind.COLUMN).first { it.name == "id" }
 
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
@@ -83,7 +82,7 @@ internal class SchemaTableColumnReferenceTest : BaseTestCase() {
     fun testResolvesSchemaAndTableAndColumnReferences() {
         myFixture.configureByFile("inspection/knownSchemaTableColumn.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val schema = table.dasParent ?: return fail("Failed to load table schema")
         val column = table.getDasChildren(ObjectKind.COLUMN).first { it.name == "id" }
 

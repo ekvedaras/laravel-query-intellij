@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -12,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
+import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
@@ -33,7 +35,11 @@ class MethodUtils private constructor() {
         }
 
         fun resolveMethodClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
-            if (DumbService.isDumb(project) || method.classReference == null) {
+            if (
+                DumbService.isDumb(project) ||
+                method.classReference == null ||
+                !ApplicationManager.getApplication().isReadAccessAllowed
+            ) {
                 return listOf()
             }
 
@@ -44,18 +50,28 @@ class MethodUtils private constructor() {
                 .completeType(project, method.classReference?.declaredType ?: return listOf(), null)
                 .types
                 .toList()
-                .forEach {
-                    PhpIndex.getInstance(project)
-                        .getClassesByFQN(it)
-                        .forEach classLoop@{ clazz ->
-                            when (clazz) {
-                                is PhpClassAliasImpl -> classes.add(clazz.original as PhpClassImpl)
-                                is PhpClassImpl -> classes.add(clazz)
-                            }
-                        }
-                }
+                .forEach { collectClasses(project, it, classes) }
 
             return classes
+        }
+
+        private fun collectClasses(
+            project: Project,
+            className: String?,
+            classes: MutableList<PhpClassImpl>
+        ) {
+            PhpIndex.getInstance(project)
+                .getClassesByFQN(className)
+                .forEach classLoop@{ clazz ->
+                    when (clazz) {
+                        is PhpClassAliasImpl -> {
+                            if (clazz.original != null) {
+                                classes.add(clazz.original as PhpClassImpl)
+                            }
+                        }
+                        is PhpClassImpl -> classes.add(clazz)
+                    }
+                }
         }
 
         fun findMethodsInTree(root: PsiElement?): MutableList<MethodReference> {
@@ -109,13 +125,15 @@ class MethodUtils private constructor() {
 fun CompletionParameters.findParamIndex(): Int =
     this.position.findParamIndex()
 
-fun PsiElement.findParamIndex(): Int {
+fun PsiElement.findParamIndex(allowArray: Boolean = false): Int {
     val parent = this.parent ?: return -1
 
     return if (parent is ParameterList) {
         ArrayUtil.indexOf(parent.parameters, this)
+    } else if (allowArray && parent is ArrayCreationExpressionImpl) {
+        parent.children.indexOfFirst { it === this }
     } else {
-        this.parent?.findParamIndex() ?: -1
+        this.parent?.findParamIndex(allowArray) ?: -1
     }
 }
 

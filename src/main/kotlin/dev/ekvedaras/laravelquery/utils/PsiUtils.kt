@@ -11,9 +11,10 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import org.jetbrains.annotations.NotNull
 
+@Suppress("MagicNumber")
 object ElementTypes {
-    const val PhpArray = 1889
-    const val ArrayValue = 805
+    val PhpArray = listOf(1386, 1889)
+    val ArrayValues = listOf(805, 816, 1405)
 }
 
 class PsiUtils private constructor() {
@@ -21,8 +22,8 @@ class PsiUtils private constructor() {
         fun PsiElement.containsVariable(): Boolean = this.textContains('$')
         fun CompletionParameters.containsVariable(): Boolean = this.position.containsVariable()
         fun String.containsAlias(): Boolean = this.contains(" as ")
-        fun PsiElement.isPhpArray(): Boolean = this.typeAsInt() == ElementTypes.PhpArray
-        fun PsiElement.isArrayValue(): Boolean = this.typeAsInt() == ElementTypes.ArrayValue
+        fun PsiElement.isPhpArray(): Boolean = ElementTypes.PhpArray.contains(this.typeAsInt())
+        fun PsiElement.isArrayValue(): Boolean = ElementTypes.ArrayValues.contains(this.typeAsInt())
         fun String.unquoteAndCleanup() = this.replace("IntellijIdeaRulezzz", "").trim('\'', '"').trim()
         fun Variable.references(): @NotNull Query<PsiReference> =
             ReferencesSearch.search(this.originalElement)

@@ -1,1 +1,1 @@
-<?php (new Illuminate\Database\Query\Builder())->from('testProject1.users')->where(['id' => '<caret>']);
+<?php (new Illuminate\Database\Query\Builder())->from('testProject1.users')->where(['id' => '$<caret>']);

@@ -7,7 +7,6 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
 import junit.framework.TestCase
 
-@Suppress("Deprecation")
 internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesSchemaReference() {
         myFixture.configureByFile("inspection/knownSchema.php")
@@ -28,7 +27,7 @@ internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesTableReference() {
         myFixture.configureByFile("inspection/knownTable.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
             ?: return fail("Failed to resolve DB table")
 
@@ -44,7 +43,7 @@ internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesSchemaAndTableReferences() {
         myFixture.configureByFile("inspection/knownSchemaTable.php")
 
-        val table = DasUtil.getTables(db).first { it.name == "users" }
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
         val schema = table.dasParent ?: return fail("Failed to load table schema")
 
         val dbSchema = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), schema)
