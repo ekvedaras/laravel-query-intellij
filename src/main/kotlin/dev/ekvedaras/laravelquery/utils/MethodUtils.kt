@@ -50,22 +50,28 @@ class MethodUtils private constructor() {
                 .completeType(project, method.classReference?.declaredType ?: return listOf(), null)
                 .types
                 .toList()
-                .forEach {
-                    PhpIndex.getInstance(project)
-                        .getClassesByFQN(it)
-                        .forEach classLoop@{ clazz ->
-                            when (clazz) {
-                                is PhpClassAliasImpl -> {
-                                    if (clazz.original != null) {
-                                        classes.add(clazz.original as PhpClassImpl)
-                                    }
-                                }
-                                is PhpClassImpl -> classes.add(clazz)
-                            }
-                        }
-                }
+                .forEach { collectClasses(project, it, classes) }
 
             return classes
+        }
+
+        private fun collectClasses(
+            project: Project,
+            className: String?,
+            classes: MutableList<PhpClassImpl>
+        ) {
+            PhpIndex.getInstance(project)
+                .getClassesByFQN(className)
+                .forEach classLoop@{ clazz ->
+                    when (clazz) {
+                        is PhpClassAliasImpl -> {
+                            if (clazz.original != null) {
+                                classes.add(clazz.original as PhpClassImpl)
+                            }
+                        }
+                        is PhpClassImpl -> classes.add(clazz)
+                    }
+                }
         }
 
         fun findMethodsInTree(root: PsiElement?): MutableList<MethodReference> {
