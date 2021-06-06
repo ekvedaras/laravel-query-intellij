@@ -51,10 +51,14 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        when (target.parts.size) {
-            1 -> completeForOnePart(project, target, items, method, result)
-            2 -> completeForTwoParts(project, target, items)
-            else -> completeForThreeParts(project, target, items)
+        if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            ApplicationManager.getApplication().runReadAction {
+                when (target.parts.size) {
+                    1 -> completeForOnePart(project, target, items, method, result)
+                    2 -> completeForTwoParts(project, target, items)
+                    else -> completeForThreeParts(project, target, items)
+                }
+            }
         }
 
         result.addAllElements(

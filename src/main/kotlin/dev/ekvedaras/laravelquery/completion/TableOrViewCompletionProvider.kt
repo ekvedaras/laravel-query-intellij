@@ -40,9 +40,13 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Table)
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        when (target.parts.size) {
-            1 -> populateWithOnePart(project, method, items)
-            else -> populateWithTwoParts(project, target, items)
+        if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            ApplicationManager.getApplication().runReadAction {
+                when (target.parts.size) {
+                    1 -> populateWithOnePart(project, method, items)
+                    else -> populateWithTwoParts(project, target, items)
+                }
+            }
         }
 
         result.addAllElements(

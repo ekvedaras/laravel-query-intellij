@@ -61,7 +61,11 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
 
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        complete(project, method, target, items)
+        if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            ApplicationManager.getApplication().runReadAction {
+                complete(project, method, target, items)
+            }
+        }
 
         result.addAllElements(
             items.distinctBy { it.lookupString }

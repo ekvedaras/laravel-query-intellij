@@ -50,7 +50,7 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
         super.tearDown()
     }
 
-    protected fun dataSource(): DasDataSource = db as DasDataSource
+    protected fun dataSource(): DasDataSource = db
 
     private fun caretAfterArgs(at: Int, prefix: String = ""): String {
         var args = ""

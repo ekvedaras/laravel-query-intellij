@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -34,7 +35,11 @@ class MethodUtils private constructor() {
         }
 
         fun resolveMethodClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
-            if (DumbService.isDumb(project) || method.classReference == null) {
+            if (
+                DumbService.isDumb(project) ||
+                method.classReference == null ||
+                !ApplicationManager.getApplication().isReadAccessAllowed
+            ) {
                 return listOf()
             }
 
@@ -50,7 +55,11 @@ class MethodUtils private constructor() {
                         .getClassesByFQN(it)
                         .forEach classLoop@{ clazz ->
                             when (clazz) {
-                                is PhpClassAliasImpl -> classes.add(clazz.original as PhpClassImpl)
+                                is PhpClassAliasImpl -> {
+                                    if (clazz.original != null) {
+                                        classes.add(clazz.original as PhpClassImpl)
+                                    }
+                                }
                                 is PhpClassImpl -> classes.add(clazz)
                             }
                         }

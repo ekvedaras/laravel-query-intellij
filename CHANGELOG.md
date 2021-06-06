@@ -13,6 +13,8 @@
 ### Fixed
 - `create`, `update`, etc. `Eloquent` methods should only complete columns
 - Inspection errors when using nested array method in `where` methods (#35)
+- Class casting issues (#25)
+- Read access not allowed issues in `DB::table('<caret>')` (#26)
 
 ## [1.1.0]
 ### Added
