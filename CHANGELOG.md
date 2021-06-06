@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.0.0]
 ### Added
 - Index completion and reference resolving in migration files
 
