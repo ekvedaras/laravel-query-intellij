@@ -28,7 +28,6 @@ See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#conne
 
 * Improve schema builder support to read current migration file as well instead of just table from database
 * Add morph columns support for schema builder integration
-* Add support for indexes in schema builder
 * Improve sorting
 
 ## Installation
