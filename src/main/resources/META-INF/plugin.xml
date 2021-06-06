@@ -27,6 +27,8 @@
                                 order="first"/>
 
         <psi.referenceContributor language="PHP"
+                                  implementation="dev.ekvedaras.laravelquery.reference.IndexReferenceContributor"/>
+        <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>
         <psi.referenceContributor language="PHP"
                                   implementation="dev.ekvedaras.laravelquery.reference.ColumnReferenceContributor"/>

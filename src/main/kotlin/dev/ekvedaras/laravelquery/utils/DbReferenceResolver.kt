@@ -222,7 +222,9 @@ private class ResolverForIndexMethods(
             }.filter {
                 reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
             }.forEach { table ->
-                table.indexesInParallel().forEach { indexes.add(it) }
+                table.indexesInParallel()
+                    .filter { it.name == reference.parts[0] }
+                    .forEach { indexes.add(it) }
             }
         }
     }
@@ -239,7 +241,9 @@ private class ResolverForKeyMethods(
             }.filter {
                 reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
             }.forEach { table ->
-                table.keysInParallel().forEach { keys.add(it) }
+                table.keysInParallel()
+                    .filter { it.name == reference.parts[0] }
+                    .forEach { keys.add(it) }
             }
         }
     }
@@ -256,7 +260,9 @@ private class ResolverForForeignKeyMethods(
             }.filter {
                 reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
             }.forEach { table ->
-                table.foreignKeysInParallel().forEach { foreignKeys.add(it) }
+                table.foreignKeysInParallel()
+                    .filter { it.name == reference.parts[0] }
+                    .forEach { foreignKeys.add(it) }
             }
         }
     }

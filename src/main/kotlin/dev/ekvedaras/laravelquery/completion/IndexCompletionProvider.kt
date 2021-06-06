@@ -9,6 +9,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeysInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keysInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForForeignKeys
@@ -53,7 +59,7 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
 
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
-        complete(project, target, items, method.isForUniqueIndexes())
+        complete(project, method, target, items)
 
         result.addAllElements(
             items.distinctBy { it.lookupString }
@@ -66,13 +72,75 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
 
     private fun complete(
         project: Project,
+        method: MethodReference,
         target: DbReferenceExpression,
         result: MutableList<LookupElement>,
-        isForUnique: Boolean
     ) {
-        target.index.filter { it.isUnique == isForUnique }.forEach { result.add(it.buildLookup(project)) }
-        target.key.forEach { result.add(it.buildLookup(project)) }
-        target.foreignKey.forEach { result.add(it.buildLookup(project)) }
+        val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
+        val tables = target.tablesAndAliases.map { it.value.first }.distinct()
+
+        when {
+            method.isForIndexes() ->
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel().filter {
+                        schemas.isEmpty() || schemas.contains(it.name)
+                    }.forEach { schema ->
+                        schema.tablesInParallel().filter {
+                            tables.contains(it.name)
+                        }.forEach { table ->
+                            table.indexesInParallel().filter {
+                                !it.isUnique
+                            }.forEach {
+                                result.add(it.buildLookup(project))
+                            }
+                        }
+                    }
+                }
+            method.isForUniqueIndexes() ->
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel().filter {
+                        schemas.isEmpty() || schemas.contains(it.name)
+                    }.forEach { schema ->
+                        schema.tablesInParallel().filter {
+                            tables.contains(it.name)
+                        }.forEach { table ->
+                            table.indexesInParallel().filter {
+                                it.isUnique
+                            }.forEach {
+                                result.add(it.buildLookup(project))
+                            }
+                        }
+                    }
+                }
+            method.isForKeys() ->
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel().filter {
+                        schemas.isEmpty() || schemas.contains(it.name)
+                    }.forEach { schema ->
+                        schema.tablesInParallel().filter {
+                            tables.contains(it.name)
+                        }.forEach { table ->
+                            table.keysInParallel().forEach {
+                                result.add(it.buildLookup(project))
+                            }
+                        }
+                    }
+                }
+            else ->
+                project.dbDataSourcesInParallel().forEach { dataSource ->
+                    dataSource.schemasInParallel().filter {
+                        schemas.isEmpty() || schemas.contains(it.name)
+                    }.forEach { schema ->
+                        schema.tablesInParallel().filter {
+                            tables.contains(it.name)
+                        }.forEach { table ->
+                            table.foreignKeysInParallel().forEach {
+                                result.add(it.buildLookup(project))
+                            }
+                        }
+                    }
+                }
+        }
     }
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =

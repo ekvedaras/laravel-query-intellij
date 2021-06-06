@@ -3,6 +3,13 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Index completion and reference resolving in migration files
+
+### Changed
+- Upgraded to latest gradle plugin
+- Upgraded  platform version to `2021.1.1`
+
 ## [1.1.0]
 ### Added
 - Schema builder integration
