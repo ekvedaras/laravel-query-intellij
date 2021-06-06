@@ -12,6 +12,7 @@
 
 ### Fixed
 - `create`, `update`, etc. `Eloquent` methods should only complete columns
+- Inspection errors when using nested array method in `where` methods (#35)
 
 ## [1.1.0]
 ### Added

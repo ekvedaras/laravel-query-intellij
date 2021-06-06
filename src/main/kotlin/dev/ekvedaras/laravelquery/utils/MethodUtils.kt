@@ -6,12 +6,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtil
+import com.intellij.util.containers.map2Array
+import com.intellij.util.containers.toArray
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 import com.jetbrains.php.lang.psi.elements.Statement
+import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
@@ -109,13 +113,15 @@ class MethodUtils private constructor() {
 fun CompletionParameters.findParamIndex(): Int =
     this.position.findParamIndex()
 
-fun PsiElement.findParamIndex(): Int {
+fun PsiElement.findParamIndex(allowArray: Boolean = false): Int {
     val parent = this.parent ?: return -1
 
     return if (parent is ParameterList) {
         ArrayUtil.indexOf(parent.parameters, this)
+    } else if (allowArray && parent is ArrayCreationExpressionImpl) {
+        parent.children.indexOfFirst { it === this }
     } else {
-        this.parent?.findParamIndex() ?: -1
+        this.parent?.findParamIndex(allowArray) ?: -1
     }
 }
 

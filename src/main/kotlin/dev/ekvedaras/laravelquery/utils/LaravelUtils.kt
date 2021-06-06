@@ -452,11 +452,8 @@ class LaravelUtils private constructor() {
         fun MethodReference.isBuilderMethodForForeignKeys(): Boolean =
             BuilderTableForeignKeysParams.containsKey(this.name)
 
-        fun MethodReference.isColumnParam(parameters: CompletionParameters): Boolean =
-            this.isColumnParam(parameters.position)
-
-        fun MethodReference.isColumnParam(position: PsiElement): Boolean =
-            this.isColumnParam(position.findParamIndex())
+        fun MethodReference.isColumnParam(position: PsiElement, allowArray: Boolean): Boolean =
+            this.isColumnParam(position.findParamIndex(allowArray))
 
         fun MethodReference.isIndexParam(position: PsiElement): Boolean =
             this.isIndexParam(position.findParamIndex())
@@ -503,11 +500,11 @@ class LaravelUtils private constructor() {
         fun MethodReference.canHaveAliasParam(): Boolean =
             BuilderTableAliasParams.containsKey(this.name)
 
-        fun CompletionParameters.isColumnIn(method: MethodReference): Boolean =
-            this.position.isColumnIn(method)
+        fun CompletionParameters.isColumnIn(method: MethodReference, allowArray: Boolean): Boolean =
+            this.position.isColumnIn(method, allowArray)
 
-        fun PsiElement.isColumnIn(method: MethodReference): Boolean =
-            method.isColumnParam(this) || method.hasColumnsInAllParams()
+        fun PsiElement.isColumnIn(method: MethodReference, allowArray: Boolean): Boolean =
+            method.isColumnParam(this, allowArray) || method.hasColumnsInAllParams()
 
         fun CompletionParameters.isIndexIn(method: MethodReference): Boolean =
             this.position.isIndexIn(method)
@@ -558,8 +555,8 @@ class LaravelUtils private constructor() {
             (this.parent?.parent is FunctionReference && this.parent?.parent !is MethodReference) ||
                 (this.parent?.parent?.parent is FunctionReference && this.parent?.parent?.parent !is MethodReference)
 
-        fun PsiElement.isOperatorParam(): Boolean =
-            OperatorPositions.contains(this.findParamIndex()) && Operators.any {
+        fun PsiElement.isOperatorParam(allowArray : Boolean = false): Boolean =
+            OperatorPositions.contains(this.findParamIndex(allowArray)) && Operators.any {
                 this.textMatches("'$it'") || this.textMatches("\"$it\"")
             }
 

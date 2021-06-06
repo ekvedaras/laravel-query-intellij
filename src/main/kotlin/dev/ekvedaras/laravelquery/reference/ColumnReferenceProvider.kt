@@ -72,12 +72,15 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
         return references
     }
 
-    private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
-        !ApplicationManager.getApplication().isReadAccessAllowed ||
+    private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement): Boolean {
+        val allowArray = method.name?.startsWith("where") ?: false
+
+        return !ApplicationManager.getApplication().isReadAccessAllowed ||
             element.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
-            !element.isColumnIn(method) ||
+            !element.isColumnIn(method, allowArray) ||
             element.isInsideRegularFunction() ||
             (element.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
             !method.isInteresting(project)
+    }
 }

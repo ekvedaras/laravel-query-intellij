@@ -115,18 +115,21 @@ class UnknownColumnInspection : PhpInspection() {
                 project: Project,
                 method: MethodReference,
                 expression: StringLiteralExpression
-            ) =
-                !ApplicationManager.getApplication().isReadAccessAllowed ||
+            ): Boolean {
+                val allowArray = method.name?.startsWith("where") ?: false
+
+                return !ApplicationManager.getApplication().isReadAccessAllowed ||
                     expression.containsVariable() ||
                     expression.selectsAllColumns() ||
-                    expression.isOperatorParam() ||
+                    expression.isOperatorParam(allowArray) ||
                     !method.isBuilderMethodForColumns() ||
-                    !expression.isColumnIn(method) ||
+                    !expression.isColumnIn(method, allowArray) ||
                     expression.isInsideRegularFunction() ||
                     (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
                     !method.isInteresting(project) ||
                     method.isSchemaBuilderMethod(project) ||
                     method.isBlueprintMethod(project)
+            }
         }
     }
 }

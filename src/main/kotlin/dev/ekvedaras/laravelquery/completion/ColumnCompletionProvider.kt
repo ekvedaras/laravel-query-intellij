@@ -185,13 +185,16 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
-    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
-        !ApplicationManager.getApplication().isReadAccessAllowed ||
+    private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters): Boolean {
+        val allowArray = method.name?.startsWith("where") ?: false
+
+        return !ApplicationManager.getApplication().isReadAccessAllowed ||
             parameters.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
-            !parameters.isColumnIn(method) ||
+            !parameters.isColumnIn(method, allowArray) ||
             parameters.isInsideRegularFunction() ||
             (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
             (!parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues()) ||
             !method.isInteresting(project)
+    }
 }

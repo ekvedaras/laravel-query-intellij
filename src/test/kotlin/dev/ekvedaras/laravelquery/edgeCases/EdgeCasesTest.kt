@@ -104,4 +104,8 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertNoCompletion("trial_ends_at")
         assertNoCompletion("customers", "testProject1", "testProject2", "migrations", "failed_jobs")
     }
+
+    fun testDoesNotWarnAboutUnknownOperatorInNestedArrayWhere() {
+        assertInspection("edgeCases/arrayNestedWhere.php", UnknownColumnInspection())
+    }
 }
