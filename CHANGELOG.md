@@ -10,6 +10,9 @@
 - Upgraded to latest gradle plugin
 - Upgraded  platform version to `2021.1.1`
 
+### Fixed
+- `create`, `update`, etc. `Eloquent` methods should only complete columns
+
 ## [1.1.0]
 ### Added
 - Schema builder integration

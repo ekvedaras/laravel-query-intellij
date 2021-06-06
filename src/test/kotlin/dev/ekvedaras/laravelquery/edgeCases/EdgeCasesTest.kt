@@ -96,4 +96,12 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertCompletion("first_name", "last_name")
         assertNoCompletion("trial_ends_at")
     }
+
+    fun testItOnlyCompletesColumnsOnModelCreateMethod() {
+        myFixture.configureByFile("edgeCases/createModel.php")
+        myFixture.completeBasic()
+        assertCompletion("first_name", "last_name")
+        assertNoCompletion("trial_ends_at")
+        assertNoCompletion("customers", "testProject1", "testProject2", "migrations", "failed_jobs")
+    }
 }

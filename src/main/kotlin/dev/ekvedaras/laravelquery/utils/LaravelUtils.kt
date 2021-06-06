@@ -267,6 +267,11 @@ class LaravelUtils private constructor() {
             "multiPolygon" to listOf(0),
             "multiPolygonZ" to listOf(0),
             "computed" to listOf(0),
+            "create" to listOf(0),
+            "update" to listOf(0),
+            "fill" to listOf(0),
+            "updateOrCreate" to listOf(0, 1),
+            "updateOrInsert" to listOf(0, 1),
         )
         // </editor-fold>
 
@@ -305,13 +310,20 @@ class LaravelUtils private constructor() {
         // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         private val BuilderMethodsWithTableColumnsInArrayValues = listOf(
-            "get", "select",
+            "get", "select", "create", "update", "fill",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
             "hasColumns", "dropColumns", "dropColumns",
             "primary", "unique", "index", "spatialIndex", "foreign",
             "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
             "indexCommand", "createIndexName",
+        )
+        // </editor-fold>
+        //
+        // <editor-fold desc="Methods where only columns should be completed" defaultstate="collapsed">
+        @JvmStatic
+        private val MethodsWhereOnlyColumnsShouldBeCompleted = listOf(
+            "create", "update", "fill",
         )
         // </editor-fold>
 
@@ -375,6 +387,11 @@ class LaravelUtils private constructor() {
                 }
             }
 
+        fun MethodReference.isEloquentModel(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                clazz.isChildOf(LaravelClasses.Model)
+            }
+
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =
             this.shouldCompleteOnlySchemas() || !this.isSchemaBuilderMethod(project)
 
@@ -387,6 +404,9 @@ class LaravelUtils private constructor() {
 
         fun MethodReference.shouldCompleteOnlySchemas(): Boolean =
             BuilderSchemaMethods.contains(this.name)
+
+        fun MethodReference.shouldCompleteOnlyColumns(): Boolean =
+            MethodsWhereOnlyColumnsShouldBeCompleted.contains(this.name)
 
         fun MethodReference.isBlueprintMethod(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->

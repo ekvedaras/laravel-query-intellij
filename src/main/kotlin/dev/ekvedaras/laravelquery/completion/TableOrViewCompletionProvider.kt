@@ -13,9 +13,11 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInP
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlySchemas
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
@@ -88,6 +90,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
+            (method.isEloquentModel(project) && method.shouldCompleteOnlyColumns()) ||
             parameters.isInsideRegularFunction() ||
             !method.isInteresting(project)
 }

@@ -25,6 +25,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
@@ -71,7 +72,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result: CompletionResultSet,
     ) {
         val schemas = target.tablesAndAliases.map { it.value.second }.filterNotNull().distinct()
-        onlyColumns = method.isBlueprintMethod(project) || method.isColumnDefinitionMethod(project)
+        onlyColumns = method.isBlueprintMethod(project) || method.isColumnDefinitionMethod(project) || method.shouldCompleteOnlyColumns()
 
         project.dbDataSourcesInParallel().forEach { dataSource ->
             if (!onlyColumns) {
