@@ -10,9 +10,9 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 

@@ -12,9 +12,9 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlySchemas
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas

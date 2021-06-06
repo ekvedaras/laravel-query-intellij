@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasForeignKey
 import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
@@ -45,5 +46,8 @@ class DatabaseUtils private constructor() {
 
         fun DasTable.keysInParallel(): Stream<out DasTableKey> =
             this.getDasChildren(ObjectKind.KEY).toList().parallelStream().map { it as DasTableKey }
+
+        fun DasTable.foreignKeysInParallel(): Stream<out DasForeignKey> =
+            this.getDasChildren(ObjectKind.FOREIGN_KEY).toList().parallelStream().map { it as DasForeignKey }
     }
 }

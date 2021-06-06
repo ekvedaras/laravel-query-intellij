@@ -11,11 +11,11 @@ import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 

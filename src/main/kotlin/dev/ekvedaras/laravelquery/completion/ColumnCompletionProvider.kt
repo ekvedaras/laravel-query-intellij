@@ -19,12 +19,12 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils

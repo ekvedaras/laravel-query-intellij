@@ -69,13 +69,12 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertNoCompletion("trial_ends_at")
     }
 
-//    TODO: This works, but crashes the tests for some reason.
-//    fun testDbTable() {
-//        myFixture.configureByFile("edgeCases/dbTable.php")
-//        myFixture.completeBasic()
-//        assertCompletion("testProject1", "users", "testProject2")
-//        assertNoCompletion("created_at")
-//    }
+    fun testDbTable() {
+        myFixture.configureByFile("edgeCases/dbTable.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "testProject2")
+        assertNoCompletion("created_at")
+    }
 
     fun testDbFacadeAliasTable() {
         myFixture.configureByFile("edgeCases/dbFacadeAliasTable.php")

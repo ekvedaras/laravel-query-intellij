@@ -33,9 +33,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
         val notExpected = schemas.filter { it != table.dasParent?.name ?: it } + // All other schemas
             schemaTables.values.flatten().filter { it != table.name } // All other tables
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor(table.name, "", method, param)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor(table.name, "", entry.key, param)
 
                 assertCompletion(*expected.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
@@ -52,9 +52,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
             schemaTables.entries.filterNot { it.key == schema }.map { it.value }
                 .flatten() // Tables of other schemas
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor(table, "$schema.", method, param)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value } .forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor(table, "$schema.", entry.key, param)
 
                 assertCompletion(*expected.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
@@ -79,9 +79,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
                     .filterNot { columns.contains(it.name) }
                     .map { it.name } // Columns of other table
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor(table.name, "${table.name}.", method, param)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor(table.name, "${table.name}.", entry.key, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
@@ -106,9 +106,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
                     .filterNot { columns.contains(it.name) }
                     .map { it.name } // Columns of other table
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor(table.name, "${table.dasParent?.name}.${table.name}.", method, param)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor(table.name, "${table.dasParent?.name}.${table.name}.", entry.key, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
@@ -134,9 +134,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
                     .filterNot { columns.contains(it.name) }
                     .map { it.name } // Columns of other table
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor("${table.name} as $alias", "$alias.", method, param)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor("${table.name} as $alias", "$alias.", entry.key, param)
 
                 assertCompletion(*columns.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())
@@ -152,9 +152,9 @@ internal class ColumnsCompletionTest : BaseTestCase() {
 
         val notExpected = listOf("failed_at")
 
-        LaravelUtils.BuilderTableColumnsParams.forEach { method, params ->
-            params.forEach { param ->
-                completeFor(table, "", method, param, CompletionType.SMART)
+        LaravelUtils.BuilderTableColumnsParams.entries.distinctBy { it.value }.forEach { entry ->
+            entry.value.forEach { param ->
+                completeFor(table, "", entry.key, param, CompletionType.SMART)
 
                 assertCompletion(*expected.toList().toTypedArray())
                 assertNoCompletion(*notExpected.toList().toTypedArray())

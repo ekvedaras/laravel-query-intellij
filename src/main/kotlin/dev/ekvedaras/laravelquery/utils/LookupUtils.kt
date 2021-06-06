@@ -6,10 +6,12 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasForeignKey
 import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasObject
 import com.intellij.database.model.DasTable
+import com.intellij.database.model.DasTableKey
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
@@ -109,6 +111,36 @@ class LookupUtils private constructor() {
                     true
                 )
                 .withTailText("${this.comment ?: ""} ${this.columnsRef.names().joinToString(", ")}", true)
+                .withInsertHandler(
+                    project,
+                    false,
+                )
+        }
+
+        fun DasTableKey.buildLookup(project: Project): LookupElement {
+            return LookupElementBuilder
+                .create(this, this.name)
+                .withIcon(this.getIcon(project))
+                .withTypeText(
+                    "  ${if (this.isPrimary) " primary" else ""}",
+                    true
+                )
+                .withTailText("${this.comment ?: ""} ${this.columnsRef.names().joinToString(", ")}", true)
+                .withInsertHandler(
+                    project,
+                    false,
+                )
+        }
+
+        fun DasForeignKey.buildLookup(project: Project): LookupElement {
+            return LookupElementBuilder
+                .create(this, this.name)
+                .withIcon(this.getIcon(project))
+                .withTypeText(
+                    "  ${this.refTableName}: ${this.columnsRef.names().joinToString(", ")}",
+                    true
+                )
+                .withTailText(this.comment ?: "", true)
                 .withInsertHandler(
                     project,
                     false,

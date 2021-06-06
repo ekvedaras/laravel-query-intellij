@@ -12,9 +12,9 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
 import dev.ekvedaras.laravelquery.utils.MethodUtils

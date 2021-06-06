@@ -1,9 +1,11 @@
 package dev.ekvedaras.laravelquery.models
 
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasForeignKey
 import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
+import com.intellij.database.model.DasTableKey
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -20,6 +22,8 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             Table,
             Column,
             Index,
+            Key,
+            ForeignKey,
         }
     }
 
@@ -32,6 +36,8 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     var table = mutableListOf<DasTable>()
     var column = mutableListOf<DasColumn>()
     var index = mutableListOf<DasIndex>()
+    var key = mutableListOf<DasTableKey>()
+    var foreignKey = mutableListOf<DasForeignKey>()
     var alias: String? = null
 
     val parts = mutableListOf<String>()
