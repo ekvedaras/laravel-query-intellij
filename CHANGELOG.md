@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Fixed
 - Do not inspect for tables in `create`, `update`, `fill`, etc. methods (#38)
+- Do not complete columns in `create`, `update`, `fill`, etc. method array values. Only in keys (#38)
 
 ## [2.0.0]
 ### Added

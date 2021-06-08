@@ -310,7 +310,7 @@ class LaravelUtils private constructor() {
         // <editor-fold desc="Methods where params may accept columns as array values" defaultstate="collapsed">
         @JvmStatic
         private val BuilderMethodsWithTableColumnsInArrayValues = listOf(
-            "get", "select", "create", "update", "fill",
+            "get", "select",
             "whereBetweenColumns", "orWhereBetweenColumns",
             "whereNotBetweenColumns", "orWhereNotBetweenColumns",
             "hasColumns", "dropColumns", "dropColumns",
@@ -318,9 +318,8 @@ class LaravelUtils private constructor() {
             "dropPrimary", "dropUnique", "dropIndex", "dropSpatialIndex", "dropForeign",
             "indexCommand", "createIndexName",
         )
-
         // </editor-fold>
-        //
+
         // <editor-fold desc="Methods where only columns should be completed" defaultstate="collapsed">
         @JvmStatic
         private val MethodsWhereOnlyColumnsShouldBeCompleted = listOf(

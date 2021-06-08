@@ -107,6 +107,12 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertNoCompletion("customers", "testProject1", "testProject2", "migrations", "failed_jobs")
     }
 
+    fun testItDoesNotCompleteColumnsOnModelCreateMethodWhenCaretIsInValue() {
+        myFixture.configureByFile("edgeCases/createModelCaretInValue.php")
+        myFixture.completeBasic()
+        assertSame(0, myFixture.lookupElements?.size ?: 0)
+    }
+
     fun testDoesNotWarnAboutUnknownOperatorInNestedArrayWhere() {
         assertInspection("edgeCases/arrayNestedWhere.php", UnknownColumnInspection())
     }
