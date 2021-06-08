@@ -110,4 +110,8 @@ internal class EdgeCasesTest : BaseTestCase() {
     fun testDoesNotWarnAboutUnknownOperatorInNestedArrayWhere() {
         assertInspection("edgeCases/arrayNestedWhere.php", UnknownColumnInspection())
     }
+
+    fun testDoesNotWarnAboutUnknownTableInCreateMethod() {
+        assertInspection("edgeCases/createModel.php", UnknownTableOrViewInspection())
+    }
 }

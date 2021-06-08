@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Do not inspect for tables in `create`, `update`, `fill`, etc. methods (#38)
+
 ## [2.0.0]
 ### Added
 - Index completion and reference resolving in migration files

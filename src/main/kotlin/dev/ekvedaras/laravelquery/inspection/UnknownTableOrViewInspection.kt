@@ -17,6 +17,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFu
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 
 class UnknownTableOrViewInspection : PhpInspection() {
@@ -58,6 +59,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
             ) =
                 !ApplicationManager.getApplication().isReadAccessAllowed ||
                     !method.isBuilderMethodByName() ||
+                    method.shouldCompleteOnlyColumns() ||
                     !expression.isTableParam() ||
                     expression.isInsideRegularFunction() ||
                     !method.isInteresting(project) ||
