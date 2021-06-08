@@ -11,9 +11,11 @@ import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 
 class TableOrViewReferenceProvider : PsiReferenceProvider() {
@@ -51,5 +53,6 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
             !method.isBuilderMethodByName() ||
             !element.isTableParam() ||
             element.isInsideRegularFunction() ||
+            (method.isEloquentModel(project) && method.shouldCompleteOnlyColumns()) ||
             !method.isInteresting(project)
 }

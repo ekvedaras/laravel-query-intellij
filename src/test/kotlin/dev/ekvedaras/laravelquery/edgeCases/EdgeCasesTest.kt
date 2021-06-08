@@ -1,10 +1,12 @@
 package dev.ekvedaras.laravelquery.edgeCases
 
 import com.intellij.database.dialects.oracle.debugger.success
+import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
 import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
@@ -119,5 +121,36 @@ internal class EdgeCasesTest : BaseTestCase() {
 
     fun testDoesNotWarnAboutUnknownTableInCreateMethod() {
         assertInspection("edgeCases/createModel.php", UnknownTableOrViewInspection())
+    }
+
+    fun testItDoesNotResolveColumnsFromOtherTablesBecauseOfTheContext() {
+        myFixture.configureByFile("edgeCases/createModelValueAsColumnName.php")
+
+        val column = DasUtil.getTables(dataSource())
+            .first { it.name == "users" }
+            .getDasChildren(ObjectKind.COLUMN)
+            .first { it.name == "email" }
+        val dbColumn = DbImplUtil.findElement(
+            DbUtil.getDataSources(project).first(),
+            column
+        ) ?: return fail("Failed to resolve DB column")
+
+        val usages = myFixture.findUsages(dbColumn)
+
+        UsefulTestCase.assertSize(0, usages)
+    }
+
+    fun testItDoesNotResolveTablesInEloquentMethodArrayKeysAndValues() {
+        myFixture.configureByFile("edgeCases/createModelKeyAndValueAsTableName.php")
+
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
+        val dbTable = DbImplUtil.findElement(
+            DbUtil.getDataSources(project).first(),
+            table
+        ) ?: return fail("Failed to resolve DB table")
+
+        val usages = myFixture.findUsages(dbTable)
+
+        UsefulTestCase.assertSize(0, usages)
     }
 }

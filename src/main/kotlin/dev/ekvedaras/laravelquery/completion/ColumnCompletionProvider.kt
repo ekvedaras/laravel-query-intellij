@@ -31,7 +31,6 @@ import dev.ekvedaras.laravelquery.utils.LookupUtils
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import java.util.Collections
 
 class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
@@ -207,7 +206,11 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             parameters.isInsideRegularFunction() ||
             (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
             (!parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues()) ||
-            (parameters.isInsidePhpArrayOrValue() && method.shouldCompleteOnlyColumns() && method.isEloquentModel(project)) ||
+            (
+                parameters.isInsidePhpArrayOrValue() &&
+                    method.shouldCompleteOnlyColumns() &&
+                    method.isEloquentModel(project)
+                ) ||
             !method.isInteresting(project)
     }
 }
