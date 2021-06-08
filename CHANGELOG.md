@@ -7,6 +7,7 @@
 - Do not inspect for tables in `create`, `update`, `fill`, etc. methods (#38)
 - Do not complete columns in `create`, `update`, `fill`, etc. method array values. Only in keys (#38)
 - Do not look for column and table references in `create`, `update`, `fill`, etc. method array values. Only in keys (#38)
+- Attempt to detect PHP array value elements by using debugName instead of various indexes (#39)
 
 ## [2.0.0]
 ### Added
