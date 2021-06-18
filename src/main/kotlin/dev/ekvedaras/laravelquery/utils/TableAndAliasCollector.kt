@@ -35,7 +35,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val method = MethodUtils.resolveMethodReference(reference.expression) ?: return
         val methods = Collections.synchronizedList(mutableListOf<MethodReference>())
 
-        collectMethodsAcrossVariableReferences(methods, method)
+        if (!reference.forReference) collectMethodsAcrossVariableReferences(methods, method)
         collectMethodsInCurrentTree(methods, method)
 
         relationResolver.resolveModelAndRelationTables(methods, method)

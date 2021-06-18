@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Hotfix to prevent non-idempotent computation exception. This will introduce reduced context knowledge when resolving column references, but should prevent exceptions until a proper refactor is implemented. (#42)
 
 ## [2.0.1]
 ### Fixed

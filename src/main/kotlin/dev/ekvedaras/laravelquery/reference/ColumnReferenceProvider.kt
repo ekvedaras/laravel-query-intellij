@@ -7,8 +7,6 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.rd.util.addUnique
-import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
@@ -21,15 +19,8 @@ import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 
 class ColumnReferenceProvider : PsiReferenceProvider() {
-    companion object {
-        val isResolving = mutableListOf<PsiElement>()
-    }
 
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        if (isResolving.contains(element)) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
@@ -37,9 +28,7 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        isResolving.addUnique(Lifetime.Eternal, element)
-
-        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column)
+        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column, true)
         var references = arrayOf<PsiReference>()
 
         if (!method.shouldCompleteOnlyColumns()) {
@@ -71,8 +60,6 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
                     target.tablesAndAliases.containsValue(it.tableName to it.dasParent?.dasParent?.name)
             }
             .forEach { references += ColumnPsiReference(target, it) }
-
-        isResolving.remove(element)
 
         return references
     }

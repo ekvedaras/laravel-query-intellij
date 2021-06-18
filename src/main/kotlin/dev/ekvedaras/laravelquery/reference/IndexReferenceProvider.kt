@@ -7,8 +7,6 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.rd.util.addUnique
-import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForForeignKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
@@ -28,15 +26,8 @@ import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
 
 class IndexReferenceProvider : PsiReferenceProvider() {
-    companion object {
-        val isResolving = mutableListOf<PsiElement>()
-    }
 
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        if (isResolving.contains(element)) {
-            return PsiReference.EMPTY_ARRAY
-        }
-
         val method = MethodUtils.resolveMethodReference(element) ?: return PsiReference.EMPTY_ARRAY
         val project = method.project
 
@@ -44,23 +35,20 @@ class IndexReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        isResolving.addUnique(Lifetime.Eternal, element)
-
         val target = DbReferenceExpression(
             element,
             when {
                 method.isForIndexes() || method.isForUniqueIndexes() -> DbReferenceExpression.Companion.Type.Index
                 method.isForKeys() -> DbReferenceExpression.Companion.Type.Key
                 else -> DbReferenceExpression.Companion.Type.ForeignKey
-            }
+            },
+            true
         )
         var references = arrayOf<PsiReference>()
 
         target.index.forEach { references += IndexPsiReference(target, it) }
         target.key.forEach { references += KeyPsiReference(target, it) }
         target.foreignKey.forEach { references += ForeignKeyPsiReference(target, it) }
-
-        isResolving.remove(element)
 
         return references
     }

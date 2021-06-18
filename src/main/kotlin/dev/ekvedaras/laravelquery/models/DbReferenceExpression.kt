@@ -16,7 +16,7 @@ import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import dev.ekvedaras.laravelquery.utils.TableAndAliasCollector
 import org.apache.commons.lang.StringUtils.substringBefore
 
-class DbReferenceExpression(val expression: PsiElement, val type: Type) {
+class DbReferenceExpression(val expression: PsiElement, val type: Type, val forReference: Boolean = false) {
     companion object {
         enum class Type {
             Table,
