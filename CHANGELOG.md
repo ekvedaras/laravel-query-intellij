@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.0.3]
 ### Fixed
 - Reference resolving was refactored a bit and the issue with stack overflow and non-idempotent computation exception resolved. (#42)
 
