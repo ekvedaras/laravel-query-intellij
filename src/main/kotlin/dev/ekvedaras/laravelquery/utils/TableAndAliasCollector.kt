@@ -49,7 +49,6 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val variable = method.parentOfType<Statement>()?.firstPsiChild?.firstPsiChild
         if (variable !is VariableImpl) return
 
-
         val declaration = variable.resolve()
         if (declaration?.reference != null) {
             collectMethodsInVariableReference(declaration.reference as PsiReference, methods)
