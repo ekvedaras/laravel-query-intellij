@@ -28,38 +28,14 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Column, true)
         var references = arrayOf<PsiReference>()
 
         if (!method.shouldCompleteOnlyColumns()) {
-            target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }
-
-            target.table.parallelStream().forEach {
-                references += TableOrViewPsiReference(target, it)
-
-                val alias = target.aliases[it.name]
-                if (alias != null) {
-                    references += TableAliasPsiReference(
-                        element,
-                        if (target.ranges.size >= 2 && target.schema.isNotEmpty()) {
-                            target.ranges[1]
-                        } else {
-                            target.ranges.first()
-                        },
-                        alias.second
-                    )
-                }
-            }
+            references += SchemaPsiReference(element, DbReferenceExpression.Companion.Type.Column)
+            references += TableOrViewPsiReference(element, DbReferenceExpression.Companion.Type.Column)
         }
 
-        target.column.parallelStream()
-            .filter {
-                target.tablesAndAliases.isEmpty() ||
-                    target.tablesAndAliases.containsKey(it.tableName) ||
-                    target.tablesAndAliases.containsValue(it.tableName to null) ||
-                    target.tablesAndAliases.containsValue(it.tableName to it.dasParent?.dasParent?.name)
-            }
-            .forEach { references += ColumnPsiReference(target, it) }
+        references += ColumnPsiReference(element)
 
         return references
     }

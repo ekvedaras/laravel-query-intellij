@@ -1,14 +1,19 @@
 package dev.ekvedaras.laravelquery.reference
 
-import com.intellij.database.model.DasIndex
 import com.intellij.database.psi.DbPsiFacade
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 
-class IndexPsiReference(target: DbReferenceExpression, private val index: DasIndex) :
-    PsiReferenceBase<PsiElement>(target.expression, target.ranges.last()) {
+class IndexPsiReference(element: PsiElement) : PsiReferenceBase<PsiElement>(element) {
     override fun resolve(): PsiElement? {
-        return DbPsiFacade.getInstance(element.project).findElement(index)
+        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Index)
+        val tables = target.tablesAndAliases.values.map { it.first }
+
+        rangeInElement = target.ranges.last()
+
+        return DbPsiFacade.getInstance(element.project).findElement(
+            target.index.find { tables.contains(it.table?.name) }
+        )
     }
 }

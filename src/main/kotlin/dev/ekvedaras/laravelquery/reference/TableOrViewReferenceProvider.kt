@@ -25,13 +25,10 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
             return PsiReference.EMPTY_ARRAY
         }
 
-        val target = DbReferenceExpression(element, DbReferenceExpression.Companion.Type.Table, true)
-        var references = arrayOf<PsiReference>()
-
-        target.schema.parallelStream().forEach { references += SchemaPsiReference(target, it) }
-        target.table.parallelStream().forEach { references += TableOrViewPsiReference(target, it) }
-
-        return references
+        return arrayOf(
+            SchemaPsiReference(element, DbReferenceExpression.Companion.Type.Table),
+            TableOrViewPsiReference(element, DbReferenceExpression.Companion.Type.Table),
+        )
     }
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =

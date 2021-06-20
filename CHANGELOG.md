@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Reference resolving was refactored a bit and the issue with stack overflow and non-idempotent computation exception resolved. (#42)
+
 ## [2.0.2]
 ### Fixed
 - Hotfix to prevent non-idempotent computation exception. This will introduce reduced context knowledge when resolving column references, but should prevent exceptions until a proper refactor is implemented. (#42)

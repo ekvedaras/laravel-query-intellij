@@ -69,18 +69,18 @@ tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
         sourceCompatibility = "1.8"
-        targetCompatibility = "11"
+        targetCompatibility = "15"
     }
     listOf("compileKotlin", "compileTestKotlin").forEach {
         getByName<KotlinCompile>(it) {
             kotlinOptions.jvmTarget = "1.8"
             kotlinOptions.useIR = true
-            kotlinOptions.apiVersion = "1.4"
+            kotlinOptions.apiVersion = "1.5"
         }
     }
 
     withType<Detekt> {
-        jvmTarget = "11"
+        jvmTarget = "15"
     }
 
     runIde {

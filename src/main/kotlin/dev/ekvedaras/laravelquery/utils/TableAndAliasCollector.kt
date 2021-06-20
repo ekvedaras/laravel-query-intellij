@@ -21,7 +21,6 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsAlias
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.statementFirstPsiChild
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import java.util.Collections
@@ -35,7 +34,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val method = MethodUtils.resolveMethodReference(reference.expression) ?: return
         val methods = Collections.synchronizedList(mutableListOf<MethodReference>())
 
-        if (!reference.forReference) collectMethodsAcrossVariableReferences(methods, method)
+        collectMethodsAcrossVariableReferences(methods, method)
         collectMethodsInCurrentTree(methods, method)
 
         relationResolver.resolveModelAndRelationTables(methods, method)
@@ -50,7 +49,13 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val variable = method.parentOfType<Statement>()?.firstPsiChild?.firstPsiChild
         if (variable !is VariableImpl) return
 
-        variable.references().forEach {
+
+        val declaration = variable.resolve()
+        if (declaration?.reference != null) {
+            collectMethodsInVariableReference(declaration.reference as PsiReference, methods)
+        }
+
+        variable.references.forEach {
             collectMethodsInVariableReference(it, methods)
         }
     }
