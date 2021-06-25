@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 
 class ClassUtils private constructor() {
@@ -13,6 +14,15 @@ class ClassUtils private constructor() {
         fun PhpClassImpl.isChildOf(clazz: PhpClass): Boolean {
             if (this.fqn == clazz.fqn) {
                 return true
+            }
+
+            if (superClass == null) {
+                return false
+            }
+
+            if (superClass is PhpClassAliasImpl) {
+                val original = (superClass as PhpClassAliasImpl).original ?: return false
+                return (original as PhpClassImpl).isChildOf(clazz)
             }
 
             return superClass != null && (superClass as PhpClassImpl).isChildOf(clazz)
@@ -24,7 +34,16 @@ class ClassUtils private constructor() {
                 return true
             }
 
-            return superClass != null && (superClass as PhpClassImpl).isChildOf(clazz)
+            if (superClass == null) {
+                return false
+            }
+
+            if (superClass is PhpClassAliasImpl) {
+                val original = (superClass as PhpClassAliasImpl).original ?: return false
+                return (original as PhpClassImpl).isChildOf(clazz)
+            }
+
+            return (superClass as PhpClassImpl).isChildOf(clazz)
         }
 
         @JvmStatic

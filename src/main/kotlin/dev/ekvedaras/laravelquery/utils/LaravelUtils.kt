@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
