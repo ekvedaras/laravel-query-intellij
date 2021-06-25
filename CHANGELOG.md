@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.0.4]
 ### Fixed
 - Class casting exception when class aliases are involved. #45
 
