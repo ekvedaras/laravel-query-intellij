@@ -4,22 +4,22 @@
 
 ## [Unreleased]
 ### Fixed
-- Class casting exception when class aliases are involved. (#45)
+- Class casting exception when class aliases are involved. #45
 
 ## [2.0.3]
 ### Fixed
-- Reference resolving was refactored a bit and the issue with stack overflow and non-idempotent computation exception resolved. (#42)
+- Reference resolving was refactored a bit and the issue with stack overflow and non-idempotent computation exception resolved. #42
 
 ## [2.0.2]
 ### Fixed
-- Hotfix to prevent non-idempotent computation exception. This will introduce reduced context knowledge when resolving column references, but should prevent exceptions until a proper refactor is implemented. (#42)
+- Hotfix to prevent non-idempotent computation exception. This will introduce reduced context knowledge when resolving column references, but should prevent exceptions until a proper refactor is implemented. #42
 
 ## [2.0.1]
 ### Fixed
-- Do not inspect for tables in `create`, `update`, `fill`, etc. methods (#38)
-- Do not complete columns in `create`, `update`, `fill`, etc. method array values. Only in keys (#38)
-- Do not look for column and table references in `create`, `update`, `fill`, etc. method array values. Only in keys (#38)
-- Attempt to detect PHP array value elements by using debugName instead of various indexes (#39)
+- Do not inspect for tables in `create`, `update`, `fill`, etc. methods #38
+- Do not complete columns in `create`, `update`, `fill`, etc. method array values. Only in keys #38
+- Do not look for column and table references in `create`, `update`, `fill`, etc. method array values. Only in keys #38
+- Attempt to detect PHP array value elements by using debugName instead of various indexes #39
 
 ## [2.0.0]
 ### Added
@@ -31,9 +31,9 @@
 
 ### Fixed
 - `create`, `update`, etc. `Eloquent` methods should only complete columns
-- Inspection errors when using nested array method in `where` methods (#35)
-- Class casting issues (#25)
-- Read access not allowed issues in `DB::table('<caret>')` (#26)
+- Inspection errors when using nested array method in `where` methods #35
+- Class casting issues #25
+- Read access not allowed issues in `DB::table('<caret>')` #26
 
 ## [1.1.0]
 ### Added
