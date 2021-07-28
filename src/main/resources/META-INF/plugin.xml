@@ -11,10 +11,9 @@
     <depends>com.intellij.database</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService
-            serviceImplementation="dev.ekvedaras.laravelquery.services.MyApplicationService"/>
+        <projectConfigurable instance="dev.ekvedaras.laravelquery.services.LaravelQuerySettingsConfigurable"/>
         <projectService
-            serviceImplementation="dev.ekvedaras.laravelquery.services.MyProjectService"/>
+            serviceImplementation="dev.ekvedaras.laravelquery.services.LaravelQuerySettings"/>
 
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"
