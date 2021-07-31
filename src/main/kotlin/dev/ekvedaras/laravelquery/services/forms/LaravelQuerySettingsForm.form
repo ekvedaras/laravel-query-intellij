@@ -43,7 +43,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="6a0d8" class="javax.swing.JTable" binding="dataSources">
+          <component id="23738" class="javax.swing.JTable" binding="dataSources" custom-create="true">
             <constraints/>
             <properties/>
           </component>
