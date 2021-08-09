@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Updated
+- Complete columns in array keys (technically still values) in methods like `create()`, `update()`, etc. (#40)
+
 ## [2.0.4]
 ### Fixed
 - Class casting exception when class aliases are involved. #45

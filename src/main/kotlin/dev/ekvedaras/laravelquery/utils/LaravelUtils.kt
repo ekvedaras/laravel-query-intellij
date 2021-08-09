@@ -3,6 +3,7 @@ package dev.ekvedaras.laravelquery.utils
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -11,6 +12,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
@@ -563,10 +565,26 @@ class LaravelUtils private constructor() {
         fun CompletionParameters.isInsidePhpArrayOrValue(): Boolean =
             this.position.isInsidePhpArrayOrValue()
 
+        fun CompletionParameters.isArrayKey(): Boolean =
+            this.position.parent?.parent?.isArrayKey() ?: false
+
+        fun CompletionParameters.isArrayValue(): Boolean =
+            this.position.parent?.parent?.isArrayValue() ?: false
+
         fun PsiElement.isInsidePhpArrayOrValue(): Boolean =
             (this.parent?.parent?.isPhpArray() ?: false) ||
                 (this.parent?.parent?.isArrayValue() ?: false) ||
                 this.parent?.parent is ArrayHashElementImpl?
+
+        fun PsiElement.isAssocArrayValue(): Boolean =
+            (
+                this.parent?.parent?.prevSibling is TreeElement &&
+                    (this.parent?.parent?.prevSibling as TreeElement).textMatches("=>")
+                ) ||
+                (
+                    this.parent?.parent?.prevSibling?.prevSibling is TreeElement &&
+                        (this.parent?.parent?.prevSibling?.prevSibling as TreeElement).textMatches("=>")
+                    )
 
         fun PsiElement.selectsAllColumns(): Boolean =
             this.textContains('*')

@@ -15,7 +15,8 @@ import org.jetbrains.annotations.NotNull
 @Suppress("MagicNumber")
 object ElementTypes {
     val PhpArray = listOf(1386, 1889)
-    const val ArrayValues = "Array value"
+    const val ArrayValue = "Array value"
+    const val ArrayKey = "Array key"
 }
 
 class PsiUtils private constructor() {
@@ -24,7 +25,8 @@ class PsiUtils private constructor() {
         fun CompletionParameters.containsVariable(): Boolean = this.position.containsVariable()
         fun String.containsAlias(): Boolean = this.contains(" as ")
         fun PsiElement.isPhpArray(): Boolean = ElementTypes.PhpArray.contains(this.typeAsInt())
-        fun PsiElement.isArrayValue(): Boolean = this.elementType.toString() === ElementTypes.ArrayValues
+        fun PsiElement.isArrayValue(): Boolean = this.elementType.toString() === ElementTypes.ArrayValue
+        fun PsiElement.isArrayKey(): Boolean = this.elementType.toString() === ElementTypes.ArrayKey
         fun String.unquoteAndCleanup() = this.replace("IntellijIdeaRulezzz", "").trim('\'', '"').trim()
         fun Variable.references(): @NotNull Query<PsiReference> =
             ReferencesSearch.search(this.originalElement, ProjectScope.getProjectScope(this.project), false)

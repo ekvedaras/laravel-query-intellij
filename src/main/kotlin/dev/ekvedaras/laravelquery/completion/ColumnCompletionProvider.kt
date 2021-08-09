@@ -18,6 +18,7 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isAssocArrayValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
@@ -192,6 +193,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         }
     }
 
+    @Suppress("ComplexMethod")
     private fun shouldNotComplete(
         project: Project,
         method: MethodReference,
@@ -204,10 +206,14 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             !method.isBuilderMethodForColumns() ||
             !parameters.isColumnIn(method, allowArray) ||
             parameters.isInsideRegularFunction() ||
-            (parameters.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
-            (!parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues()) ||
             (
                 parameters.isInsidePhpArrayOrValue() &&
+                    parameters.position.isAssocArrayValue() &&
+                    !method.canHaveColumnsInArrayValues()
+                ) ||
+            (!parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues()) ||
+            (
+                parameters.position.isAssocArrayValue() &&
                     method.shouldCompleteOnlyColumns() &&
                     method.isEloquentModel(project)
                 ) ||
