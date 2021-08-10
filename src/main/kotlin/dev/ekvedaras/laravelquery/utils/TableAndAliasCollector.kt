@@ -94,6 +94,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                     ?.parentOfType<Statement>()
                     ?.parentOfType<Statement>()
                     ?.firstPsiChild
+                ?: method.parentOfType<Statement>()?.firstPsiChild // $var->relation()->create()
             ).forEach { methods.addUnique(Lifetime.Eternal, it) }
         } else {
             MethodUtils.findMethodsInTree(method.firstChildOfParentStatement()).forEach {

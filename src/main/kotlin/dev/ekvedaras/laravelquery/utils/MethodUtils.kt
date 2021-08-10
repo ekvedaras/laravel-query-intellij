@@ -34,6 +34,26 @@ class MethodUtils private constructor() {
             return resolveMethodReference(element.parent, depthLimit - 1)
         }
 
+        fun resolveMethodTypeClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
+            if (
+                DumbService.isDumb(project) ||
+                !ApplicationManager.getApplication().isReadAccessAllowed
+            ) {
+                return listOf()
+            }
+
+            val classes = mutableListOf<PhpClassImpl>()
+
+            PhpIndex
+                .getInstance(project)
+                .completeType(project, method.declaredType, null)
+                .types
+                .toList()
+                .forEach { collectClasses(project, it, classes) }
+
+            return classes
+        }
+
         fun resolveMethodClasses(method: MethodReference, project: Project): List<PhpClassImpl> {
             if (
                 DumbService.isDumb(project) ||

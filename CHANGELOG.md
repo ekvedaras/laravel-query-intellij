@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Updated
 - Complete columns in array keys (technically still values) in methods like `create()`, `update()`, etc. (#40)
+- Make sure it properly resolves table in scenario like so: `$user->customer()->create([])` (#41)
 
 ## [2.0.4]
 ### Fixed

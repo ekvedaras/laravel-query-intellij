@@ -95,7 +95,10 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
-            ((method.isEloquentModel(project) || method.isJoinOrRelation(project)) && method.shouldCompleteOnlyColumns()) ||
+            (
+                (method.isEloquentModel(project) || method.isJoinOrRelation(project)) &&
+                    method.shouldCompleteOnlyColumns()
+                ) ||
             parameters.isInsideRegularFunction() ||
             !method.isInteresting(project)
 }
