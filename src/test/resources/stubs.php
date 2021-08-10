@@ -1,7 +1,355 @@
 <?php
 
+namespace Illuminate\Database\Eloquent\Concerns {
+    trait HasRelationships {
+        /**
+         * Define a one-to-one relationship.
+         *
+         * @param  string  $related
+         * @param  string|null  $foreignKey
+         * @param  string|null  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasOne
+         */
+        public function hasOne($related, $foreignKey = null, $localKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new HasOne relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $foreignKey
+         * @param  string  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasOne
+         */
+        protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
+        {
+        }
+
+        /**
+         * Define a has-one-through relationship.
+         *
+         * @param  string  $related
+         * @param  string  $through
+         * @param  string|null  $firstKey
+         * @param  string|null  $secondKey
+         * @param  string|null  $localKey
+         * @param  string|null  $secondLocalKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+         */
+        public function hasOneThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new HasOneThrough relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $farParent
+         * @param  \Illuminate\Database\Eloquent\Model  $throughParent
+         * @param  string  $firstKey
+         * @param  string  $secondKey
+         * @param  string  $localKey
+         * @param  string  $secondLocalKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+         */
+        protected function newHasOneThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey)
+        {
+        }
+
+        /**
+         * Define a polymorphic one-to-one relationship.
+         *
+         * @param  string  $related
+         * @param  string  $name
+         * @param  string|null  $type
+         * @param  string|null  $id
+         * @param  string|null  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+         */
+        public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new MorphOne relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $type
+         * @param  string  $id
+         * @param  string  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+         */
+        protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+        {
+        }
+
+        /**
+         * Define an inverse one-to-one or many relationship.
+         *
+         * @param  string  $related
+         * @param  string|null  $foreignKey
+         * @param  string|null  $ownerKey
+         * @param  string|null  $relation
+         * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+         */
+        public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
+        {
+        }
+
+        /**
+         * Instantiate a new BelongsTo relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $child
+         * @param  string  $foreignKey
+         * @param  string  $ownerKey
+         * @param  string  $relation
+         * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+         */
+        protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+        {
+        }
+
+        /**
+         * Define a polymorphic, inverse one-to-one or many relationship.
+         *
+         * @param  string|null  $name
+         * @param  string|null  $type
+         * @param  string|null  $id
+         * @param  string|null  $ownerKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+         */
+        public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
+        {
+        }
+
+        /**
+         * Define a polymorphic, inverse one-to-one or many relationship.
+         *
+         * @param  string  $name
+         * @param  string  $type
+         * @param  string  $id
+         * @param  string  $ownerKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+         */
+        protected function morphEagerTo($name, $type, $id, $ownerKey)
+        {
+        }
+
+        /**
+         * Define a polymorphic, inverse one-to-one or many relationship.
+         *
+         * @param  string  $target
+         * @param  string  $name
+         * @param  string  $type
+         * @param  string  $id
+         * @param  string  $ownerKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+         */
+        protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
+        {
+        }
+
+        /**
+         * Instantiate a new MorphTo relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $foreignKey
+         * @param  string  $ownerKey
+         * @param  string  $type
+         * @param  string  $relation
+         * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+         */
+        protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+        {
+        }
+
+        /**
+         * Define a one-to-many relationship.
+         *
+         * @param  string  $related
+         * @param  string|null  $foreignKey
+         * @param  string|null  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasMany
+         */
+        public function hasMany($related, $foreignKey = null, $localKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new HasMany relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $foreignKey
+         * @param  string  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasMany
+         */
+        protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
+        {
+        }
+
+        /**
+         * Define a has-many-through relationship.
+         *
+         * @param  string  $related
+         * @param  string  $through
+         * @param  string|null  $firstKey
+         * @param  string|null  $secondKey
+         * @param  string|null  $localKey
+         * @param  string|null  $secondLocalKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+         */
+        public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new HasManyThrough relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $farParent
+         * @param  \Illuminate\Database\Eloquent\Model  $throughParent
+         * @param  string  $firstKey
+         * @param  string  $secondKey
+         * @param  string  $localKey
+         * @param  string  $secondLocalKey
+         * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+         */
+        protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey)
+        {
+        }
+
+        /**
+         * Define a polymorphic one-to-many relationship.
+         *
+         * @param  string  $related
+         * @param  string  $name
+         * @param  string|null  $type
+         * @param  string|null  $id
+         * @param  string|null  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+         */
+        public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
+        {
+        }
+
+        /**
+         * Instantiate a new MorphMany relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $type
+         * @param  string  $id
+         * @param  string  $localKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+         */
+        protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+        {
+        }
+
+        /**
+         * Define a many-to-many relationship.
+         *
+         * @param  string  $related
+         * @param  string|null  $table
+         * @param  string|null  $foreignPivotKey
+         * @param  string|null  $relatedPivotKey
+         * @param  string|null  $parentKey
+         * @param  string|null  $relatedKey
+         * @param  string|null  $relation
+         * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+         */
+        public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
+                                      $parentKey = null, $relatedKey = null, $relation = null)
+        {
+        }
+
+        /**
+         * Instantiate a new BelongsToMany relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $table
+         * @param  string  $foreignPivotKey
+         * @param  string  $relatedPivotKey
+         * @param  string  $parentKey
+         * @param  string  $relatedKey
+         * @param  string|null  $relationName
+         * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+         */
+        protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
+                                            $parentKey, $relatedKey, $relationName = null)
+        {
+        }
+
+        /**
+         * Define a polymorphic many-to-many relationship.
+         *
+         * @param  string  $related
+         * @param  string  $name
+         * @param  string|null  $table
+         * @param  string|null  $foreignPivotKey
+         * @param  string|null  $relatedPivotKey
+         * @param  string|null  $parentKey
+         * @param  string|null  $relatedKey
+         * @param  bool  $inverse
+         * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+         */
+        public function morphToMany($related, $name, $table = null, $foreignPivotKey = null,
+                                    $relatedPivotKey = null, $parentKey = null,
+                                    $relatedKey = null, $inverse = false)
+        {
+        }
+
+        /**
+         * Instantiate a new MorphToMany relationship.
+         *
+         * @param  \Illuminate\Database\Eloquent\Builder  $query
+         * @param  \Illuminate\Database\Eloquent\Model  $parent
+         * @param  string  $name
+         * @param  string  $table
+         * @param  string  $foreignPivotKey
+         * @param  string  $relatedPivotKey
+         * @param  string  $parentKey
+         * @param  string  $relatedKey
+         * @param  string|null  $relationName
+         * @param  bool  $inverse
+         * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+         */
+        protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
+                                          $relatedPivotKey, $parentKey, $relatedKey,
+                                          $relationName = null, $inverse = false)
+        {
+        }
+
+        /**
+         * Define a polymorphic, inverse many-to-many relationship.
+         *
+         * @param  string  $related
+         * @param  string  $name
+         * @param  string|null  $table
+         * @param  string|null  $foreignPivotKey
+         * @param  string|null  $relatedPivotKey
+         * @param  string|null  $parentKey
+         * @param  string|null  $relatedKey
+         * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+         */
+        public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
+                                      $relatedPivotKey = null, $parentKey = null, $relatedKey = null)
+        {
+        }
+    }
+}
+
 namespace Illuminate\Database\Eloquent {
     class Model {
+        use \Illuminate\Database\Eloquent\Concerns\HasRelationships;
+
         /**
          * Begin querying the model.
          *
@@ -474,7 +822,40 @@ namespace Illuminate\Database\Eloquent {
 }
 
 namespace Illuminate\Database\Eloquent\Relations {
-    class Relation {
+    class Relation extends \Illuminate\Database\Eloquent\Builder {
+    }
+
+    class BelongsTo extends Relation {
+    }
+
+    class BelongsToMany extends Relation {
+    }
+
+    class HasManyThrough extends Relation {
+    }
+
+    class HasOneThrough extends HasManyThrough {
+    }
+
+    abstract class HasOneOrMany extends Relation {
+    }
+
+    class HasMany extends HasOneOrMany {
+    }
+
+    abstract class MorphOneOrMany extends HasOneOrMany {
+    }
+
+    class MorphMany extends MorphOneOrMany {
+    }
+
+    class Pivot extends \Illuminate\Database\Eloquent\Model {
+    }
+
+    class MorphPivot extends Pivot {
+    }
+
+    class MorphToMany extends BelongsToMany {
     }
 }
 

@@ -22,6 +22,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnl
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
 import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.utils.MethodUtils
+import dev.ekvedaras.laravelquery.utils.isJoinOrRelation
 import java.util.Collections
 
 class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -94,7 +95,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
-            (method.isEloquentModel(project) && method.shouldCompleteOnlyColumns()) ||
+            ((method.isEloquentModel(project) || method.isJoinOrRelation(project)) && method.shouldCompleteOnlyColumns()) ||
             parameters.isInsideRegularFunction() ||
             !method.isInteresting(project)
 }

@@ -10,6 +10,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
+import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
@@ -433,8 +434,8 @@ class LaravelUtils private constructor() {
         fun PsiElement.isInsideRelationClosure(): Boolean =
             this is ArrayHashElementImpl && this.parentOfType<MethodReferenceImpl>()?.name == "with"
 
-        fun PhpClass.isJoinOrRelation(): Boolean =
-            this.fqn == LaravelClasses.JoinClause || this.fqn == LaravelClasses.Relation
+        fun PhpClassImpl.isJoinOrRelation(): Boolean =
+            this.isChildOf(LaravelClasses.JoinClause) || this.isChildOf(LaravelClasses.Relation)
 
         fun MethodReference.isBuilderMethodByName(): Boolean =
             BuilderTableMethods.contains(this.name)

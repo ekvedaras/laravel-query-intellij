@@ -117,6 +117,14 @@ internal class EdgeCasesTest : BaseTestCase() {
         assertNoCompletion("customers", "testProject1", "testProject2", "migrations", "failed_jobs")
     }
 
+    fun testItOnlyCompletesColumnsOnRelationCreateMethodWhenOnlyTheKeyIsPresent() {
+        myFixture.configureByFile("edgeCases/createRelationNewKey.php")
+        myFixture.completeBasic()
+        assertCompletion("trial_ends_at", "billable_id")
+        assertNoCompletion("email", "name")
+        assertNoCompletion("customers", "testProject1", "testProject2", "migrations", "failed_jobs")
+    }
+
     fun testItDoesNotCompleteColumnsOnModelCreateMethodWhenCaretIsInValue() {
         myFixture.configureByFile("edgeCases/createModelCaretInValue.php")
         myFixture.completeBasic()
