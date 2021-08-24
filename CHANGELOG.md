@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Do not inspect for unknown columns inside value array for `whereIn()`. #56
+
 ## [2.0.5]
 ### Updated
 - Complete columns in array keys (technically still values) in methods like `create()`, `update()`, etc. (#40)

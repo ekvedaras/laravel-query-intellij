@@ -199,7 +199,8 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         method: MethodReference,
         parameters: CompletionParameters
     ): Boolean {
-        val allowArray = method.name?.startsWith("where") ?: false
+        val allowArray = !(method.name?.equals("whereIn") ?: false) &&
+            (method.name?.startsWith("where") ?: false)
 
         return !ApplicationManager.getApplication().isReadAccessAllowed ||
             parameters.containsVariable() ||

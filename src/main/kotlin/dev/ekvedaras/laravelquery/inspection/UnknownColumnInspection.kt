@@ -116,7 +116,8 @@ class UnknownColumnInspection : PhpInspection() {
                 method: MethodReference,
                 expression: StringLiteralExpression
             ): Boolean {
-                val allowArray = method.name?.startsWith("where") ?: false
+                val allowArray = !(method.name?.equals("whereIn") ?: false) &&
+                    (method.name?.startsWith("where") ?: false)
 
                 return !ApplicationManager.getApplication().isReadAccessAllowed ||
                     expression.containsVariable() ||

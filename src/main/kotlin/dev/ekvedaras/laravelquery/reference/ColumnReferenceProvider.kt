@@ -41,7 +41,8 @@ class ColumnReferenceProvider : PsiReferenceProvider() {
     }
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement): Boolean {
-        val allowArray = method.name?.startsWith("where") ?: false
+        val allowArray = !(method.name?.equals("whereIn") ?: false) &&
+            (method.name?.startsWith("where") ?: false)
 
         return !ApplicationManager.getApplication().isReadAccessAllowed ||
             element.containsVariable() ||
