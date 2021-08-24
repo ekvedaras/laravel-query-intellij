@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
@@ -120,6 +121,7 @@ class UnknownColumnInspection : PhpInspection() {
                     (method.name?.startsWith("where") ?: false)
 
                 return !ApplicationManager.getApplication().isReadAccessAllowed ||
+                    expression.parent is ArrayIndexImpl ||
                     expression.containsVariable() ||
                     expression.selectsAllColumns() ||
                     expression.isOperatorParam(allowArray) ||

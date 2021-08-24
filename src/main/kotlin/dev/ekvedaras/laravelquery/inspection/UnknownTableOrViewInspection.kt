@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
@@ -58,6 +59,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
                 expression: StringLiteralExpression
             ) =
                 !ApplicationManager.getApplication().isReadAccessAllowed ||
+                    expression.parent is ArrayIndexImpl ||
                     !method.isBuilderMethodByName() ||
                     method.shouldCompleteOnlyColumns() ||
                     !expression.isTableParam() ||

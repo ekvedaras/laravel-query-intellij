@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Fixed
 - Do not inspect for unknown columns inside value array for `whereIn()`. #56
+- Do not inspect for unknown columns and tables inside array indexes. #44
 
 ### Updated
 - Bump platform version to 2021.2 and resolve new deprecations.

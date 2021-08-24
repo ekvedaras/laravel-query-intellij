@@ -74,4 +74,8 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testDoesNotWarnAboutUnknownColumnForWhereInMethodValuesList() {
         assertInspection("inspection/noInspectionsForValuesInWhereIn.php", UnknownColumnInspection())
     }
+
+    fun testDoesNotWarnAboutUnknownColumnForNestedArrayKeys() {
+        assertInspection("inspection/noInspectionsForNestedArrayKeys.php", UnknownColumnInspection())
+    }
 }
