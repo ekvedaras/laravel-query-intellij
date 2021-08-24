@@ -89,12 +89,17 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         // $var->where(['relation' => function (Relation $relation) { $relation->where() }])
         // $var->join('table', function (JoinClause $join) { $join->on() })
         if (method.isJoinOrRelation(reference.project)) {
+            val firstAttempt = method.parentOfType<Statement>()
+                ?.parentOfType<Statement>()
+                ?.parentOfType<Statement>()
+                ?.firstPsiChild
+
             MethodUtils.findMethodsInTree(
-                method.parentOfType<Statement>()
-                    ?.parentOfType<Statement>()
-                    ?.parentOfType<Statement>()
-                    ?.firstPsiChild
-                    ?: method.parentOfType<Statement>()?.firstPsiChild // $var->relation()->create()
+                if (firstAttempt is MethodReference) {
+                    firstAttempt
+                } else {
+                    method.parentOfType<Statement>()?.firstPsiChild // $var->relation()->create()
+                }
             ).forEach { methods.addUnique(Lifetime.Eternal, it) }
         } else {
             MethodUtils.findMethodsInTree(method.firstChildOfParentStatement()).forEach {
@@ -119,7 +124,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         if (!methods.none { it.name == "from" }) return null
 
         // TODO can this be improved with methods like firstPsiChild, nextPsiSibling ?
-        return methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
+        val method = methods.find { isModelReference(it) }?.firstChild as? PhpTypedElement
             ?: methods.find { isNewModelInstance(it) }
                 ?.firstChild
                 ?.firstChild
@@ -131,6 +136,12 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 it.isInteresting(it.project) &&
                     it.parentOfType<PhpClassImpl>()?.isChildOf(LaravelClasses.Model) ?: false
             }?.parentOfType<PhpClassImpl>() as? PhpTypedElement
+
+        if (method is VariableImpl) {
+            return method.getClass(method.project)
+        }
+
+        return method
     }
 
     private fun isNewModelInstance(methodReference: MethodReference): Boolean {
