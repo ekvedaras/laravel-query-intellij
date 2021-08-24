@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.0.6]
 ### Fixed
 - Do not inspect for unknown columns inside value array for `whereIn()`. #56
 - Do not inspect for unknown columns and tables inside array indexes. #44
