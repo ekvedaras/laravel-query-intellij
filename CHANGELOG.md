@@ -6,6 +6,9 @@
 ### Fixed
 - Do not inspect for unknown columns inside value array for `whereIn()`. #56
 
+### Updated
+- Bump platform version to 2021.2 and resolve new deprecations.
+
 ## [2.0.5]
 ### Updated
 - Complete columns in array keys (technically still values) in methods like `create()`, `update()`, etc. (#40)
