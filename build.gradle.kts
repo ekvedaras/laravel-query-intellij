@@ -28,7 +28,7 @@ repositories {
     maven("https://jitpack.io")
 }
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1")
     implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
 }
 
