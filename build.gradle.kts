@@ -87,6 +87,8 @@ tasks {
         if (environment.contains("IDE_DIR")) {
             ideDir.set(File(environment["IDE_DIR"].toString()))
         }
+
+        systemProperty("idea.platform.prefix", "PhpStorm")
     }
 
     patchPluginXml {
