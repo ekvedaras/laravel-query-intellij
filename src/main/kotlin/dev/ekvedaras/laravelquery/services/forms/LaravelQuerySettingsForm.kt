@@ -19,7 +19,7 @@ class LaravelQuerySettingsForm(val project: Project) {
     private var filterDataSources: JCheckBox? = null
     private var dataSources: JTable? = null
 
-    private val settings: LaravelQuerySettings = LaravelQuerySettings.instance
+    private val settings: LaravelQuerySettings = LaravelQuerySettings.getInstance(project)
 
     fun component(): JComponent? = panel
 
