@@ -15,9 +15,7 @@ class LaravelQuerySettingsConfigurable(val project: Project) : SearchableConfigu
         return settingsForm?.component()
     }
 
-    override fun isModified(): Boolean {
-        return settingsForm?.isModified ?: false
-    }
+    override fun isModified(): Boolean = settingsForm?.isModified ?: false
 
     @Throws(ConfigurationException::class)
     override fun apply() {
@@ -40,6 +38,6 @@ class LaravelQuerySettingsConfigurable(val project: Project) : SearchableConfigu
     override fun getId(): String = ID
 
     companion object {
-        val ID = "preferences.ekvedaras.laravelquery"
+        const val ID = "preferences.ekvedaras.laravelquery"
     }
 }

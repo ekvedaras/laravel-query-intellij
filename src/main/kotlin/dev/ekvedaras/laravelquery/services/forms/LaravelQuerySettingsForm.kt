@@ -1,17 +1,18 @@
 package dev.ekvedaras.laravelquery.services.forms;
 
+import com.intellij.database.psi.DbDataSource
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.BooleanTableCellRenderer
 import com.intellij.ui.table.JBTable
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
-import javax.swing.ListSelectionModel
 import javax.swing.table.DefaultTableModel
-import javax.swing.table.TableModel
 
 
 class LaravelQuerySettingsForm(val project: Project) {
@@ -24,57 +25,76 @@ class LaravelQuerySettingsForm(val project: Project) {
     fun component(): JComponent? = panel
 
     fun shouldFilterDataSources() = filterDataSources?.isSelected
-    fun filteredDataSources() = dataSources?.selectedRows?.map { dataSources?.getValueAt(it, 0) as String }
+    fun filteredDataSources(): List<String> {
+        var selected = listOf<String>()
+
+        for (row in 0 until (dataSources?.rowCount ?: 0)) {
+            val dataSource = dataSources?.getValueAt(row, 1) as DbDataSource
+
+            if (dataSources?.getValueAt(row, 0) == true) {
+                selected = selected + dataSource.uniqueId
+            }
+        }
+
+        return selected
+    }
 
     val isModified: Boolean
-        get() = shouldFilterDataSources() != settings.filterDataSources
+        get() = shouldFilterDataSources() != settings.filterDataSources ||
+            filteredDataSources() != settings.filteredDataSources
 
     init {
         loadSettings()
     }
 
-    private fun createUIComponents()
-    {
-        val model = DefaultTableModel()
-
-        model.addColumn("ID")
-        model.addColumn("Data source")
-        model.addColumn("Complete")
-
-        DbUtil.getDataSources(project).forEach { dataSource ->
-            model.insertRow(0, arrayOf(dataSource.uniqueId, dataSource.toString(), "Maybe"))
+    private fun createUIComponents() {
+        val model = object : DefaultTableModel() {
+            override fun isCellEditable(row: Int, column: Int) = column == 0
         }
 
-//        model.insertRow(0, arrayOf<Any>("DB 1", "Yes"))
-//        model.insertRow(0, arrayOf<Any>("DB 2", "No"))
+        model.addColumn("Complete")
+        model.addColumn("Data source")
 
-//        model.setValueAt("Value 1", 0, 0)
-//        model.setValueAt("Yes", 0, 1)
-//
-//        model.setValueAt("Value 2", 1, 0)
-//        model.setValueAt("No", 1, 1)
+        DbUtil.getDataSources(project).forEach { dataSource ->
+            model.insertRow(0, arrayOf(false, dataSource))
+        }
 
         dataSources = JBTable(model)
-        dataSources!!.rowHeight = 24
-        dataSources!!.autoCreateRowSorter = true
-        dataSources!!.columnModel.getColumn(2).cellEditor = JBTable.createBooleanEditor()
-        dataSources!!.columnModel.getColumn(2).cellRenderer = BooleanTableCellRenderer()
-        dataSources!!.columnModel.getColumn(2).sizeWidthToFit()
 
-        dataSources!!.setSelectionMode(0)
+        dataSources!!.addMouseListener(
+            object : MouseAdapter() {
+                override fun mouseClicked(event: MouseEvent) {
+                    val row = dataSources!!.rowAtPoint(event.point)
 
-//        val col2 = dataSources.columnModel.getColumn(1)
-//        col2.cellEditor = JBTable.createBooleanEditor()
-//        col2.cellRenderer = BooleanTableCellRenderer()
+                    if (row >= 0) {
+                        dataSources!!.setValueAt(
+                            !(dataSources!!.getValueAt(row, 0) as Boolean),
+                            row,
+                            0
+                        )
+                    }
+                }
+            }
+        )
 
+        dataSources!!.columnModel.getColumn(0).cellEditor = JBTable.createBooleanEditor()
+        dataSources!!.columnModel.getColumn(0).cellRenderer = BooleanTableCellRenderer()
+        dataSources!!.columnModel.getColumn(0).preferredWidth = 60
+        dataSources!!.columnModel.getColumn(0).resizable = false
 
+        dataSources!!.columnModel.getColumn(1).preferredWidth = 500
 
-//        dataSources = CheckBoxList<String>()
-//        dataSources!!.addItem("Item a", "Text b", false)
-//        dataSources!!.addItem("Item b", "Text c", true)
     }
 
     fun loadSettings() {
         filterDataSources?.isSelected = settings.filterDataSources
+
+        for (row in 0 until (dataSources?.rowCount ?: 0)) {
+            val dataSource = dataSources?.getValueAt(row, 1) as DbDataSource
+
+            if (settings.filteredDataSources.contains(dataSource.uniqueId)) {
+                dataSources?.setValueAt(true, row, 0)
+            }
+        }
     }
 }

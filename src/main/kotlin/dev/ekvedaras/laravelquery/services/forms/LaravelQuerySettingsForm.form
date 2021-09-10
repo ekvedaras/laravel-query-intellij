@@ -45,7 +45,14 @@
         <children>
           <component id="23738" class="javax.swing.JTable" binding="dataSources" custom-create="true">
             <constraints/>
-            <properties/>
+            <properties>
+              <autoResizeMode value="0"/>
+              <focusable value="false"/>
+              <requestFocusEnabled value="false"/>
+              <rowSelectionAllowed value="false"/>
+              <showHorizontalLines value="false"/>
+              <showVerticalLines value="false"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
