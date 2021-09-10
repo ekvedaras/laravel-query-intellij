@@ -4,6 +4,7 @@ import com.intellij.database.psi.DbDataSource
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.BooleanTableCellRenderer
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.table.JBTable
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.awt.event.MouseAdapter
@@ -60,13 +61,13 @@ class LaravelQuerySettingsForm(val project: Project) {
         }
 
         dataSources = JBTable(model)
-
+        dataSources!!.isEnabled = false
         dataSources!!.addMouseListener(
             object : MouseAdapter() {
                 override fun mouseClicked(event: MouseEvent) {
                     val row = dataSources!!.rowAtPoint(event.point)
 
-                    if (row >= 0) {
+                    if (row >= 0 && dataSources!!.isEnabled) {
                         dataSources!!.setValueAt(
                             !(dataSources!!.getValueAt(row, 0) as Boolean),
                             row,
@@ -84,17 +85,20 @@ class LaravelQuerySettingsForm(val project: Project) {
 
         dataSources!!.columnModel.getColumn(1).preferredWidth = 500
 
+
+        filterDataSources = JBCheckBox()
+        filterDataSources!!.addChangeListener {
+            dataSources!!.isEnabled = filterDataSources!!.isSelected
+        }
     }
 
     fun loadSettings() {
         filterDataSources?.isSelected = settings.filterDataSources
+        dataSources?.isEnabled = filterDataSources?.isSelected ?: false
 
         for (row in 0 until (dataSources?.rowCount ?: 0)) {
             val dataSource = dataSources?.getValueAt(row, 1) as DbDataSource
-
-            if (settings.filteredDataSources.contains(dataSource.uniqueId)) {
-                dataSources?.setValueAt(true, row, 0)
-            }
+            dataSources?.setValueAt(settings.filteredDataSources.contains(dataSource.uniqueId), row, 0)
         }
     }
 }
