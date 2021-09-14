@@ -1,11 +1,12 @@
 package dev.ekvedaras.laravelquery.services.forms;
 
-import com.intellij.database.psi.DbDataSource
+import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import com.intellij.ui.BooleanTableCellRenderer
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.table.JBTable
+import dev.ekvedaras.laravelquery.models.SettingsSchema
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -26,14 +27,14 @@ class LaravelQuerySettingsForm(val project: Project) {
     fun component(): JComponent? = panel
 
     fun shouldFilterDataSources() = filterDataSources?.isSelected
-    fun filteredDataSources(): List<String> {
-        var selected = listOf<String>()
+    fun filteredDataSources(): Set<String> {
+        var selected = setOf<String>()
 
         for (row in 0 until (dataSources?.rowCount ?: 0)) {
-            val dataSource = dataSources?.getValueAt(row, 1) as DbDataSource
+            val schema = dataSources?.getValueAt(row, 1) as SettingsSchema
 
             if (dataSources?.getValueAt(row, 0) == true) {
-                selected = selected + dataSource.uniqueId
+                selected = selected + schema.key()
             }
         }
 
@@ -54,10 +55,13 @@ class LaravelQuerySettingsForm(val project: Project) {
         }
 
         model.addColumn("Complete")
-        model.addColumn("Data source")
+        model.addColumn("Database")
+        model.addColumn("Source")
 
-        DbUtil.getDataSources(project).forEach { dataSource ->
-            model.insertRow(0, arrayOf(false, dataSource))
+        DbUtil.getDataSources(project).sortedBy { it.toString() }.forEach { dataSource ->
+            DasUtil.getSchemas(dataSource).sortedBy { it.name }.forEach { schema ->
+                model.insertRow(0, arrayOf(false, SettingsSchema(dataSource, schema), dataSource))
+            }
         }
 
         dataSources = JBTable(model)
@@ -83,7 +87,8 @@ class LaravelQuerySettingsForm(val project: Project) {
         dataSources!!.columnModel.getColumn(0).preferredWidth = 60
         dataSources!!.columnModel.getColumn(0).resizable = false
 
-        dataSources!!.columnModel.getColumn(1).preferredWidth = 500
+        dataSources!!.columnModel.getColumn(1).preferredWidth = 200
+        dataSources!!.columnModel.getColumn(2).preferredWidth = 300
 
 
         filterDataSources = JBCheckBox()
@@ -97,8 +102,8 @@ class LaravelQuerySettingsForm(val project: Project) {
         dataSources?.isEnabled = filterDataSources?.isSelected ?: false
 
         for (row in 0 until (dataSources?.rowCount ?: 0)) {
-            val dataSource = dataSources?.getValueAt(row, 1) as DbDataSource
-            dataSources?.setValueAt(settings.filteredDataSources.contains(dataSource.uniqueId), row, 0)
+            val schema = dataSources?.getValueAt(row, 1) as SettingsSchema
+            dataSources?.setValueAt(settings.filteredDataSources.contains(schema.key()), row, 0)
         }
     }
 }

@@ -21,7 +21,7 @@ class LaravelQuerySettingsConfigurable(val project: Project) : SearchableConfigu
     override fun apply() {
         val settings = LaravelQuerySettings.getInstance(project)
         settings.filterDataSources = settingsForm?.shouldFilterDataSources() ?: false
-        settings.filteredDataSources = settingsForm?.filteredDataSources() ?: listOf()
+        settings.filteredDataSources = settingsForm?.filteredDataSources() ?: setOf()
     }
 
     override fun reset() {

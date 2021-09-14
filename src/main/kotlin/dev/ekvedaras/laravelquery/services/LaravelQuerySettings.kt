@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable
 @State(name = "LaravelQuerySettings", storages = [Storage("laravel-query-settings.xml")])
 class LaravelQuerySettings : PersistentStateComponent<LaravelQuerySettings> {
     var filterDataSources = false
-    var filteredDataSources = listOf<String>()
+    var filteredDataSources = setOf<String>()
 
     @Nullable
     override fun getState() = this
