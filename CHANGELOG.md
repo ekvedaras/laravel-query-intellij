@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.1.0]
 ### Added
 - Add settings to allow configuring which schemas to inspect.
 
