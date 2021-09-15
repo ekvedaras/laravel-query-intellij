@@ -20,6 +20,8 @@
             instance="dev.ekvedaras.laravelquery.services.LaravelQuerySettingsConfigurable"/>
         <projectService
             serviceImplementation="dev.ekvedaras.laravelquery.services.LaravelQuerySettings"/>
+        <notificationGroup displayType="BALLOON" id="Laravel Query Settings" isLogByDefault="true"/>
+        <postStartupActivity implementation="dev.ekvedaras.laravelquery.services.Startup" />
 
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"

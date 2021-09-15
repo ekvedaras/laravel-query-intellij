@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable
 class LaravelQuerySettings : PersistentStateComponent<LaravelQuerySettings> {
     var filterDataSources = false
     var filteredDataSources = setOf<String>()
+    var ignoreSettings = false
 
     @Nullable
     override fun getState() = this
