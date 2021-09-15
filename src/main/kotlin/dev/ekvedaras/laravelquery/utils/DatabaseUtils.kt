@@ -11,6 +11,7 @@ import com.intellij.database.psi.DbDataSource
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
+import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.util.stream.Stream
 
 private val SchemasToSkip = listOf(
@@ -20,16 +21,24 @@ private val SchemasToSkip = listOf(
 class DatabaseUtils private constructor() {
     companion object {
         fun Project.dbDataSourcesInParallel(): Stream<out DbDataSource> =
-            DbUtil.getDataSources(this).toList().parallelStream()
+            DbUtil.getDataSources(this).toList().parallelStream().filter {
+                LaravelQuerySettings.getInstance(this).interestedIn(it)
+            }
 
         fun DbDataSource.schemasInParallel(): Stream<out DasNamespace> =
-            DasUtil.getSchemas(this).toList().parallelStream().filter { !SchemasToSkip.contains(it.name) }
+            DasUtil.getSchemas(this).toList().parallelStream().filter {
+                LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
+            }.filter { !SchemasToSkip.contains(it.name) }
 
         fun DbDataSource.tables() =
-            DasUtil.getTables(this).filter { !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name) }
+            DasUtil.getTables(this).filter {
+                LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
+            }.filter { !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name) }
 
         fun DbDataSource.tablesInParallel(): Stream<out DasTable> =
             DasUtil.getTables(this).toList().parallelStream().filter {
+                LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
+            }.filter {
                 !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name)
             }
 

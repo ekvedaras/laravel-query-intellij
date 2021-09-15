@@ -1,4 +1,4 @@
-package dev.ekvedaras.laravelquery.services.forms;
+package dev.ekvedaras.laravelquery.services.forms
 
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
@@ -15,7 +15,6 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.table.DefaultTableModel
-
 
 class LaravelQuerySettingsForm(val project: Project) {
     private var panel: JPanel? = null
@@ -49,6 +48,7 @@ class LaravelQuerySettingsForm(val project: Project) {
         loadSettings()
     }
 
+    @SuppressWarnings("UnusedPrivateMember", "UnsafeCallOnNullableType")
     private fun createUIComponents() {
         val model = object : DefaultTableModel() {
             override fun isCellEditable(row: Int, column: Int) = column == 0
@@ -84,12 +84,15 @@ class LaravelQuerySettingsForm(val project: Project) {
 
         dataSources!!.columnModel.getColumn(0).cellEditor = JBTable.createBooleanEditor()
         dataSources!!.columnModel.getColumn(0).cellRenderer = BooleanTableCellRenderer()
+
+        @SuppressWarnings("MagicNumber")
         dataSources!!.columnModel.getColumn(0).preferredWidth = 60
         dataSources!!.columnModel.getColumn(0).resizable = false
 
+        @SuppressWarnings("MagicNumber")
         dataSources!!.columnModel.getColumn(1).preferredWidth = 200
+        @SuppressWarnings("MagicNumber")
         dataSources!!.columnModel.getColumn(2).preferredWidth = 300
-
 
         filterDataSources = JBCheckBox()
         filterDataSources!!.addChangeListener {

@@ -8,7 +8,7 @@ import javax.swing.JComponent
 import org.jetbrains.annotations.Nls
 
 class LaravelQuerySettingsConfigurable(val project: Project) : SearchableConfigurable {
-    var settingsForm : LaravelQuerySettingsForm? = null
+    var settingsForm: LaravelQuerySettingsForm? = null
 
     override fun createComponent(): JComponent? {
         settingsForm = settingsForm ?: LaravelQuerySettingsForm(project)

@@ -12,7 +12,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable
-            parentId="tools"
+            parentId="language"
             id="preferences.ekvedaras.laravelquery"
             displayName="Laravel Query"
             nonDefaultProject="true"

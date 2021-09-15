@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Add settings to allow configuring which schemas to inspect.
+
 ## [2.0.6]
 ### Fixed
 - Do not inspect for unknown columns inside value array for `whereIn()`. #56

@@ -220,7 +220,7 @@ private class ResolverForIndexMethods(
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.name)
             }.filter {
-                reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
+                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.indexesInParallel()
                     .filter { it.name == reference.parts[0] }
@@ -239,7 +239,7 @@ private class ResolverForKeyMethods(
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.name)
             }.filter {
-                reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
+                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.keysInParallel()
                     .filter { it.name == reference.parts[0] }
@@ -258,7 +258,7 @@ private class ResolverForForeignKeyMethods(
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.name)
             }.filter {
-                reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name == it.dasParent?.name
+                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.foreignKeysInParallel()
                     .filter { it.name == reference.parts[0] }
