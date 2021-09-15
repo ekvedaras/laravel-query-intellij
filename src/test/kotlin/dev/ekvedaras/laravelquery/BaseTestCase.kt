@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.sql.database.SqlCommonTestUtils
 import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -27,6 +28,8 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
         super.setUp()
 
         myFixture.copyFileToProject("stubs.php")
+
+        LaravelQuerySettings.getInstance(project).filterDataSources = false
 
         db = SqlCommonTestUtils.createDataSourceFromSql(
             project,
