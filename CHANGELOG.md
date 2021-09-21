@@ -3,6 +3,7 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+## [2.1.1]
 ### Fixed
 - Correctly resolve column name when JSON properties are referenced.
 
