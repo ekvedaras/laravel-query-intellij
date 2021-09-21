@@ -78,4 +78,8 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testDoesNotWarnAboutUnknownColumnForNestedArrayKeys() {
         assertInspection("inspection/noInspectionsForNestedArrayKeys.php", UnknownColumnInspection())
     }
+
+    fun testDoesNotWarnAboutKnownJsonColumn() {
+        assertInspection("inspection/knownJsonColumn.php", UnknownColumnInspection())
+    }
 }

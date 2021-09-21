@@ -46,6 +46,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     init {
         parts.addAll(
             expression.text.unquoteAndCleanup()
+                .substringBefore("->") // strip out json fields
                 .split(".")
                 .map { it.substringBefore(" as").trim() }
         )

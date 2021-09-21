@@ -126,4 +126,23 @@ internal class SchemaTableColumnReferenceTest : BaseTestCase() {
             columnUsages.first().navigationRange.endOffset
         )
     }
+
+    fun testResolvesJsonColumnReference() {
+        myFixture.configureByFile("inspection/knownJsonColumn.php")
+
+        val column = DasUtil.getTables(dataSource())
+            .first { it.name == "users" }
+            .getDasChildren(ObjectKind.COLUMN)
+            .first { it.name == "id" }
+        val dbColumn = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), column)
+            ?: return fail("Failed to resolve DB column")
+
+        val usages = myFixture.findUsages(dbColumn)
+
+        UsefulTestCase.assertSize(1, usages)
+        TestCase.assertEquals(ColumnPsiReference::class.java, usages.first().referenceClass)
+        TestCase.assertTrue(usages.first().element?.textMatches("'id->prop'") ?: false)
+        TestCase.assertEquals(82, usages.first().navigationRange.startOffset)
+        TestCase.assertEquals(82 + column.name.length, usages.first().navigationRange.endOffset)
+    }
 }

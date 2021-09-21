@@ -3,6 +3,9 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Correctly resolve column name when JSON properties are referenced.
+
 ## [2.1.0]
 ### Added
 - Add settings to allow configuring which schemas to inspect.
