@@ -1,6 +1,6 @@
 package dev.ekvedaras.laravelquery.reference
 
-import com.intellij.database.psi.DbPsiFacade
+import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
@@ -12,18 +12,13 @@ class IndexPsiReference(element: PsiElement) : PsiReferenceBase<PsiElement>(elem
 
         rangeInElement = target.ranges.last()
 
-//       TODO uncomment when 2021.3 comes out
-//        DbUtil.getDataSources(element.project).forEach { dataSource ->
-//            val dbIndex = dataSource.findElement(target.index.find { tables.contains(it.table?.name) })
-//            if (dbIndex != null) {
-//                return dbIndex
-//            }
-//        }
-//
-//        return null
+        DbUtil.getDataSources(element.project).forEach { dataSource ->
+            val dbIndex = dataSource.findElement(target.index.find { tables.contains(it.table?.name) })
+            if (dbIndex != null) {
+                return dbIndex
+            }
+        }
 
-        return DbPsiFacade.getInstance(element.project).findElement(
-            target.index.find { tables.contains(it.table?.name) }
-        )
+        return null
     }
 }
