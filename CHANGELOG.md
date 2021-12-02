@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.0.0]
 ### Changed
 - Support only 2012.3 and above as it contains some breaking changes.
 
@@ -68,6 +70,7 @@
 ## [1.0.3]
 ### Updated
 - Slightly improve completion sorting.
+
 ### Added
 - Support for `DB::table()`
 
