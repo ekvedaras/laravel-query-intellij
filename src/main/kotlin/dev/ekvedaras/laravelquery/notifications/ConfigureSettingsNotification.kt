@@ -20,7 +20,7 @@ class ConfigureSettingsNotification {
         val notification: Notification = group.createNotification(content, NotificationType.INFORMATION)
 
         notification.addActions(
-            mutableListOf(
+            mutableSetOf(
                 object : NotificationAction("Configure") {
                     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
                         ShowSettingsUtil

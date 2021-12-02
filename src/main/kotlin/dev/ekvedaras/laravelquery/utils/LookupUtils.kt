@@ -1,7 +1,6 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.codeInsight.AutoPopupController
-import com.intellij.codeInsight.completion.DeclarativeInsertHandler
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -15,6 +14,7 @@ import com.intellij.database.model.DasTableKey
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
+import dev.ekvedaras.laravelquery.completion.DeclarativeInsertHandler
 import icons.DatabaseIcons
 
 class LookupUtils private constructor() {
