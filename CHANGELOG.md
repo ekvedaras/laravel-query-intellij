@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Changed
 - Support only 2012.3 and above as it contains some breaking changes.
+
 ## [2.1.1]
 ### Fixed
 - Correctly resolve column name when JSON properties are referenced.
