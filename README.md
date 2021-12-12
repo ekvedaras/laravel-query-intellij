@@ -13,8 +13,7 @@
 
 This plugin provides database integration for Laravel query builder.
 
-**Don't forget to connect your database in order for this to work.**
-See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#connect-to-mysql-database> for instructions.
+## Features
 
 * Schemas, tables, views and columns completion for query builder methods
 * Inspection of unknown database elements
@@ -29,6 +28,23 @@ See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#conne
 * Improve schema builder support to read current migration file as well instead of just table from database
 * Add morph columns support for schema builder integration
 * Improve sorting
+
+## Prerequisites
+
+### Connect your database
+See <https://www.jetbrains.com/help/phpstorm/connecting-to-a-database.html#connect-to-mysql-database> for instructions.
+
+### Laravel tools
+
+You also need either [Laravel Idea](https://laravel-idea.com) plugin (paid) or [Laravel IDE helper](https://github.com/barryvdh/laravel-ide-helper) added to your project and run 
+```shell
+php artisan ide-helper:generate
+php artisan ide-helper:meta
+php artisan ide-helper:models
+```
+which will generate some helper files so your IDE could see Eloquent methods.
+
+Laravel Query plugin needs either of those to work otherwise, it cannot understand for which methods to trigger autocompletion.
 
 ## Installation
 
