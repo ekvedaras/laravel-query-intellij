@@ -41,6 +41,7 @@ You also need either [Laravel Idea](https://laravel-idea.com) plugin (paid) or [
 php artisan ide-helper:generate
 php artisan ide-helper:meta
 php artisan ide-helper:models
+php artisan ide-helper:eloquent
 ```
 which will generate some helper files so your IDE could see Eloquent methods.
 
