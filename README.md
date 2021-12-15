@@ -21,13 +21,6 @@ This plugin provides database integration for Laravel query builder.
 * Table name resolving from model for eloquent builder methods
 * Model relation table name resolving for eloquent builder relation closure methods
 * Text linking with database elements for navigation and refactoring
-<!-- Plugin description end -->
-
-## Future plans
-
-* Improve schema builder support to read current migration file as well instead of just table from database
-* Add morph columns support for schema builder integration
-* Improve sorting
 
 ## Prerequisites
 
@@ -41,10 +34,18 @@ You also need either [Laravel Idea](https://laravel-idea.com) plugin (paid) or [
 php artisan ide-helper:generate
 php artisan ide-helper:meta
 php artisan ide-helper:models
+php artisan ide-helper:eloquent
 ```
 which will generate some helper files so your IDE could see Eloquent methods.
 
 Laravel Query plugin needs either of those to work otherwise, it cannot understand for which methods to trigger autocompletion.
+<!-- Plugin description end -->
+
+## Future plans
+
+* Improve schema builder support to read current migration file as well instead of just table from database
+* Add morph columns support for schema builder integration
+* Improve sorting
 
 ## Installation
 
