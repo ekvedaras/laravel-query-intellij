@@ -14,8 +14,8 @@ class AliasCollector(private val reference: DbReferenceExpression) {
         referencedSchema: String?,
     ) {
         var referencedSchema1 = referencedSchema
-        val alias = referencedTable.substringAfter("as").trim()
-        val table = referencedTable.substringBefore("as").trim()
+        val alias = referencedTable.substringAfter(" as ").substringAfter(" AS ").trim()
+        val table = referencedTable.substringBefore(" as ").substringBefore(" AS ").trim()
 
         if (referencedSchema1 == null) {
             reference.project.dbDataSourcesInParallel().forEach loop@{ dataSource ->

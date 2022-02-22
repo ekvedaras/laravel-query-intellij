@@ -23,7 +23,7 @@ class PsiUtils private constructor() {
     companion object {
         fun PsiElement.containsVariable(): Boolean = this.textContains('$')
         fun CompletionParameters.containsVariable(): Boolean = this.position.containsVariable()
-        fun String.containsAlias(): Boolean = this.contains(" as ")
+        fun String.containsAlias(): Boolean = this.contains(" as ", true)
         fun PsiElement.isPhpArray(): Boolean = ElementTypes.PhpArray.contains(this.typeAsInt())
         fun PsiElement.isArrayValue(): Boolean = this.elementType.toString() === ElementTypes.ArrayValue
         fun PsiElement.isArrayKey(): Boolean = this.elementType.toString() === ElementTypes.ArrayKey
