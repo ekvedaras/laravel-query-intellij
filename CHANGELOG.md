@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.0.1]
 ### Changed
 - Make alias usage detection case-insensitive. #81
 
