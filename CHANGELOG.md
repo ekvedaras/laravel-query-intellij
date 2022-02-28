@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Lookup parent tree when resolving model table name. #74
 
 ## [3.0.1]
 ### Changed

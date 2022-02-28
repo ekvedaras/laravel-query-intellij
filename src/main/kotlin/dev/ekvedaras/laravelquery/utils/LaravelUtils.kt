@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
@@ -421,11 +422,29 @@ class LaravelUtils private constructor() {
                 clazz.isChildOf(LaravelClasses.ColumnDefinition)
             }
 
-        fun PhpClass.tableName(): String {
+        fun PhpClass.tableName(resolveFromName: Boolean = true): String? {
             val tableField = this.fields.find { it.name == "table" }
 
             if (ClassUtils.fieldHasDefaultValue(tableField)) {
-                return tableField?.defaultValue?.text?.unquoteAndCleanup() ?: this.asTableName()
+                val defaultName = tableField?.defaultValue?.text?.unquoteAndCleanup()
+                if (defaultName != null) {
+                    return defaultName
+                }
+
+                if (!resolveFromName) {
+                    return defaultName
+                }
+            }
+
+            if (this.parent is PhpClass) {
+                val defaultName = (this.parent as PhpClass).tableName(false)
+                if (defaultName != null) {
+                    return defaultName
+                }
+
+                if (!resolveFromName) {
+                    return defaultName
+                }
             }
 
             return this.asTableName()

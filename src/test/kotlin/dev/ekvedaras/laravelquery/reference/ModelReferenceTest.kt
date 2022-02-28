@@ -1,80 +1,32 @@
 package dev.ekvedaras.laravelquery.reference
 
 import com.intellij.database.util.DasUtil
+import com.intellij.testFramework.TestDataFile
 import dev.ekvedaras.laravelquery.BaseTestCase
 
 internal class ModelReferenceTest : BaseTestCase() {
     fun testResolveTableNameFromModelTableProperty() {
-        myFixture.configureByFile("model/modelWithTableProperty.php")
+        this.assertResolvesUsersTable("model/modelWithTableProperty.php")
+    }
 
-        val table = DasUtil.getTables(dataSource())
-            .filter { it.name == "users" }
-            .firstOrNull() ?: return fail("Did not find any tables.")
-        val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(dataSource())
-            .filterNot { it.name == "users" }
-            .lastOrNull() ?: return fail("Did not find any tables.")
+    fun testResolveTableNameFromModelParentTableProperty() {
+        this.assertResolvesUsersTable("model/modelParentWithTableProperty.php")
+    }
 
-        val expected = schemas + columns
-        val notExpected =
-            schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                .flatten() + // Tables of other schemas
-                DasUtil.getColumns(otherTable)
-                    .filterNot { columns.contains(it.name) }
-                    .map { it.name } // Columns of other table
-
-        myFixture.completeBasic()
-        assertCompletion(*expected.toList().toTypedArray())
-        assertNoCompletion(*notExpected.toList().toTypedArray())
+    fun testResolveTableNameFromModelWhenParentDoesNotHaveTableProperty() {
+        this.assertResolvesUsersTable("model/modelParentWithoutTableProperty.php")
     }
 
     fun testResolveTableNameFromModelTablePropertyAndCompletesColumnsOnStaticWhere() {
-        myFixture.configureByFile("model/modelWhere.php")
-
-        val table = DasUtil.getTables(dataSource())
-            .filter { it.name == "users" }
-            .firstOrNull() ?: return fail("Did not find any tables.")
-        val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(dataSource())
-            .filterNot { it.name == "users" }
-            .lastOrNull() ?: return fail("Did not find any tables.")
-
-        val expected = schemas + columns
-        val notExpected =
-            schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                .flatten() + // Tables of other schemas
-                DasUtil.getColumns(otherTable)
-                    .filterNot { columns.contains(it.name) }
-                    .map { it.name } // Columns of other table
-
-        myFixture.completeBasic()
-
-        assertCompletion(*expected.toList().toTypedArray())
-        assertNoCompletion(*notExpected.toList().toTypedArray())
+        this.assertResolvesUsersTable("model/modelWhere.php")
     }
 
     fun testResolveTableNameModelName() {
-        myFixture.configureByFile("model/modelWithoutTableProperty.php")
+        this.assertResolvesUsersTable("model/modelWithoutTableProperty.php")
+    }
 
-        val table = DasUtil.getTables(dataSource())
-            .filter { it.name == "users" }
-            .firstOrNull() ?: return fail("Did not find any tables.")
-        val columns = DasUtil.getColumns(table).map { it.name }
-        val otherTable = DasUtil.getTables(dataSource())
-            .filterNot { it.name == "users" }
-            .lastOrNull() ?: return fail("Did not find any tables.")
-
-        val expected = schemas + columns
-        val notExpected =
-            schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
-                .flatten() + // Tables of other schemas
-                DasUtil.getColumns(otherTable)
-                    .filterNot { columns.contains(it.name) }
-                    .map { it.name } // Columns of other table
-
-        myFixture.completeBasic()
-        assertCompletion(*expected.toList().toTypedArray())
-        assertNoCompletion(*notExpected.toList().toTypedArray())
+    fun testResolveTableNameInsideScopeMethod() {
+        this.assertResolvesUsersTable("model/modelInsideScope.php")
     }
 
     fun testResolveRelationTableName() {
@@ -108,8 +60,8 @@ internal class ModelReferenceTest : BaseTestCase() {
         assertNoCompletion(*notExpected.toList().toTypedArray())
     }
 
-    fun testResolveTableNameInsideScopeMethod() {
-        myFixture.configureByFile("model/modelInsideScope.php")
+    private fun assertResolvesUsersTable(@TestDataFile filePath : String) {
+        myFixture.configureByFile(filePath)
 
         val table = DasUtil.getTables(dataSource())
             .filter { it.name == "users" }

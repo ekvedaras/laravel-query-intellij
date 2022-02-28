@@ -116,7 +116,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     }
 
     fun resolveTableName(model: PhpClass) {
-        val name = model.tableName()
+        val name = model.tableName()!!
         reference.tablesAndAliases[name] = name to null
     }
 
