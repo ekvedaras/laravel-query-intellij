@@ -4,6 +4,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveAliasParam
 
@@ -19,7 +20,7 @@ class AliasCollector(private val reference: DbReferenceExpression) {
 
         if (referencedSchema1 == null) {
             reference.project.dbDataSourcesInParallel().forEach loop@{ dataSource ->
-                val dasTable = dataSource.tables().firstOrNull { it.name == table } ?: return@loop
+                val dasTable = dataSource.tables().firstOrNull { it.nameWithoutPrefix(reference.project) == table } ?: return@loop
                 referencedSchema1 = dasTable.dasParent?.name
             }
         }

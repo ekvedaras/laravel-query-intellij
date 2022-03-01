@@ -17,6 +17,7 @@ class LaravelQuerySettings : PersistentStateComponent<LaravelQuerySettings> {
     var filterDataSources = false
     var filteredDataSources = setOf<String>()
     var ignoreSettings = false
+    var tablePrefix = ""
 
     @Nullable
     override fun getState() = this

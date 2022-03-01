@@ -15,6 +15,9 @@ import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.completion.DeclarativeInsertHandler
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tableNameWithoutPrefix
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.withoutTablePrefix
 import icons.DatabaseIcons
 
 class LookupUtils private constructor() {
@@ -45,8 +48,8 @@ class LookupUtils private constructor() {
             PrioritizedLookupElement.withGrouping(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
-                        .create(this, this.name)
-                        .withLookupString("${this.dasParent?.name}.${this.name}")
+                        .create(this, this.nameWithoutPrefix(project))
+                        .withLookupString("${this.dasParent?.name}.${this.nameWithoutPrefix(project)}")
                         .withTypeText(this.dasParent?.name ?: "", true)
                         .withIcon(this.getIcon(project))
                         .withInsertHandler(
@@ -74,7 +77,7 @@ class LookupUtils private constructor() {
             } else {
                 ""
             } + "." + if (withTablePrefix) {
-                this.dasParent?.name ?: ""
+                this.tableNameWithoutPrefix(project)
             } else {
                 ""
             }
@@ -88,9 +91,9 @@ class LookupUtils private constructor() {
                             "  ${this.dataType}${if (this.default != null) " = ${this.default}" else ""}",
                             true
                         )
-                        .withTypeText("${this.comment ?: ""} ${this.tableName}", true)
-                        .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableName}"}.${this.name}")
-                        .withLookupString("${this.tableName}.${this.name}")
+                        .withTypeText("${this.comment ?: ""} ${this.tableNameWithoutPrefix(project)}", true)
+                        .withLookupString("${alias ?: "${this.table?.dasParent?.name}.${this.tableNameWithoutPrefix(project)}"}.${this.name}")
+                        .withLookupString("${this.tableNameWithoutPrefix(project)}.${this.name}")
                         .withInsertHandler(
                             project,
                             false,
@@ -137,7 +140,7 @@ class LookupUtils private constructor() {
                 .create(this, this.name)
                 .withIcon(this.getIcon(project))
                 .withTypeText(
-                    "  ${this.refTableName}: ${this.columnsRef.names().joinToString(", ")}",
+                    "  ${this.refTableName.withoutTablePrefix(project)}: ${this.columnsRef.names().joinToString(", ")}",
                     true
                 )
                 .withTailText(this.comment ?: "", true)

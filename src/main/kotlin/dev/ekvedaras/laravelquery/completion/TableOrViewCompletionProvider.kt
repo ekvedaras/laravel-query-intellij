@@ -86,7 +86,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
         result: MutableList<LookupElement>,
     ) {
         target.schema.parallelStream().forEach { schema ->
-            schema.tablesInParallel().forEach { table ->
+            schema.tablesInParallel(project).forEach { table ->
                 result.add(table.buildLookup(project, true))
             }
         }

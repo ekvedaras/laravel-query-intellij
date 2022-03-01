@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
@@ -107,7 +108,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         items.add(schema.buildLookup(project, dataSource))
 
         if (shouldCompleteAll || target.tablesAndAliases.isEmpty()) {
-            schema.tablesInParallel().forEach { table ->
+            schema.tablesInParallel(project).forEach { table ->
                 items.add(table.buildLookup(project, withTablePrefix = false, triggerCompletion = true))
             }
         }
@@ -123,7 +124,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         result.addLookupAdvertisement("CTRL(CMD) + SHIFT + Space to see all options")
         target.tablesAndAliases.forEach { tableAlias ->
             val table = dataSource.tables().firstOrNull { dasTable ->
-                dasTable.name == tableAlias.value.first &&
+                dasTable.nameWithoutPrefix(project) == tableAlias.value.first &&
                     (tableAlias.value.second == null || dasTable.dasParent?.name == tableAlias.value.second)
             }
 
@@ -161,7 +162,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         target.table.parallelStream().forEach { table ->
             val alias = target.tablesAndAliases.entries
                 .filter { it.value.first != it.key }
-                .firstOrNull { it.value.first == table.name }?.key
+                .firstOrNull { it.value.first == table.nameWithoutPrefix(project) }?.key
 
             table.columnsInParallel().forEach { column ->
                 result.add(column.buildLookup(project, withTablePrefix = true, withSchemaPrefix = false, alias = alias))
@@ -175,7 +176,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         project: Project
     ) {
         target.schema.parallelStream().forEach { schema ->
-            schema.tablesInParallel().forEach { table ->
+            schema.tablesInParallel(project).forEach { table ->
                 result.add(table.buildLookup(project, withTablePrefix = true, triggerCompletion = true))
             }
         }

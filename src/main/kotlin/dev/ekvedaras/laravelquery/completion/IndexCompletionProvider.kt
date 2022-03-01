@@ -14,6 +14,7 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInP
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeysInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keysInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canOnlyHaveColumnsInArrayValues
@@ -115,8 +116,8 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
             dataSource.schemasInParallel().filter {
                 schemas.isEmpty() || schemas.contains(it.name)
             }.forEach { schema ->
-                schema.tablesInParallel()
-                    .filter { tables.contains(it.name) }
+                schema.tablesInParallel(project)
+                    .filter { tables.contains(it.nameWithoutPrefix(project)) }
                     .forEach(scanTableUsing)
             }
         }

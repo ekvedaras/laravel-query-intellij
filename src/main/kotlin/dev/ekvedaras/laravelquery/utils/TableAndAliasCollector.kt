@@ -17,6 +17,7 @@ import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
@@ -116,7 +117,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
     }
 
     fun resolveTableName(model: PhpClass) {
-        val name = model.tableName()!!
+        val name = model.tableName()!! // This will be without prefix as expected in reference.tablesAndAliases
         reference.tablesAndAliases[name] = name to null
     }
 
@@ -184,7 +185,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
 
         if (referencedSchema == null) {
             reference.project.dbDataSourcesInParallel().forEach { dataSource ->
-                dataSource.tables().firstOrNull { it.name == referencedTable }?.let {
+                dataSource.tables().firstOrNull { it.nameWithoutPrefix(reference.project) == referencedTable }?.let {
                     referencedSchema = it.dasParent?.name
                 }
             }

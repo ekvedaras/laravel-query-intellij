@@ -32,7 +32,6 @@ create table customers
 create index customers_billable_id_billable_type_index
 	on customers (billable_id, billable_type);
 
-
 use testProject2;
 
 create table failed_jobs

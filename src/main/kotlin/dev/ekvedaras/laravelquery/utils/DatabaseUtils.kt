@@ -12,6 +12,7 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import java.util.stream.Stream
 
 private val SchemasToSkip = listOf(
@@ -33,19 +34,22 @@ class DatabaseUtils private constructor() {
         fun DbDataSource.tables() =
             DasUtil.getTables(this).filter {
                 LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
-            }.filter { !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name) }
+            }.filter { !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name) }.filter {
+                it.isPrefixed(this.project)
+            }
 
         fun DbDataSource.tablesInParallel(): Stream<out DasTable> =
             DasUtil.getTables(this).toList().parallelStream().filter {
                 LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
             }.filter {
                 !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name)
-            }
+            }.filter { it.isPrefixed(this.project) }
 
-        fun DasNamespace.tablesInParallel(): Stream<out DasTable> =
+        fun DasNamespace.tablesInParallel(project: Project): Stream<out DasTable> =
             this.getDasChildren(ObjectKind.TABLE).toList().parallelStream()
                 .map { it as DasTable }
                 .filter { !it.isSystem }
+                .filter { it.isPrefixed(project) }
 
         fun DasTable.columnsInParallel(): Stream<out DasColumn> =
             this.getDasChildren(ObjectKind.COLUMN).toList().parallelStream().map { it as DasColumn }
@@ -58,5 +62,17 @@ class DatabaseUtils private constructor() {
 
         fun DasTable.foreignKeysInParallel(): Stream<out DasForeignKey> =
             this.getDasChildren(ObjectKind.FOREIGN_KEY).toList().parallelStream().map { it as DasForeignKey }
+
+        private fun DasTable.isPrefixed(project: Project): Boolean =
+            this.name.startsWith(LaravelQuerySettings.getInstance(project).tablePrefix)
+
+        fun DasTable.nameWithoutPrefix(project: Project): String =
+            this.name.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
+
+        fun DasColumn.tableNameWithoutPrefix(project: Project): String =
+            this.tableName.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
+
+        fun String.withoutTablePrefix(project: Project): String =
+            this.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
     }
 }

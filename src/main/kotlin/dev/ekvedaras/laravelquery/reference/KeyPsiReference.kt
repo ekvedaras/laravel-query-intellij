@@ -4,6 +4,8 @@ import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 
 class KeyPsiReference(element: PsiElement) : PsiReferenceBase<PsiElement>(element) {
     override fun resolve(): PsiElement? {
@@ -12,8 +14,12 @@ class KeyPsiReference(element: PsiElement) : PsiReferenceBase<PsiElement>(elemen
 
         rangeInElement = target.ranges.last()
 
-        DbUtil.getDataSources(element.project).forEach { dataSource ->
-            val dbKey = dataSource.findElement(target.key.find { tables.contains(it.table?.name) })
+        DbUtil.getDataSources(element.project).filter {
+            LaravelQuerySettings.getInstance(element.project).interestedIn(it)
+        }.forEach { dataSource ->
+            val dbKey = dataSource.findElement(target.key.find {
+                tables.contains(it.table?.nameWithoutPrefix(element.project))
+            })
             if (dbKey != null) {
                 return dbKey
             }

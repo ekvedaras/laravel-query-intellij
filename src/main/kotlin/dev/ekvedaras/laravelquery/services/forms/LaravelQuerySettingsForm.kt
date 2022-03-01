@@ -14,17 +14,20 @@ import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
+import javax.swing.JTextField
 import javax.swing.table.DefaultTableModel
 
 class LaravelQuerySettingsForm(val project: Project) {
     private var panel: JPanel? = null
     private var filterDataSources: JCheckBox? = null
     private var dataSources: JTable? = null
+    private var tablePrefix: JTextField? = null
 
     private val settings: LaravelQuerySettings = LaravelQuerySettings.getInstance(project)
 
     fun component(): JComponent? = panel
 
+    fun tablePrefix() = this.tablePrefix?.text ?: ""
     fun shouldFilterDataSources() = filterDataSources?.isSelected
     fun filteredDataSources(): Set<String> {
         var selected = setOf<String>()
@@ -42,7 +45,8 @@ class LaravelQuerySettingsForm(val project: Project) {
 
     val isModified: Boolean
         get() = shouldFilterDataSources() != settings.filterDataSources ||
-            filteredDataSources() != settings.filteredDataSources
+            filteredDataSources() != settings.filteredDataSources ||
+            tablePrefix() != settings.tablePrefix
 
     init {
         loadSettings()
@@ -101,6 +105,7 @@ class LaravelQuerySettingsForm(val project: Project) {
     }
 
     fun loadSettings() {
+        tablePrefix?.text = settings.tablePrefix
         filterDataSources?.isSelected = settings.filterDataSources
         dataSources?.isEnabled = filterDataSources?.isSelected ?: false
 

@@ -4,6 +4,7 @@ import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 
 class TableOrViewPsiReference(element: PsiElement, private val type: DbReferenceExpression.Companion.Type) :
     PsiReferenceBase<PsiElement>(element) {
@@ -16,7 +17,9 @@ class TableOrViewPsiReference(element: PsiElement, private val type: DbReference
             target.ranges.first()
         }
 
-        DbUtil.getDataSources(element.project).forEach { dataSource ->
+        DbUtil.getDataSources(element.project).filter {
+            LaravelQuerySettings.getInstance(element.project).interestedIn(it)
+        }.forEach { dataSource ->
             val dbTable = dataSource.findElement(target.table.firstOrNull())
             if (dbTable != null) {
                 return dbTable

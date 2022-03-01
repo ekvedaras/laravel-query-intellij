@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- A new setting to configure table prefix #83
 
 ## [3.0.4]
 ### Added

@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.inspection
 
 import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 
 internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testWarnsAboutUnknownSchema() {
@@ -13,6 +14,12 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
 
     fun testDoesNotWarnAboutKnownTable() {
         assertInspection("inspection/knownTable.php", UnknownTableOrViewInspection())
+    }
+
+    fun testDoesNotWarnAboutKnownTableWhenUsingPrefixes() {
+        LaravelQuerySettings.getInstance(project).tablePrefix = "failed_"
+        assertInspection("inspection/knownWithPrefixTable.php", UnknownTableOrViewInspection())
+        LaravelQuerySettings.getInstance(project).tablePrefix = ""
     }
 
     fun testWarnsAboutUnknownSchemaTable() {

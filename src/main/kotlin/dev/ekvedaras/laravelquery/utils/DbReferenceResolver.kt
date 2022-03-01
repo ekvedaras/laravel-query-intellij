@@ -12,6 +12,7 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInP
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeysInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keysInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import java.util.Collections
@@ -72,11 +73,11 @@ private class ResolverForTableMethods(
     private fun resolveTables() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.tablesInParallel().forEach { table ->
-                if (table.name == reference.parts.last()) {
+                if (table.nameWithoutPrefix(reference.project) == reference.parts.last()) {
                     tables.add(table)
-                } else if (reference.tablesAndAliases[reference.parts.last()]?.first == table.name) {
+                } else if (reference.tablesAndAliases[reference.parts.last()]?.first == table.nameWithoutPrefix(reference.project)) {
                     tables.add(table)
-                    reference.alias = table.name
+                    reference.alias = table.nameWithoutPrefix(reference.project)
                 }
             }
         }
@@ -92,7 +93,7 @@ private class ResolverForTableMethods(
                 .forEach { schema ->
                     dataSource.tablesInParallel()
                         .filter { it.dasParent?.name == schema.name }
-                        .filter { it.name == reference.parts.last() }
+                        .filter { it.nameWithoutPrefix(reference.project) == reference.parts.last() }
                         .forEach { tables.add(it) }
                 }
         }
@@ -126,9 +127,9 @@ private class ResolverForColumnMethods(
                 .forEach { schemas.add(it) }
 
             dataSource.tablesInParallel().forEach { dasTable ->
-                if (dasTable.name == reference.parts.first()) {
+                if (dasTable.nameWithoutPrefix(reference.project) == reference.parts.first()) {
                     tables.add(dasTable)
-                } else if (reference.tablesAndAliases[reference.parts.first()]?.first == dasTable.name) {
+                } else if (reference.tablesAndAliases[reference.parts.first()]?.first == dasTable.nameWithoutPrefix(reference.project)) {
                     tables.add(dasTable)
                 }
 
@@ -159,7 +160,7 @@ private class ResolverForColumnMethods(
     }
 
     private fun addTablesAndTheirColumns(table: DasTable) {
-        if (table.name == reference.parts.first() || table.name == reference.parts.last()) {
+        if (table.nameWithoutPrefix(reference.project) == reference.parts.first() || table.nameWithoutPrefix(reference.project) == reference.parts.last()) {
             tables.add(table)
 
             table.columnsInParallel()
@@ -167,8 +168,8 @@ private class ResolverForColumnMethods(
                 .forEach { columns.add(it) }
         } else if (schemas.isEmpty() &&
             (
-                reference.tablesAndAliases[reference.parts.first()]?.first == table.name ||
-                    reference.tablesAndAliases[reference.parts.last()]?.first == table.name
+                reference.tablesAndAliases[reference.parts.first()]?.first == table.nameWithoutPrefix(reference.project) ||
+                    reference.tablesAndAliases[reference.parts.last()]?.first == table.nameWithoutPrefix(reference.project)
                 )
         ) {
             tables.add(table)
@@ -195,13 +196,13 @@ private class ResolverForColumnMethods(
     }
 
     private fun addTableAndItsColumns(table: DasTable) {
-        if (table.name == reference.parts[1]) {
+        if (table.nameWithoutPrefix(reference.project) == reference.parts[1]) {
             tables.add(table)
 
             table.columnsInParallel()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
-        } else if (reference.tablesAndAliases[reference.parts[1]]?.first == table.name) {
+        } else if (reference.tablesAndAliases[reference.parts[1]]?.first == table.nameWithoutPrefix(reference.project)) {
             tables.add(table)
 
             table.columnsInParallel()
@@ -218,9 +219,9 @@ private class ResolverForIndexMethods(
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.tablesInParallel().filter {
-                reference.tablesAndAliases.containsKey(it.name)
+                reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
-                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
+                (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.indexesInParallel()
                     .filter { it.name == reference.parts[0] }
@@ -237,9 +238,9 @@ private class ResolverForKeyMethods(
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.tablesInParallel().filter {
-                reference.tablesAndAliases.containsKey(it.name)
+                reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
-                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
+                (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.keysInParallel()
                     .filter { it.name == reference.parts[0] }
@@ -256,9 +257,9 @@ private class ResolverForForeignKeyMethods(
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
             dataSource.tablesInParallel().filter {
-                reference.tablesAndAliases.containsKey(it.name)
+                reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
-                (reference.tablesAndAliases[it.name]?.second ?: it.dasParent?.name) == it.dasParent?.name
+                (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 table.foreignKeysInParallel()
                     .filter { it.name == reference.parts[0] }
