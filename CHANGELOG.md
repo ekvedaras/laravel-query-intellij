@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
+## [3.0.3]
 ### Fixed
 - Unknown table inspection was being triggered when using `AS` instead of `as`. #81
 
