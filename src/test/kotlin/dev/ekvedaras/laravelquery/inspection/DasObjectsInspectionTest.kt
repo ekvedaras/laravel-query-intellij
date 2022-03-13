@@ -57,6 +57,7 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
 
     fun testDoesNotWarnAboutKnownAliasColumn() {
         assertInspection("inspection/knownAliasColumn.php", UnknownColumnInspection())
+        assertInspection("inspection/knownAliasColumn.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutColumnFromOtherTable() {

@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Unknown table inspection was being triggered when using `AS` instead of `as`. #81
+
 ## [3.0.2]
 ### Fixed
 - Lookup parent tree when resolving model table name. #74
