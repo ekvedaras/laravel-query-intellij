@@ -32,6 +32,7 @@ object LaravelClasses {
     const val SchemaFacade = "\\Illuminate\\Support\\Facades\\Schema"
     const val SchemaFacadeAlias = "\\Schema"
     const val ColumnDefinition = "\\Illuminate\\Database\\Schema\\ColumnDefinition"
+    const val InteractsWithDatabase = "\\Illuminate\\Foundation\\Testing\\Concerns\\InteractsWithDatabase"
 }
 
 @Suppress("TooManyFunctions")
@@ -76,6 +77,7 @@ class LaravelUtils private constructor() {
             "hasColumn", "hasColumns", "getColumnType",
             "table", "create", "drop", "dropIfExists",
             "dropColumns", "rename", "createDatabase", "dropDatabaseIfExists",
+            "assertDatabaseHas", "assertDatabaseMissing", "assertDatabaseCount", "assertDeleted", "assertSoftDeleted",
         )
         // </editor-fold>
 
@@ -377,7 +379,7 @@ class LaravelUtils private constructor() {
             "&", "|", "^", "<<", ">>",
             "rlike", "not rlike", "regexp", "not regexp",
             "~", "~*", "!~", "!~*", "similar to",
-            "not similar to", "not ilike", "~~*", "!~~*",
+            "not similar to", "not ilike", "~~*", "!~~*", "distinct from",
         )
 
         @JvmStatic

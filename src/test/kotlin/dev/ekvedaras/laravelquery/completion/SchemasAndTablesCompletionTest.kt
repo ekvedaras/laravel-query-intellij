@@ -44,4 +44,22 @@ internal class SchemasAndTablesCompletionTest : BaseTestCase() {
             }
         }
     }
+
+    fun testCompletesSchemasAndTablesForTestAssertions() {
+        LaravelUtils.BuilderTableMethods.filter { it.startsWith("assertDatabase") }.forEach { method ->
+            myFixture.configureByText(
+                "test.php",
+                "<?php class Test extends TestCase { public function test_it_completes() { $this->$method('<carte>'); } }"
+            )
+            myFixture.completeBasic()
+
+            if (LaravelUtils.BuilderSchemaMethods.contains(method)) {
+                assertEquals(schemas.size, myFixture.lookupElementStrings?.size)
+                assertCompletion(*schemas.toTypedArray())
+            } else {
+                assertEquals(schemasAndTables.size, myFixture.lookupElementStrings?.size)
+                assertCompletion(*schemasAndTables.toTypedArray())
+            }
+        }
+    }
 }
