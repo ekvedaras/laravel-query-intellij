@@ -58,8 +58,6 @@ internal class SchemaTableReferenceTest : BaseTestCase() {
         TestCase.assertTrue(usages.first().element?.textMatches("'jobs'") ?: false)
         TestCase.assertEquals(55, usages.first().navigationRange.startOffset)
         TestCase.assertEquals(55 + table.name.length - settings.tablePrefix.length, usages.first().navigationRange.endOffset)
-
-        settings.tablePrefix = ""
     }
 
     fun testResolvesSchemaAndTableReferences() {

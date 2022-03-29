@@ -26,6 +26,8 @@ repositories {
 }
 dependencies {
     implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
 }
 
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
@@ -64,21 +66,15 @@ tasks {
         }
     }
 
-    val test by getting(Test::class) {
-        isScanForTestClasses = false
-        include("**/*Test.class")
+    test {
+        // Support "setUp" like "BasePlatformTestCase::setUp" as valid test structure
+        useJUnitPlatform {
+            includeEngines("junit-vintage")
+        }
     }
 
     wrapper {
         gradleVersion = properties("gradleVersion")
-    }
-
-    runIde {
-        if (environment.contains("IDE_DIR")) {
-            ideDir.set(File(environment["IDE_DIR"].toString()))
-        }
-
-        systemProperty("idea.platform.prefix", "PhpStorm")
     }
 
     patchPluginXml {
@@ -120,10 +116,6 @@ tasks {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
         password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
     }
 
     publishPlugin {

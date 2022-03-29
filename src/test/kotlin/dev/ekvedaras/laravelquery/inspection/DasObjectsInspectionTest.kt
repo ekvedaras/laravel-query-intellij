@@ -19,7 +19,11 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testDoesNotWarnAboutKnownTableWhenUsingPrefixes() {
         LaravelQuerySettings.getInstance(project).tablePrefix = "failed_"
         assertInspection("inspection/knownWithPrefixTable.php", UnknownTableOrViewInspection())
-        LaravelQuerySettings.getInstance(project).tablePrefix = ""
+    }
+
+    fun testWarnsAboutUnknownTableWhenUsingPrefixes() {
+        LaravelQuerySettings.getInstance(project).tablePrefix = "failed"
+        assertInspection("inspection/unknownWithPrefixTable.php", UnknownTableOrViewInspection())
     }
 
     fun testWarnsAboutUnknownSchemaTable() {

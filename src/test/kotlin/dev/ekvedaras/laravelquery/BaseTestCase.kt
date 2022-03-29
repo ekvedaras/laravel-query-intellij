@@ -48,6 +48,7 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
     }
 
     override fun tearDown() {
+        LaravelQuerySettings.getInstance(project).tablePrefix = ""
         LocalDataSourceManager.getInstance(project).removeDataSource(db)
 
         super.tearDown()
