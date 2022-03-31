@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.0.4]
 ### Added
 - Support for table references and completion in methods from `InteractsWithDatabase` trait.
 
