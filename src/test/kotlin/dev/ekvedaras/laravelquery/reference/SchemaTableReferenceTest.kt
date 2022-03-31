@@ -7,6 +7,8 @@ import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import junit.framework.TestCase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 internal class SchemaTableReferenceTest : BaseTestCase() {
     fun testResolvesSchemaReference() {
@@ -42,10 +44,7 @@ internal class SchemaTableReferenceTest : BaseTestCase() {
     }
 
     fun testResolvesTableReferenceWhenPrefixesAreUsed() {
-        val settings = LaravelQuerySettings.getInstance(project)
-        settings.tablePrefix = "failed_"
-
-        myFixture.configureByFile("inspection/knownWithPrefixTable.php")
+        val prefix = useTablePrefix("failed_")
 
         val table = DasUtil.getTables(dataSource()).first { it.name == "failed_jobs" }
         val dbTable = DbImplUtil.findElement(DbUtil.getDataSources(project).first(), table)
@@ -57,7 +56,7 @@ internal class SchemaTableReferenceTest : BaseTestCase() {
         TestCase.assertEquals(TableOrViewPsiReference::class.java, usages.first().referenceClass)
         TestCase.assertTrue(usages.first().element?.textMatches("'jobs'") ?: false)
         TestCase.assertEquals(55, usages.first().navigationRange.startOffset)
-        TestCase.assertEquals(55 + table.name.length - settings.tablePrefix.length, usages.first().navigationRange.endOffset)
+        TestCase.assertEquals(55 + table.name.length - prefix.length, usages.first().navigationRange.endOffset)
     }
 
     fun testResolvesSchemaAndTableReferences() {

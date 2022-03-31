@@ -56,6 +56,11 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
 
     protected fun dataSource(): DasDataSource = db
 
+    protected fun useTablePrefix(prefix: String): String {
+        LaravelQuerySettings.getInstance(project).tablePrefix = prefix
+        return prefix
+    }
+
     private fun caretAfterArgs(at: Int, prefix: String = ""): String {
         var args = ""
 
