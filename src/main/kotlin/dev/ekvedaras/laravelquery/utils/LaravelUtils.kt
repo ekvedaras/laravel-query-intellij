@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
@@ -78,6 +79,13 @@ class LaravelUtils private constructor() {
             "hasColumn", "hasColumns", "getColumnType",
             "table", "create", "drop", "dropIfExists",
             "dropColumns", "rename", "createDatabase", "dropDatabaseIfExists",
+            "assertDatabaseHas", "assertDatabaseMissing", "assertDatabaseCount", "assertDeleted", "assertSoftDeleted",
+        )
+        // </editor-fold>
+
+        // <editor-fold desc="TestCase methods where table name should be completed" defaultstate="collapsed">
+        @JvmStatic
+        val TestCaseDatabaseAssertionMethods = listOf(
             "assertDatabaseHas", "assertDatabaseMissing", "assertDatabaseCount", "assertDeleted", "assertSoftDeleted",
         )
         // </editor-fold>
@@ -407,6 +415,9 @@ class LaravelUtils private constructor() {
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
                 clazz.isChildOf(LaravelClasses.TestCase)
             }
+
+        fun MethodReference.isDatabaseAssertion(project: Project): Boolean =
+            TestCaseDatabaseAssertionMethods.contains(this.name)
 
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =
             this.shouldCompleteOnlySchemas() || !this.isSchemaBuilderMethod(project)

@@ -17,11 +17,13 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInA
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isDatabaseAssertion
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isOperatorParam
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isSchemaBuilderMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTestCase
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.selectsAllColumns
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
@@ -129,6 +131,7 @@ class UnknownColumnInspection : PhpInspection() {
                     !expression.isColumnIn(method, allowArray) ||
                     expression.isInsideRegularFunction() ||
                     (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                    (method.isTestCase(project) && !method.isDatabaseAssertion(project)) ||
                     !method.isInteresting(project) ||
                     method.isSchemaBuilderMethod(project) ||
                     method.isBlueprintMethod(project)

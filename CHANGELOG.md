@@ -5,6 +5,8 @@
 ## [Unreleased]
 ### Added
 - A new setting to configure table prefix #83
+### Fixed
+- Do not complete or inspect in other TestCase methods like `$this->get()`.
 
 ## [3.0.4]
 ### Added

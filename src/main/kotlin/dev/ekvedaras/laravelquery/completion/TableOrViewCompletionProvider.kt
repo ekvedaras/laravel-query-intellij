@@ -13,6 +13,7 @@ import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInP
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isDatabaseAssertion
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
@@ -97,9 +98,10 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
             (
-                (method.isEloquentModel(project) || method.isJoinOrRelation(project) || method.isTestCase(project)) &&
+                (method.isEloquentModel(project) || method.isJoinOrRelation(project)) &&
                     method.shouldCompleteOnlyColumns()
                 ) ||
+            (method.isTestCase(project) && !method.isDatabaseAssertion(project)) ||
             parameters.isInsideRegularFunction() ||
             !method.isInteresting(project)
 }

@@ -57,4 +57,15 @@ internal class SchemasAndTablesCompletionTest : BaseTestCase() {
             assertCompletion(*schemasAndTables.toTypedArray())
         }
     }
+
+    fun testDoesNotCompleteSchemasAndTablesForOtherTestCaseMethods() {
+        myFixture.configureByText(
+            "test.php",
+            "<?php class Test extends \\Tests\\TestCase { public function test_it_completes() { \$this->get('<caret>'); } }"
+        )
+        myFixture.completeBasic()
+
+        assertEquals(0, myFixture.lookupElementStrings?.size)
+        assertNoCompletion(*schemasAndTables.toTypedArray())
+    }
 }
