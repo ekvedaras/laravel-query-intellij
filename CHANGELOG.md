@@ -3,8 +3,11 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.1.1]
 ### Added
 - A new setting to configure table prefix #83
+
 ### Fixed
 - Do not complete or inspect in other TestCase methods like `$this->get()`.
 
