@@ -4,7 +4,7 @@
 
 ## [Unreleased]
 ### Added
-- Support for table references in methods from `InteractsWithDatabase` trait.
+- Support for table references and completion in methods from `InteractsWithDatabase` trait.
 
 ## [3.0.3]
 ### Fixed
