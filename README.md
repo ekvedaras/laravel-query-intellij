@@ -15,7 +15,8 @@ This plugin provides database integration for Laravel query builder.
 
 ## Features
 
-* Schemas, tables, views and columns completion for query builder methods
+* Schemas, tables, views and columns completion for query and schema builder methods
+* Completion for database assertion test methods
 * Inspection of unknown database elements
 * Table alias support
 * Table name resolving from model for eloquent builder methods
