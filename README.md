@@ -22,6 +22,7 @@ This plugin provides database integration for Laravel query builder.
 * Table name resolving from model for eloquent builder methods
 * Model relation table name resolving for eloquent builder relation closure methods
 * Text linking with database elements for navigation and refactoring
+* Configurable table prefix and datasource filtering
 
 ## Prerequisites
 
