@@ -46,20 +46,15 @@ internal class SchemasAndTablesCompletionTest : BaseTestCase() {
     }
 
     fun testCompletesSchemasAndTablesForTestAssertions() {
-        LaravelUtils.BuilderTableMethods.filter { it.startsWith("assertDatabase") }.forEach { method ->
+        LaravelUtils.BuilderTableMethods.filter { it.startsWith("assert") }.forEach { method ->
             myFixture.configureByText(
                 "test.php",
-                "<?php class Test extends TestCase { public function test_it_completes() { $this->$method('<carte>'); } }"
+                "<?php class Test extends \\Tests\\TestCase { public function test_it_completes() { \$this->$method('<caret>'); } }"
             )
             myFixture.completeBasic()
 
-            if (LaravelUtils.BuilderSchemaMethods.contains(method)) {
-                assertEquals(schemas.size, myFixture.lookupElementStrings?.size)
-                assertCompletion(*schemas.toTypedArray())
-            } else {
-                assertEquals(schemasAndTables.size, myFixture.lookupElementStrings?.size)
-                assertCompletion(*schemasAndTables.toTypedArray())
-            }
+            assertEquals("Completion for method $method should contain all schemas and tables", schemasAndTables.size, myFixture.lookupElementStrings?.size)
+            assertCompletion(*schemasAndTables.toTypedArray())
         }
     }
 }

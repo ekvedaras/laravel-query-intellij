@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Support for table references in methods from `InteractsWithDatabase` trait.
 
 ## [3.0.3]
 ### Fixed

@@ -179,4 +179,32 @@ internal class ColumnsCompletionTest : BaseTestCase() {
         assertCompletion(*expected.toList().toTypedArray())
         assertNoCompletion(*notExpected.toList().toTypedArray())
     }
+
+    fun testCompletesTableColumnsTestAssertions() {
+        val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
+        val columns = DasUtil.getColumns(table).map { it.name }
+        val lastTable = DasUtil.getTables(dataSource()).first { it.name == "customers" }
+
+        val notExpected =
+            schemas.filterNot { it == table.dasParent?.name } + // All other schemas
+                schemaTables.entries.filterNot { it.key == table.dasParent?.name }.map { it.value }
+                    .flatten() + // Tables of other schemas
+                DasUtil.getColumns(lastTable)
+                    .filterNot { columns.contains(it.name) }
+                    .map { it.name } // Columns of other table
+
+        LaravelUtils.BuilderTableMethods
+            .filter { it.startsWith("assert") }
+            .filterNot { it === "assertDatabaseCount" }
+            .forEach { method ->
+                myFixture.configureByText(
+                    "test.php",
+                    "<?php class Test extends \\Tests\\TestCase { public function test_it_completes() { \$this->$method('users', ['<caret>']); } }"
+                )
+                myFixture.completeBasic()
+
+                assertCompletion(*columns.toList().toTypedArray())
+                assertNoCompletion(*notExpected.toList().toTypedArray())
+            }
+    }
 }

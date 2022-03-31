@@ -32,7 +32,7 @@ object LaravelClasses {
     const val SchemaFacade = "\\Illuminate\\Support\\Facades\\Schema"
     const val SchemaFacadeAlias = "\\Schema"
     const val ColumnDefinition = "\\Illuminate\\Database\\Schema\\ColumnDefinition"
-    const val InteractsWithDatabase = "\\Illuminate\\Foundation\\Testing\\Concerns\\InteractsWithDatabase"
+    const val TestCase = "\\Illuminate\\Foundation\\Testing\\TestCase"
 }
 
 @Suppress("TooManyFunctions")
@@ -53,6 +53,7 @@ class LaravelUtils private constructor() {
             LaravelClasses.SchemaFacadeAlias,
             LaravelClasses.Blueprint,
             LaravelClasses.ColumnDefinition,
+            LaravelClasses.TestCase,
         )
         // </editor-fold>
 
@@ -278,6 +279,10 @@ class LaravelUtils private constructor() {
             "fill" to listOf(0),
             "updateOrCreate" to listOf(0, 1),
             "updateOrInsert" to listOf(0, 1),
+            "assertDatabaseHas" to listOf(1),
+            "assertDatabaseMissing" to listOf(1),
+            "assertDeleted" to listOf(1),
+            "assertSoftDeleted" to listOf(1),
         )
         // </editor-fold>
 
@@ -396,6 +401,11 @@ class LaravelUtils private constructor() {
         fun MethodReference.isEloquentModel(project: Project): Boolean =
             MethodUtils.resolveMethodClasses(this, project).any { clazz ->
                 clazz.isChildOf(LaravelClasses.Model)
+            }
+
+        fun MethodReference.isTestCase(project: Project): Boolean =
+            MethodUtils.resolveMethodClasses(this, project).any { clazz ->
+                clazz.isChildOf(LaravelClasses.TestCase)
             }
 
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =

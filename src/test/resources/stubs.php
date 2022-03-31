@@ -3252,3 +3252,83 @@ namespace {
     class DB extends \Illuminate\Support\Facades\DB {}
     class Schema extends \Illuminate\Support\Facades\Schema {}
 }
+
+namespace Illuminate\Foundation\Testing\Concerns {
+    trait InteractsWithDatabase
+    {
+        /**
+         * Assert that a given where condition exists in the database.
+         *
+         * @param  \Illuminate\Database\Eloquent\Model|string  $table
+         * @param  array  $data
+         * @param  string|null  $connection
+         * @return $this
+         */
+        protected function assertDatabaseHas($table, array $data, $connection = null)
+        {
+        }
+
+        /**
+         * Assert that a given where condition does not exist in the database.
+         *
+         * @param  \Illuminate\Database\Eloquent\Model|string  $table
+         * @param  array  $data
+         * @param  string|null  $connection
+         * @return $this
+         */
+        protected function assertDatabaseMissing($table, array $data, $connection = null)
+        {
+        }
+
+        /**
+         * Assert the count of table entries.
+         *
+         * @param  \Illuminate\Database\Eloquent\Model|string  $table
+         * @param  int  $count
+         * @param  string|null  $connection
+         * @return $this
+         */
+        protected function assertDatabaseCount($table, int $count, $connection = null)
+        {
+        }
+
+        /**
+         * Assert the given record has been deleted.
+         *
+         * @param  \Illuminate\Database\Eloquent\Model|string  $table
+         * @param  array  $data
+         * @param  string|null  $connection
+         * @return $this
+         */
+        protected function assertDeleted($table, array $data = [], $connection = null)
+        {
+        }
+
+        /**
+         * Assert the given record has been "soft deleted".
+         *
+         * @param  \Illuminate\Database\Eloquent\Model|string  $table
+         * @param  array  $data
+         * @param  string|null  $connection
+         * @param  string|null  $deletedAtColumn
+         * @return $this
+         */
+        protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
+        {
+        }
+    }
+}
+
+namespace Illuminate\Foundation\Testing {
+    abstract class TestCase extends \PHPUnit\Framework\TestCase
+    {
+        use Concerns\InteractsWithDatabase;
+    }
+}
+
+namespace Tests {
+    use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+    abstract class TestCase extends BaseTestCase {
+    }
+}

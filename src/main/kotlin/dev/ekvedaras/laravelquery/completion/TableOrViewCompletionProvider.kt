@@ -17,6 +17,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTestCase
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlySchemas
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteSchemas
@@ -96,7 +97,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             !method.isBuilderMethodByName() ||
             !parameters.isTableParam() ||
             (
-                (method.isEloquentModel(project) || method.isJoinOrRelation(project)) &&
+                (method.isEloquentModel(project) || method.isJoinOrRelation(project) || method.isTestCase(project)) &&
                     method.shouldCompleteOnlyColumns()
                 ) ||
             parameters.isInsideRegularFunction() ||
