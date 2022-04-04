@@ -73,7 +73,7 @@ class IndexCompletionProvider : CompletionProvider<CompletionParameters>() {
         )
 
         if (!(parameters.isInsidePhpArrayOrValue() && method.canOnlyHaveColumnsInArrayValues())) {
-            result.stopHere()
+//            result.stopHere()
         }
     }
 

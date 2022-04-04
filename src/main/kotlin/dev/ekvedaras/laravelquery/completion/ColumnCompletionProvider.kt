@@ -70,7 +70,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             items.distinctBy { it.lookupString }
         )
 
-        result.stopHere()
+//        result.stopHere()
     }
 
     private fun completeForOnePart(

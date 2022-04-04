@@ -56,7 +56,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
             items.distinctBy { it.lookupString }
         )
 
-        result.stopHere()
+//        result.stopHere()
     }
 
     private fun populateWithOnePart(
