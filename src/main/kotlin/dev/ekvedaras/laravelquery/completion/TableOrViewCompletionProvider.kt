@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isDatabaseAssertion
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
@@ -95,7 +95,7 @@ class TableOrViewCompletionProvider : CompletionProvider<CompletionParameters>()
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         !ApplicationManager.getApplication().isReadAccessAllowed ||
-            !method.isBuilderMethodByName() ||
+            !method.isBuilderMethodForTableByName() ||
             !parameters.isTableParam() ||
             (
                 (method.isEloquentModel(project) || method.isJoinOrRelation(project)) &&

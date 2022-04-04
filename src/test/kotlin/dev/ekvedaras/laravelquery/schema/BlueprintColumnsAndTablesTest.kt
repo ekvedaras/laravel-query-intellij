@@ -86,4 +86,12 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
     fun testDoesNotWarnAboutUnknownTable() {
         assertInspection("schema/unknownBlueprintTable.php", UnknownTableOrViewInspection())
     }
+
+    fun testCompletesColumnsForIndexForNewTable() {
+        myFixture.configureByFile("schema/createTableAndIndex.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "branch", "amount", "weight", "price", "created_at", "updated_at")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
+    }
 }

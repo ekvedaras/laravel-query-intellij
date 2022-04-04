@@ -13,7 +13,7 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
 import dev.ekvedaras.laravelquery.MyBundle
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isDatabaseAssertion
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
@@ -62,7 +62,7 @@ class UnknownTableOrViewInspection : PhpInspection() {
             ) =
                 !ApplicationManager.getApplication().isReadAccessAllowed ||
                     expression.parent is ArrayIndexImpl ||
-                    !method.isBuilderMethodByName() ||
+                    !method.isBuilderMethodForTableByName() ||
                     method.shouldCompleteOnlyColumns() ||
                     !expression.isTableParam() ||
                     expression.isInsideRegularFunction() ||

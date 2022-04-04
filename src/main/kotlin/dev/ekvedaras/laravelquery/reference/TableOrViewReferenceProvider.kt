@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodByName
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
@@ -33,7 +33,7 @@ class TableOrViewReferenceProvider : PsiReferenceProvider() {
 
     private fun shouldNotInspect(project: Project, method: MethodReference, element: PsiElement) =
         !ApplicationManager.getApplication().isReadAccessAllowed ||
-            !method.isBuilderMethodByName() ||
+            !method.isBuilderMethodForTableByName() ||
             !element.isTableParam() ||
             element.isInsideRegularFunction() ||
             (method.isEloquentModel(project) && method.shouldCompleteOnlyColumns()) ||

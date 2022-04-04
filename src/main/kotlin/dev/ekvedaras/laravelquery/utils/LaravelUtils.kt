@@ -13,8 +13,6 @@ import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
@@ -479,7 +477,7 @@ class LaravelUtils private constructor() {
         fun PhpClassImpl.isJoinOrRelation(): Boolean =
             this.isChildOf(LaravelClasses.JoinClause) || this.isChildOf(LaravelClasses.Relation)
 
-        fun MethodReference.isBuilderMethodByName(): Boolean =
+        fun MethodReference.isBuilderMethodForTableByName(): Boolean =
             BuilderTableMethods.contains(this.name)
 
         fun MethodReference.isBuilderMethodForColumns(): Boolean =
