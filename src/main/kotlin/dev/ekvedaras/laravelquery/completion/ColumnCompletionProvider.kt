@@ -70,6 +70,8 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
             items.distinctBy { it.lookupString }
         )
 
+        context.sharedContext.put("columns", items.map { it.lookupString })
+
 //        result.stopHere()
     }
 

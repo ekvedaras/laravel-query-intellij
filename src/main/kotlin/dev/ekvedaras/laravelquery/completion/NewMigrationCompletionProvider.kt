@@ -11,6 +11,13 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
+import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnDefinitionReference
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isId
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isDatabaseAssertion
@@ -46,86 +53,49 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
             ApplicationManager.getApplication().runReadAction {
                 (method.firstPsiChild as VariableImpl).references().forEach { reference ->
                     val referenceMethod = (reference.element as VariableImpl).parent as MethodReferenceImpl
-                    if (referenceMethod.name == "id") {
-                        items.add(LookupElementBuilder.create("id").withLookupString("id").withPsiElement(referenceMethod))
-                    } else if (referenceMethod.name == "timestamps") {
-                        items.add(LookupElementBuilder.create("created_at").withLookupString("created_at").withPsiElement(referenceMethod))
-                        items.add(LookupElementBuilder.create("updated_at").withLookupString("updated_at").withPsiElement(referenceMethod))
-                    } else if (referenceMethod.name == "softDeletes") {
-                        items.add(LookupElementBuilder.create("deleted_at").withLookupString("deleted_at").withPsiElement(referenceMethod))
-                    } else if ( listOf(
-                            "increments",
-                            "integerIncrements",
-                            "tinyIncrements",
-                            "mediumIncrements",
-                            "bigIncrements",
-                            "char",
-                            "string",
-                            "text",
-                            "mediumText",
-                            "longText",
-                            "integer",
-                            "tinyInteger",
-                            "smallInteger",
-                            "mediumInteger",
-                            "bigInteger",
-                            "unsignedInteger",
-                            "unsignedTinyInteger",
-                            "unsignedSmallInteger",
-                            "unsignedMediumInteger",
-                            "unsignedBigInteger",
-                            "foreignId",
-//                            "foreignIdFor", // Needs custom handling
-                            "float",
-                            "double",
-                            "decimal",
-                            "unsignedFloat",
-                            "unsignedDouble",
-                            "unsignedDecimal",
-                            "boolean",
-                            "enum",
-                            "set",
-                            "json",
-                            "jsonb",
-                            "date",
-                            "dateTime",
-                            "dateTimeTz",
-                            "time",
-                            "timeTz",
-                            "timestamp",
-                            "timestampTz",
-                            "softDeletes",
-                            "softDeletesTz",
-                            "year",
-                            "binary",
-                            "uuid",
-                            "foreignUuid",
-                            "ipAddress",
-                            "macAddress",
-                            "geometry",
-                            "point",
-                            "lineString",
-                            "polygon",
-                            "geometryCollection",
-                            "multiPoint",
-                            "multiLineString",
-                            "multiPolygon",
-                            "multiPolygonZ",
-                            "computed",
-                    ).contains(referenceMethod.name)) {
-                        items.add(LookupElementBuilder.create(referenceMethod.firstPsiChild?.nextPsiSibling?.firstPsiChild?.text?.unquoteAndCleanup() ?: "?").withPsiElement(referenceMethod.firstPsiChild?.nextPsiSibling?.firstPsiChild))
+                    if (referenceMethod.isId()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("id")
+                                .withLookupString("id")
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (referenceMethod.isTimestamps()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("created_at")
+                                .withLookupString("created_at")
+                                .withPsiElement(referenceMethod)
+                        )
+                        items.add(
+                            LookupElementBuilder
+                                .create("updated_at")
+                                .withLookupString("updated_at")
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (referenceMethod.isSoftDeletes()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("deleted_at")
+                                .withLookupString("deleted_at")
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (referenceMethod.isColumnDefinition()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create(referenceMethod.getColumnName() ?: '?')
+                                .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                        )
                     }
                 }
-                // Find $table param
-                // Collect all references of $table param
-                // Parse each reference to build list of columns and indexes added / renamed in this migration
-                // Maybe: exclude columns that are already on the table
-                // Populate items collection with lookup items
             }
         }
 
         result.addAllElements(
-            items.distinctBy { it.lookupString }
+            items
+                .filterNot { (context.sharedContext.get("columns") as List<*>).contains(it.lookupString) }
+                .distinctBy { it.lookupString }
+
         )
 
         result.stopHere()
