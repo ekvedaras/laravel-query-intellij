@@ -102,4 +102,19 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("id", "email", "branch", "amount", "weight", "price", "created_at", "updated_at")
         assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
     }
+
+    fun testDoesNotCompleteColumnsForColumnMethodsInUpMigrationForNewTable() {
+        myFixture.configureByFile("schema/createTableWithColumns.php")
+        myFixture.completeBasic()
+
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id", "id", "email", "branch", "amount", "weight", "price", "created_at", "updated_at");
+    }
+
+    fun testCompletesColumnsForColumnMethodsWhenUpdatingTable() {
+        myFixture.configureByFile("schema/updateTableWithColumns.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "email", "branch", "amount", "weight", "price", "created_at", "updated_at")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
+    }
 }

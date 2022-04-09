@@ -11,6 +11,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.createsTable
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isInsideUpMigration
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
@@ -206,6 +209,7 @@ class ColumnCompletionProvider(private val shouldCompleteAll: Boolean = false) :
         return !ApplicationManager.getApplication().isReadAccessAllowed ||
             parameters.containsVariable() ||
             !method.isBuilderMethodForColumns() ||
+            (method.isBlueprintMethod(project) && method.isColumnDefinition() && method.isInsideUpMigration() && method.createsTable()) ||
             !parameters.isColumnIn(method, allowArray) ||
             parameters.isInsideRegularFunction() ||
             (

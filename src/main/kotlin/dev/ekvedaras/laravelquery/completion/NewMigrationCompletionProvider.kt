@@ -11,6 +11,7 @@ import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.util.IconUtil
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
@@ -18,10 +19,12 @@ import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
 import com.jetbrains.rd.util.first
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.createsTable
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnDefinitionReference
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isId
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isInsideUpMigration
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
@@ -30,6 +33,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
+import icons.DatabaseIcons
 import java.util.Collections
 
 class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -75,6 +79,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                         items.add(
                             LookupElementBuilder
                                 .create("id")
+                                .withIcon(DatabaseIcons.ColGoldKey)
                                 .withPsiElement(referenceMethod)
                         )
                     } else if (referenceMethod.isTimestamps()) {
@@ -82,6 +87,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                             items.add(
                                 LookupElementBuilder
                                     .create("created_at")
+                                    .withIcon(DatabaseIcons.ColDot)
                                     .withPsiElement(referenceMethod)
                             )
                         }
@@ -90,6 +96,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                             items.add(
                                 LookupElementBuilder
                                     .create("updated_at")
+                                    .withIcon(DatabaseIcons.ColDot)
                                     .withPsiElement(referenceMethod)
                             )
                         }
@@ -97,12 +104,14 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                         items.add(
                             LookupElementBuilder
                                 .create("deleted_at")
+                                .withIcon(DatabaseIcons.Col)
                                 .withPsiElement(referenceMethod)
                         )
                     } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
                         items.add(
                             LookupElementBuilder
                                 .create(referenceMethod.getColumnName() ?: '?')
+                                .withIcon(DatabaseIcons.ColDot)
                                 .withPsiElement(referenceMethod.getColumnDefinitionReference())
                         )
                     }
@@ -120,6 +129,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =
         !ApplicationManager.getApplication().isReadAccessAllowed ||
             !method.isBlueprintMethod(project) ||
+            (method.isColumnDefinition() && method.isInsideUpMigration() && method.createsTable()) ||
             parameters.isInsideRegularFunction() ||
             method.firstPsiChild !is VariableImpl
 }
