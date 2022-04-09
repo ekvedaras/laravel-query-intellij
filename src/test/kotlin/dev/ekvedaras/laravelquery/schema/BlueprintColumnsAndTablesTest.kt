@@ -94,4 +94,12 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("id", "branch", "amount", "weight", "price", "created_at", "updated_at")
         assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
     }
+
+    fun testCompletesColumnsForIndexForExistingTable() {
+        myFixture.configureByFile("schema/createExistingTableAndIndex.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "email", "branch", "amount", "weight", "price", "created_at", "updated_at")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
+    }
 }
