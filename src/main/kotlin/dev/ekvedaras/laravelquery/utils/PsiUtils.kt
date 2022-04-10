@@ -36,5 +36,17 @@ class PsiUtils private constructor() {
 
         fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
         private fun PsiElement.typeAsInt(): Int = this.elementType?.index?.toInt() ?: 0
+
+        fun PsiElement.nextSiblingWithText(text: String): PsiElement? {
+            if (this.nextSibling == null) {
+                return null
+            }
+
+            if (this.nextSibling.textMatches(text)) {
+                return this.nextSibling
+            }
+
+            return this.nextSibling.nextSiblingWithText(text)
+        }
     }
 }

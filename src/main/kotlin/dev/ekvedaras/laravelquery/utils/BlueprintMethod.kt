@@ -1,9 +1,13 @@
 package dev.ekvedaras.laravelquery.utils
 
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.parentOfType
+import com.jetbrains.php.lang.psi.elements.ConstantReference
 import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.ParameterList
+import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.nextSiblingWithText
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 
 internal val BlueprintColumnMethods = listOf(
@@ -77,5 +81,15 @@ class BlueprintMethod private constructor() {
         fun MethodReference.getColumnName() = this.getColumnDefinitionReference()?.text?.unquoteAndCleanup()
         fun MethodReference.isInsideUpMigration() = this.parentOfType<Method>()?.name == "up"
         fun MethodReference.createsTable() = this.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "create"
+        fun MethodReference.isNullable() = this.nextSibling is LeafPsiElement &&
+            (this.nextSibling as LeafPsiElement).textMatches("->") &&
+            this.nextSiblingWithText("nullable") != null &&
+            (
+                ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) !is ConstantReference) || (
+                    ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) is ConstantReference)
+                        && ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) as ConstantReference).canonicalText == "true"
+                    )
+                )
+
     }
 }
