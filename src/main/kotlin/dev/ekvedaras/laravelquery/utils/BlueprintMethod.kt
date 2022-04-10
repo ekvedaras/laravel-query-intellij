@@ -70,8 +70,8 @@ internal val BlueprintColumnMethods = listOf(
 class BlueprintMethod private constructor() {
     companion object {
         fun MethodReference.isId() = this.name == "id"
-        fun MethodReference.isTimestamps() = this.name == "timestamps"
-        fun MethodReference.isSoftDeletes() = this.name == "softDeletes"
+        fun MethodReference.isTimestamps() = this.name == "timestamps" || this.name == "timestampsTz"
+        fun MethodReference.isSoftDeletes() = this.name == "softDeletes" || this.name == "softDeletesTz"
         fun MethodReference.isColumnDefinition() = BlueprintColumnMethods.contains(this.name)
         fun MethodReference.getColumnDefinitionReference() = this.firstPsiChild?.nextPsiSibling?.firstPsiChild
         fun MethodReference.getColumnName() = this.getColumnDefinitionReference()?.text?.unquoteAndCleanup()

@@ -117,4 +117,28 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("id", "email", "branch", "amount", "weight", "price", "created_at", "updated_at")
         assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
     }
+
+    fun testCompletesColumnsForNewlyCreatedTableUpdate() {
+        myFixture.configureByFile("schema/updateNewTableWithColumns.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "branch", "amount", "weight", "price", "created_at", "updated_at")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id", "email");
+    }
+
+    fun testCompletesExistingColumnsForTableCreateInDownMigration() {
+        myFixture.configureByFile("schema/createExistingTableInDown.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "email", "created_at", "updated_at")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
+    }
+
+    fun testCompletesNewlyAddedColumnsInDownMigration() {
+        myFixture.configureByFile("schema/dropColumnInDown.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "email", "created_at", "updated_at", "new_column_1", "new_column_2")
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
+    }
 }

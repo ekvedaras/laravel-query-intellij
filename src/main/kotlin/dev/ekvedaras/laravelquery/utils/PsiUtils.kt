@@ -8,6 +8,7 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.Query
+import com.jetbrains.php.lang.psi.elements.Parameter
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import org.jetbrains.annotations.NotNull
@@ -29,6 +30,8 @@ class PsiUtils private constructor() {
         fun PsiElement.isArrayKey(): Boolean = this.elementType.toString() === ElementTypes.ArrayKey
         fun String.unquoteAndCleanup() = this.replace("IntellijIdeaRulezzz", "").trim('\'', '"').trim()
         fun Variable.references(): @NotNull Query<PsiReference> =
+            ReferencesSearch.search(this.originalElement, ProjectScope.getProjectScope(this.project), false)
+        fun Parameter.references(): @NotNull Query<PsiReference> =
             ReferencesSearch.search(this.originalElement, ProjectScope.getProjectScope(this.project), false)
 
         fun PsiReference.statementFirstPsiChild(): PsiElement? = this.element.parentOfType<Statement>()?.firstPsiChild
