@@ -130,7 +130,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                     return@referenceLoop
                 }
 
-                if (method.isColumnDefinitionMethod(method.project)) {
+                if (method.isColumnDefinition()) {
                     if (referenceMethod.isId() && !columns.contains("id")) {
                         items.add(
                             LookupElementBuilder
@@ -182,7 +182,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                         )
                     }
                 } else {
-                    if (!referenceMethod.isColumnDefinitionMethod(method.project)) {
+                    if (!referenceMethod.isColumnDefinition()) {
                         // TODO also scan index methods that can define specific index name or be built of multiple columns
                         return@forEach
                     }
