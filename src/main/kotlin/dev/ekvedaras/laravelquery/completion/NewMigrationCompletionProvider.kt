@@ -12,6 +12,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
+import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Variable
@@ -34,6 +35,10 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
@@ -79,65 +84,11 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
             ApplicationManager.getApplication().runReadAction {
                 method.parentOfType<PhpClass>()?.ownMethods?.forEach { migrationMethod ->
                     if (migrationMethod.name == "up") {
-                        migrationMethod.statementsForTable(target.tablesAndAliases.first().key).forEach { statementMethod ->
-                            statementMethod.blueprintTableParam()?.references()?.forEach referenceLoop@{ reference ->
-                                val referenceMethod = (reference.element as Variable).parent as MethodReference
+                        scabMigrationMethod(migrationMethod, target, method, columns, items)
+                    }
 
-                                if (referenceMethod == method) { // TODO: not working like this
-                                    return@referenceLoop
-                                }
-
-                                if (method.isInsideUpMigration() && method.createsTable() && method.isColumnDefinition()) {
-                                    return@referenceLoop
-                                }
-
-                                if (referenceMethod.isId() && !columns.contains("id")) {
-                                    items.add(
-                                        LookupElementBuilder
-                                            .create("id")
-                                            .withIcon(DatabaseIcons.ColGoldKey)
-                                            .withTypeText("primary")
-                                            .withPsiElement(referenceMethod)
-                                    )
-                                } else if (referenceMethod.isTimestamps()) {
-                                    if (!columns.contains("created_at")) {
-                                        items.add(
-                                            LookupElementBuilder
-                                                .create("created_at")
-                                                .withIcon(DatabaseIcons.ColDot)
-                                                .withTypeText(referenceMethod.name)
-                                                .withPsiElement(referenceMethod)
-                                        )
-                                    }
-
-                                    if (!columns.contains("updated_at")) {
-                                        items.add(
-                                            LookupElementBuilder
-                                                .create("updated_at")
-                                                .withIcon(DatabaseIcons.ColDot)
-                                                .withTypeText(referenceMethod.name)
-                                                .withPsiElement(referenceMethod)
-                                        )
-                                    }
-                                } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
-                                    items.add(
-                                        LookupElementBuilder
-                                            .create("deleted_at")
-                                            .withIcon(DatabaseIcons.Col)
-                                            .withTypeText("timestamp")
-                                            .withPsiElement(referenceMethod)
-                                    )
-                                } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
-                                    items.add(
-                                        LookupElementBuilder
-                                            .create(referenceMethod.getColumnName() ?: '?')
-                                            .withIcon(referenceMethod.dbIcon())
-                                            .withTypeText(referenceMethod.name)
-                                            .withPsiElement(referenceMethod.getColumnDefinitionReference())
-                                    )
-                                }
-                            }
-                        }
+                    if (shouldScanDownMethod(migrationMethod, method)) {
+                        scabMigrationMethod(migrationMethod, target, method, columns, items)
                     }
                 }
             }
@@ -148,6 +99,80 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
         )
 
         result.stopHere()
+    }
+
+    private fun shouldScanDownMethod(
+        migrationMethod: Method,
+        method: MethodReference
+    ) =
+        migrationMethod.name == "down" && method.parentOfType<Method>()?.name == "down" && (method.isBuilderMethodForIndexes() || method.isBuilderMethodForKeys() || method.isBuilderMethodForUniqueIndexes())
+
+    private fun scabMigrationMethod(
+        migrationMethod: Method,
+        target: DbReferenceExpression,
+        method: MethodReference,
+        columns: Iterable<String>,
+        items: MutableList<LookupElement>
+    ) {
+        migrationMethod.statementsForTable(target.tablesAndAliases.first().key).forEach { statementMethod ->
+            statementMethod.blueprintTableParam()?.references()?.forEach referenceLoop@{ reference ->
+                val referenceMethod = (reference.element as Variable).parent as MethodReference
+
+                if (referenceMethod == method) { // TODO: not working like this
+                    return@referenceLoop
+                }
+
+                if (method.isInsideUpMigration() && method.createsTable() && method.isColumnDefinition()) {
+                    return@referenceLoop
+                }
+
+                if (referenceMethod.isId() && !columns.contains("id")) {
+                    items.add(
+                        LookupElementBuilder
+                            .create("id")
+                            .withIcon(DatabaseIcons.ColGoldKey)
+                            .withTypeText("primary")
+                            .withPsiElement(referenceMethod)
+                    )
+                } else if (referenceMethod.isTimestamps()) {
+                    if (!columns.contains("created_at")) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("created_at")
+                                .withIcon(DatabaseIcons.ColDot)
+                                .withTypeText(referenceMethod.name)
+                                .withPsiElement(referenceMethod)
+                        )
+                    }
+
+                    if (!columns.contains("updated_at")) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("updated_at")
+                                .withIcon(DatabaseIcons.ColDot)
+                                .withTypeText(referenceMethod.name)
+                                .withPsiElement(referenceMethod)
+                        )
+                    }
+                } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
+                    items.add(
+                        LookupElementBuilder
+                            .create("deleted_at")
+                            .withIcon(DatabaseIcons.Col)
+                            .withTypeText("timestamp")
+                            .withPsiElement(referenceMethod)
+                    )
+                } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
+                    items.add(
+                        LookupElementBuilder
+                            .create(referenceMethod.getColumnName() ?: '?')
+                            .withIcon(referenceMethod.dbIcon())
+                            .withTypeText(referenceMethod.name)
+                            .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                    )
+                }
+            }
+        }
     }
 
     private fun shouldNotComplete(project: Project, method: MethodReference, parameters: CompletionParameters) =

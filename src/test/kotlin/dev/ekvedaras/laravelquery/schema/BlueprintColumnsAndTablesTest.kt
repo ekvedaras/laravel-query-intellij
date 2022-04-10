@@ -141,4 +141,20 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("id", "email", "created_at", "updated_at", "new_column_1", "new_column_2")
         assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id");
     }
+
+    fun testCompletesNewlyAddedColumnsFromDownMigrationInDownMigrationForIndexMethod() {
+        myFixture.configureByFile("schema/addIndexInDown.php")
+        myFixture.completeBasic()
+
+        assertCompletion("new_column_1", "new_column_2", "new_column_3");
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id", "email");
+    }
+
+    fun testDoesNotCompleteNewlyAddedColumnsFromDownMigrationInUpMigrationForIndexMethod() {
+        myFixture.configureByFile("schema/addIndexInUpFromDown.php")
+        myFixture.completeBasic()
+
+        assertCompletion("new_column_1", "new_column_2");
+        assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id", "email", "new_column_3");
+    }
 }
