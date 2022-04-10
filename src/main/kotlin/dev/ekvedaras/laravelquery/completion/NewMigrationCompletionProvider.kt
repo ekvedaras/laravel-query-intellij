@@ -29,7 +29,6 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasUniqueIndex
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isId
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isInsideUpMigration
-import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isNullable
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isPrimary
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
@@ -38,7 +37,7 @@ import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForIndexes
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.MethodUtils
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
@@ -104,8 +103,13 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
     private fun shouldScanDownMethod(
         migrationMethod: Method,
         method: MethodReference
-    ) =
-        migrationMethod.name == "down" && method.parentOfType<Method>()?.name == "down" && (method.isBuilderMethodForIndexes() || method.isBuilderMethodForKeys() || method.isBuilderMethodForUniqueIndexes())
+    ) = migrationMethod.name == "down" &&
+        method.parentOfType<Method>()?.name == "down" &&
+        (
+            method.isBuilderMethodForIndexes() ||
+                method.isBuilderMethodForKeys() ||
+                method.isBuilderMethodForUniqueIndexes()
+            )
 
     private fun scabMigrationMethod(
         migrationMethod: Method,
@@ -118,7 +122,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
             statementMethod.blueprintTableParam()?.references()?.forEach referenceLoop@{ reference ->
                 val referenceMethod = (reference.element as Variable).parent as MethodReference
 
-                if (referenceMethod == method) { // TODO: not working like this
+                if (referenceMethod == method) {
                     return@referenceLoop
                 }
 
@@ -126,50 +130,91 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                     return@referenceLoop
                 }
 
-                if (referenceMethod.isId() && !columns.contains("id")) {
-                    items.add(
-                        LookupElementBuilder
-                            .create("id")
-                            .withIcon(DatabaseIcons.ColGoldKey)
-                            .withTypeText("primary")
-                            .withPsiElement(referenceMethod)
-                    )
-                } else if (referenceMethod.isTimestamps()) {
-                    if (!columns.contains("created_at")) {
+                if (method.isColumnDefinitionMethod(method.project)) {
+                    if (referenceMethod.isId() && !columns.contains("id")) {
                         items.add(
                             LookupElementBuilder
-                                .create("created_at")
-                                .withIcon(DatabaseIcons.ColDot)
-                                .withTypeText(referenceMethod.name)
+                                .create("id")
+                                .withIcon(DatabaseIcons.ColGoldKey)
+                                .withTailText("  primary")
+                                .withTypeText(target.tablesAndAliases.first().key)
                                 .withPsiElement(referenceMethod)
                         )
+                    } else if (referenceMethod.isTimestamps()) {
+                        if (!columns.contains("created_at")) {
+                            items.add(
+                                LookupElementBuilder
+                                    .create("created_at")
+                                    .withIcon(DatabaseIcons.ColDot)
+                                    .withTailText("  " + referenceMethod.name)
+                                    .withTypeText(target.tablesAndAliases.first().key)
+                                    .withPsiElement(referenceMethod)
+                            )
+                        }
+
+                        if (!columns.contains("updated_at")) {
+                            items.add(
+                                LookupElementBuilder
+                                    .create("updated_at")
+                                    .withIcon(DatabaseIcons.ColDot)
+                                    .withTailText("  " + referenceMethod.name)
+                                    .withTypeText(target.tablesAndAliases.first().key)
+                                    .withPsiElement(referenceMethod)
+                            )
+                        }
+                    } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("deleted_at")
+                                .withIcon(DatabaseIcons.Col)
+                                .withTailText("  timestamp")
+                                .withTypeText(target.tablesAndAliases.first().key)
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
+                        items.add(
+                            LookupElementBuilder
+                                .create(referenceMethod.getColumnName() ?: '?')
+                                .withIcon(referenceMethod.dbIcon())
+                                .withTailText("  " + referenceMethod.name)
+                                .withTypeText(target.tablesAndAliases.first().key)
+                                .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                        )
+                    }
+                } else {
+                    if (!referenceMethod.isColumnDefinitionMethod(method.project)) {
+                        // TODO also scan index methods that can define specific index name or be built of multiple columns
+                        return@forEach
                     }
 
-                    if (!columns.contains("updated_at")) {
+                    if (method.isBuilderMethodForKeys() && referenceMethod.isPrimary()) {
                         items.add(
                             LookupElementBuilder
-                                .create("updated_at")
-                                .withIcon(DatabaseIcons.ColDot)
-                                .withTypeText(referenceMethod.name)
+                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_primary")
+                                .withIcon(DatabaseIcons.GoldKey)
+                                .withTailText("  " + referenceMethod.name)
+                                .withTypeText(target.tablesAndAliases.first().key)
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (method.isBuilderMethodForIndexes() && referenceMethod.hasIndex()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_index")
+                                .withIcon(DatabaseIcons.Index)
+                                .withTailText("  " + referenceMethod.name)
+                                .withTypeText(target.tablesAndAliases.first().key)
+                                .withPsiElement(referenceMethod)
+                        )
+                    } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.hasUniqueIndex()) {
+                        items.add(
+                            LookupElementBuilder
+                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_unique")
+                                .withIcon(DatabaseIcons.BlueKey)
+                                .withTailText("  " + referenceMethod.name)
+                                .withTypeText(target.tablesAndAliases.first().key)
                                 .withPsiElement(referenceMethod)
                         )
                     }
-                } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
-                    items.add(
-                        LookupElementBuilder
-                            .create("deleted_at")
-                            .withIcon(DatabaseIcons.Col)
-                            .withTypeText("timestamp")
-                            .withPsiElement(referenceMethod)
-                    )
-                } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
-                    items.add(
-                        LookupElementBuilder
-                            .create(referenceMethod.getColumnName() ?: '?')
-                            .withIcon(referenceMethod.dbIcon())
-                            .withTypeText(referenceMethod.name)
-                            .withPsiElement(referenceMethod.getColumnDefinitionReference())
-                    )
                 }
             }
         }

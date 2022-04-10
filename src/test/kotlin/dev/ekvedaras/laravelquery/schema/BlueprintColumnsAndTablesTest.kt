@@ -157,4 +157,15 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("new_column_1", "new_column_2");
         assertNoCompletion("testProject1", "testProject2", "orders", "users", "customers", "user_id", "email", "new_column_3");
     }
+
+    fun testCompletesIndexesButNotColumnsInDropIndexInDown() {
+        myFixture.configureByFile("schema/dropIndexScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("unique_new_column", "orders_new_column_2_index");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+        );
+    }
 }
