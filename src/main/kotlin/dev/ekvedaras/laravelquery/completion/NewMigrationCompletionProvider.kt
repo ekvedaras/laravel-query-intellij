@@ -20,12 +20,16 @@ import com.jetbrains.rd.util.first
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.createsTable
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.dbIcon
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnDefinitionReference
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasIndex
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasUniqueIndex
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isId
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isInsideUpMigration
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isNullable
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isPrimary
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
@@ -127,13 +131,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                                     items.add(
                                         LookupElementBuilder
                                             .create(referenceMethod.getColumnName() ?: '?')
-                                            .withIcon(
-                                                if (referenceMethod.isNullable()) {
-                                                    DatabaseIcons.Col
-                                                } else {
-                                                    DatabaseIcons.ColDot
-                                                }
-                                            )
+                                            .withIcon(referenceMethod.dbIcon())
                                             .withTypeText(referenceMethod.name)
                                             .withPsiElement(referenceMethod.getColumnDefinitionReference())
                                     )

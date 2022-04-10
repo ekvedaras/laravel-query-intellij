@@ -7,8 +7,9 @@ import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.nextSiblingWithText
+import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.nextSiblingInTreeWithText
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import icons.DatabaseIcons
 
 internal val BlueprintColumnMethods = listOf(
     "increments",
@@ -83,13 +84,43 @@ class BlueprintMethod private constructor() {
         fun MethodReference.createsTable() = this.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "create"
         fun MethodReference.isNullable() = this.nextSibling is LeafPsiElement &&
             (this.nextSibling as LeafPsiElement).textMatches("->") &&
-            this.nextSiblingWithText("nullable") != null &&
+            this.nextSiblingInTreeWithText("nullable") != null &&
             (
-                ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) !is ConstantReference) || (
-                    ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) is ConstantReference)
-                        && ((this.nextSiblingWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) as ConstantReference).canonicalText == "true"
+                ((this.nextSiblingInTreeWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) !is ConstantReference) || (
+                    ((this.nextSiblingInTreeWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) is ConstantReference)
+                        && ((this.nextSiblingInTreeWithText("nullable")!!.nextSibling.nextSibling as ParameterList).getParameter(0) as ConstantReference).canonicalText == "true"
                     )
                 )
 
+        fun MethodReference.hasUniqueIndex() = this.nextSibling is LeafPsiElement &&
+            (this.nextSibling as LeafPsiElement).textMatches("->") &&
+            this.nextSiblingInTreeWithText("unique") != null
+
+        fun MethodReference.hasIndex() = this.nextSibling is LeafPsiElement &&
+            (this.nextSibling as LeafPsiElement).textMatches("->") &&
+            this.nextSiblingInTreeWithText("index") != null
+
+        fun MethodReference.isPrimary() = this.nextSibling is LeafPsiElement &&
+            (this.nextSibling as LeafPsiElement).textMatches("->") &&
+            this.nextSiblingInTreeWithText("primary") != null
+
+        fun MethodReference.dbIcon() =
+            if (this.isPrimary()) {
+                DatabaseIcons.ColGoldKey
+            } else if (this.hasIndex()) {
+                if (this.isNullable()) {
+                    DatabaseIcons.ColIndex
+                } else {
+                    DatabaseIcons.ColDotIndex
+                }
+            } else if (this.hasUniqueIndex()) {
+                if (this.isNullable()) {
+                    DatabaseIcons.ColBlueKeyIndex
+                } else {
+                    DatabaseIcons.ColBlueKeyDotIndex
+                }
+            } else {
+                DatabaseIcons.ColDot
+            }
     }
 }
