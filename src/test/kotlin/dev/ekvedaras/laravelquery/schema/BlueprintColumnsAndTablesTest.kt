@@ -162,7 +162,18 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         myFixture.configureByFile("schema/dropIndexScanMigration.php")
         myFixture.completeBasic()
 
-        assertCompletion("unique_new_column", "orders_new_column_2_index");
+        assertCompletion("index_new_column", "orders_new_column_2_index");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+        );
+    }
+
+    fun testCompletesUniqueIndexesButNotColumnsInDropUniqueIndexInDown() {
+        myFixture.configureByFile("schema/dropUniqueIndexScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("unique_new_column", "orders_new_column_2_unique", "orders_new_column_3_unique", "orders_new_column_2_new_column_3_unique");
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",

@@ -24,6 +24,7 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.createsTable
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.dbIcon
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnDefinitionReference
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getIndexName
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasIndex
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasUniqueIndex
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isColumnDefinition
@@ -183,7 +184,35 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                     }
                 } else {
                     if (!referenceMethod.isColumnDefinition()) {
-                        // TODO also scan index methods that can define specific index name or be built of multiple columns
+                        if (method.isBuilderMethodForKeys() && referenceMethod.name == "primary") {
+                            items.add(
+                                LookupElementBuilder
+                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                                    .withIcon(DatabaseIcons.GoldKey)
+                                    .withTailText("  " + referenceMethod.name)
+                                    .withTypeText(target.tablesAndAliases.first().key)
+                                    .withPsiElement(referenceMethod)
+                            )
+                        } else if (method.isBuilderMethodForIndexes() && referenceMethod.name == "index") {
+                            items.add(
+                                LookupElementBuilder
+                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                                    .withIcon(DatabaseIcons.Index)
+                                    .withTailText("  " + referenceMethod.name)
+                                    .withTypeText(target.tablesAndAliases.first().key)
+                                    .withPsiElement(referenceMethod)
+                            )
+                        } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.name == "unique") {
+                            items.add(
+                                LookupElementBuilder
+                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                                    .withIcon(DatabaseIcons.BlueKey)
+                                    .withTailText("  " + referenceMethod.name)
+                                    .withTypeText(target.tablesAndAliases.first().key)
+                                    .withPsiElement(referenceMethod)
+                            )
+                        }
+
                         return@forEach
                     }
 
