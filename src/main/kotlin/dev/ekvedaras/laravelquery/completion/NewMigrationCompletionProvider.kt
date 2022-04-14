@@ -213,7 +213,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                             )
                         }
 
-                        return@forEach
+                        return@referenceLoop
                     }
 
                     if (method.isBuilderMethodForKeys() && referenceMethod.isPrimary()) {

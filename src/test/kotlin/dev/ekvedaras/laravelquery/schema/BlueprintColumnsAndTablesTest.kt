@@ -179,4 +179,67 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
         );
     }
+
+    fun testCompletesPrimaryKeyFromColumnButNotColumnsInDropPrimaryInDown() {
+        myFixture.configureByFile("schema/dropPrimaryFromColumnScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("orders_new_column_1_primary");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+        );
+    }
+
+    fun testCompletesPrimaryKeyFromIndexButNotColumnsInDropPrimaryInDown() {
+        myFixture.configureByFile("schema/dropPrimaryFromIndexScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("orders_new_column_1_primary");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+        );
+    }
+
+    fun testCompletesPrimaryKeyFromIndexWithNameButNotColumnsInDropPrimaryInDown() {
+        myFixture.configureByFile("schema/dropPrimaryFromIndexWithNameScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("orders_primary_key");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "orders_new_column_1_primary",
+        );
+    }
+
+    fun testDoesNotCompletePrimaryKeyFromIdColumnInDropPrimaryInDown() {
+        myFixture.configureByFile("schema/dropPrimaryFromIdColumnScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion();
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "orders_id_primary",
+        );
+    }
+
+    fun testCompletesPrimaryKeyColumnsInDropPrimaryInDown() {
+        myFixture.configureByFile("schema/dropPrimaryColumnsScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("new_column_1", "new_column_2");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_1",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "orders_id_primary",
+        );
+    }
 }

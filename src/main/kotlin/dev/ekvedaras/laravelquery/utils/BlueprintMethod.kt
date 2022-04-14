@@ -89,7 +89,11 @@ class BlueprintMethod private constructor() {
 
                 while (element?.nextPsiSibling != null) {
                     element = element.nextPsiSibling
-                    name += if (element != null) { "_" + element.text.unquoteAndCleanup() } else { "" }
+                    name += if (element != null) {
+                        "_" + element.text.unquoteAndCleanup()
+                    } else {
+                        ""
+                    }
                 }
 
                 return name
@@ -97,6 +101,7 @@ class BlueprintMethod private constructor() {
 
             return this.getColumnDefinitionReference()?.text?.unquoteAndCleanup()
         }
+
         fun MethodReference.isInsideUpMigration() = this.parentOfType<Method>()?.name == "up"
         fun MethodReference.createsTable() = this.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "create"
         fun MethodReference.isNullable() = this.nextSibling is LeafPsiElement &&
