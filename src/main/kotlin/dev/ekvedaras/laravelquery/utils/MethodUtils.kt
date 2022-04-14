@@ -128,6 +128,8 @@ class MethodUtils private constructor() {
             return null
         }
 
+        fun MethodReference.isSameInSameFile(that: MethodReference) = this.absoluteRange == that.absoluteRange
+
         private fun findMethodsInTree(root: PsiElement?, list: MutableList<MethodReference>) {
             if (root == null) {
                 return

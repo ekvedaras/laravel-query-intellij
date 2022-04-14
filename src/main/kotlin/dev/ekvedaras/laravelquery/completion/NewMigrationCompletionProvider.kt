@@ -24,6 +24,7 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.createsTable
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.dbIcon
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnDefinitionReference
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumns
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getIndexName
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasIndex
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.hasUniqueIndex
@@ -34,14 +35,15 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isPrimary
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.wantsColumn
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.wantsColumnForIndexes
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnDefinitionMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
 import dev.ekvedaras.laravelquery.utils.MethodUtils
+import dev.ekvedaras.laravelquery.utils.MethodUtils.Companion.isSameInSameFile
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.references
 import dev.ekvedaras.laravelquery.utils.SchemaMethod.Companion.blueprintTableParam
 import dev.ekvedaras.laravelquery.utils.SchemaMethod.Companion.statementsForTable
@@ -124,7 +126,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
             statementMethod.blueprintTableParam()?.references()?.forEach referenceLoop@{ reference ->
                 val referenceMethod = (reference.element as Variable).parent as MethodReference
 
-                if (referenceMethod == method) {
+                if (referenceMethod.isSameInSameFile(method)) {
                     return@referenceLoop
                 }
 
@@ -133,119 +135,192 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                 }
 
                 if (method.wantsColumn()) {
-                    if (referenceMethod.isId() && !columns.contains("id")) {
-                        items.add(
-                            LookupElementBuilder
-                                .create("id")
-                                .withIcon(DatabaseIcons.ColGoldKey)
-                                .withTailText("  primary")
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod)
-                        )
-                    } else if (referenceMethod.isTimestamps()) {
-                        if (!columns.contains("created_at")) {
-                            items.add(
-                                LookupElementBuilder
-                                    .create("created_at")
-                                    .withIcon(DatabaseIcons.ColDot)
-                                    .withTailText("  " + referenceMethod.name)
-                                    .withTypeText(target.tablesAndAliases.first().key)
-                                    .withPsiElement(referenceMethod)
-                            )
-                        }
-
-                        if (!columns.contains("updated_at")) {
-                            items.add(
-                                LookupElementBuilder
-                                    .create("updated_at")
-                                    .withIcon(DatabaseIcons.ColDot)
-                                    .withTailText("  " + referenceMethod.name)
-                                    .withTypeText(target.tablesAndAliases.first().key)
-                                    .withPsiElement(referenceMethod)
-                            )
-                        }
-                    } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
-                        items.add(
-                            LookupElementBuilder
-                                .create("deleted_at")
-                                .withIcon(DatabaseIcons.Col)
-                                .withTailText("  timestamp")
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod)
-                        )
-                    } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
-                        items.add(
-                            LookupElementBuilder
-                                .create(referenceMethod.getColumnName() ?: '?')
-                                .withIcon(referenceMethod.dbIcon())
-                                .withTailText("  " + referenceMethod.name)
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod.getColumnDefinitionReference())
-                        )
+                    if (method.wantsColumnForIndexes()) {
+                        addColumnForIndex(method, referenceMethod, items, target)
+                    } else {
+                        addColumn(referenceMethod, columns, items, target)
                     }
                 } else {
                     if (!referenceMethod.isColumnDefinition()) {
-                        if (method.isBuilderMethodForKeys() && referenceMethod.name == "primary") {
-                            items.add(
-                                LookupElementBuilder
-                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
-                                    .withIcon(DatabaseIcons.GoldKey)
-                                    .withTailText("  " + referenceMethod.name)
-                                    .withTypeText(target.tablesAndAliases.first().key)
-                                    .withPsiElement(referenceMethod)
-                            )
-                        } else if (method.isBuilderMethodForIndexes() && referenceMethod.name == "index") {
-                            items.add(
-                                LookupElementBuilder
-                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
-                                    .withIcon(DatabaseIcons.Index)
-                                    .withTailText("  " + referenceMethod.name)
-                                    .withTypeText(target.tablesAndAliases.first().key)
-                                    .withPsiElement(referenceMethod)
-                            )
-                        } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.name == "unique") {
-                            items.add(
-                                LookupElementBuilder
-                                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
-                                    .withIcon(DatabaseIcons.BlueKey)
-                                    .withTailText("  " + referenceMethod.name)
-                                    .withTypeText(target.tablesAndAliases.first().key)
-                                    .withPsiElement(referenceMethod)
-                            )
-                        }
+                        addIndexFromIndexMethod(method, referenceMethod, items, target)
 
                         return@referenceLoop
                     }
 
-                    if (method.isBuilderMethodForKeys() && referenceMethod.isPrimary()) {
-                        items.add(
-                            LookupElementBuilder
-                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_primary")
-                                .withIcon(DatabaseIcons.GoldKey)
-                                .withTailText("  " + referenceMethod.name)
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod)
-                        )
-                    } else if (method.isBuilderMethodForIndexes() && referenceMethod.hasIndex()) {
-                        items.add(
-                            LookupElementBuilder
-                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_index")
-                                .withIcon(DatabaseIcons.Index)
-                                .withTailText("  " + referenceMethod.name)
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod)
-                        )
-                    } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.hasUniqueIndex()) {
-                        items.add(
-                            LookupElementBuilder
-                                .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_unique")
-                                .withIcon(DatabaseIcons.BlueKey)
-                                .withTailText("  " + referenceMethod.name)
-                                .withTypeText(target.tablesAndAliases.first().key)
-                                .withPsiElement(referenceMethod)
-                        )
-                    }
+                    addIndexFromColumnMethod(method, referenceMethod, items, target)
                 }
+            }
+        }
+    }
+
+    private fun addIndexFromColumnMethod(
+        method: MethodReference,
+        referenceMethod: MethodReference,
+        items: MutableList<LookupElement>,
+        target: DbReferenceExpression
+    ) {
+        if (method.isBuilderMethodForKeys() && referenceMethod.isPrimary()) {
+            items.add(
+                LookupElementBuilder
+                    .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_primary")
+                    .withIcon(DatabaseIcons.GoldKey)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (method.isBuilderMethodForIndexes() && referenceMethod.hasIndex()) {
+            items.add(
+                LookupElementBuilder
+                    .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_index")
+                    .withIcon(DatabaseIcons.Index)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.hasUniqueIndex()) {
+            items.add(
+                LookupElementBuilder
+                    .create("${target.tablesAndAliases.first().key}_${referenceMethod.getColumnName() ?: "?"}_unique")
+                    .withIcon(DatabaseIcons.BlueKey)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        }
+    }
+
+    private fun addIndexFromIndexMethod(
+        method: MethodReference,
+        referenceMethod: MethodReference,
+        items: MutableList<LookupElement>,
+        target: DbReferenceExpression
+    ) {
+        if (method.isBuilderMethodForKeys() && referenceMethod.name == "primary") {
+            items.add(
+                LookupElementBuilder
+                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                    .withIcon(DatabaseIcons.GoldKey)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (method.isBuilderMethodForIndexes() && referenceMethod.name == "index") {
+            items.add(
+                LookupElementBuilder
+                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                    .withIcon(DatabaseIcons.Index)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (method.isBuilderMethodForUniqueIndexes() && referenceMethod.name == "unique") {
+            items.add(
+                LookupElementBuilder
+                    .create(referenceMethod.getIndexName(target.tablesAndAliases.first().key))
+                    .withIcon(DatabaseIcons.BlueKey)
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        }
+    }
+
+    private fun addColumn(
+        referenceMethod: MethodReference,
+        columns: Iterable<String>,
+        items: MutableList<LookupElement>,
+        target: DbReferenceExpression
+    ) {
+        if (referenceMethod.isId() && !columns.contains("id")) {
+            items.add(
+                LookupElementBuilder
+                    .create("id")
+                    .withIcon(DatabaseIcons.ColGoldKey)
+                    .withTailText("  primary")
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (referenceMethod.isTimestamps()) {
+            if (!columns.contains("created_at")) {
+                items.add(
+                    LookupElementBuilder
+                        .create("created_at")
+                        .withIcon(DatabaseIcons.ColDot)
+                        .withTailText("  " + referenceMethod.name)
+                        .withTypeText(target.tablesAndAliases.first().key)
+                        .withPsiElement(referenceMethod)
+                )
+            }
+
+            if (!columns.contains("updated_at")) {
+                items.add(
+                    LookupElementBuilder
+                        .create("updated_at")
+                        .withIcon(DatabaseIcons.ColDot)
+                        .withTailText("  " + referenceMethod.name)
+                        .withTypeText(target.tablesAndAliases.first().key)
+                        .withPsiElement(referenceMethod)
+                )
+            }
+        } else if (referenceMethod.isSoftDeletes() && !columns.contains("deleted_at")) {
+            items.add(
+                LookupElementBuilder
+                    .create("deleted_at")
+                    .withIcon(DatabaseIcons.Col)
+                    .withTailText("  timestamp")
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod)
+            )
+        } else if (referenceMethod.isColumnDefinition() && !columns.contains(referenceMethod.getColumnName())) {
+            items.add(
+                LookupElementBuilder
+                    .create(referenceMethod.getColumnName() ?: '?')
+                    .withIcon(referenceMethod.dbIcon())
+                    .withTailText("  " + referenceMethod.name)
+                    .withTypeText(target.tablesAndAliases.first().key)
+                    .withPsiElement(referenceMethod.getColumnDefinitionReference())
+            )
+        }
+    }
+
+    private fun addColumnForIndex(
+        method: MethodReference,
+        referenceMethod: MethodReference,
+        items: MutableList<LookupElement>,
+        target: DbReferenceExpression
+    ) {
+        if (method.isBuilderMethodForKeys() && (referenceMethod.isPrimary() || referenceMethod.isBuilderMethodForKeys())) {
+            referenceMethod.getColumns().forEach { column ->
+                items.add(
+                    LookupElementBuilder
+                        .create(column)
+                        .withIcon(referenceMethod.dbIcon()) // TODO: find column definition method and use that here
+//                        .withTailText("  " + referenceMethod.name) // TODO: find column definition method and use that here
+                        .withTypeText(target.tablesAndAliases.first().key)
+                        .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                )
+            }
+        } else if (method.isBuilderMethodForIndexes() && (referenceMethod.hasIndex() || referenceMethod.isBuilderMethodForIndexes())) {
+            referenceMethod.getColumns().forEach { column ->
+                items.add(
+                    LookupElementBuilder
+                        .create(column)
+                        .withIcon(referenceMethod.dbIcon()) // TODO: find column definition method and use that here
+//                        .withTailText("  " + referenceMethod.name) // TODO: find column definition method and use that here
+                        .withTypeText(target.tablesAndAliases.first().key)
+                        .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                )
+            }
+        } else if (method.isBuilderMethodForUniqueIndexes() && (referenceMethod.hasUniqueIndex() || referenceMethod.isBuilderMethodForUniqueIndexes())) {
+            referenceMethod.getColumns().forEach { column ->
+                items.add(
+                    LookupElementBuilder
+                        .create(column)
+                        .withIcon(referenceMethod.dbIcon()) // TODO: find column definition method and use that here
+//                        .withTailText("  " + referenceMethod.name) // TODO: find column definition method and use that here
+                        .withTypeText(target.tablesAndAliases.first().key)
+                        .withPsiElement(referenceMethod.getColumnDefinitionReference())
+                )
             }
         }
     }

@@ -9,6 +9,8 @@ import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.wantsColumnForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
@@ -84,12 +86,18 @@ class BlueprintMethod private constructor() {
         fun MethodReference.isTimestamps() = this.name == "timestamps" || this.name == "timestampsTz"
         fun MethodReference.isSoftDeletes() = this.name == "softDeletes" || this.name == "softDeletesTz"
         fun MethodReference.isColumnDefinition() = BlueprintColumnMethods.contains(this.name)
-        fun MethodReference.wantsColumn() = this.isColumnDefinition() || this.name == "dropColumn" ||
-            (this.findParameterListDown()?.getParameter(0) is ArrayCreationExpression && (
+        fun MethodReference.wantsColumn() = this.isColumnDefinition() || this.name == "dropColumn" || (
+            this.findParameterListDown()?.getParameter(0) is ArrayCreationExpression && (
                 this.isBuilderMethodForIndexes() ||
                     this.isBuilderMethodForKeys() ||
                     this.isBuilderMethodForUniqueIndexes()
-                ))
+                )
+            )
+        fun MethodReference.wantsColumnForIndexes() = (this.name?.startsWith("drop") ?: false) && this.findParameterListDown()?.getParameter(0) is ArrayCreationExpression && (
+            this.isBuilderMethodForIndexes() ||
+                this.isBuilderMethodForKeys() ||
+                this.isBuilderMethodForUniqueIndexes()
+            )
 
         fun MethodReference.getColumnDefinitionReference() = this.firstPsiChild?.nextPsiSibling?.firstPsiChild
         fun MethodReference.getColumnName(): String? {
@@ -110,6 +118,22 @@ class BlueprintMethod private constructor() {
             }
 
             return this.getColumnDefinitionReference()?.text?.unquoteAndCleanup()
+        }
+        fun MethodReference.getColumns(): List<String> {
+            if (this.getColumnDefinitionReference() !is ArrayCreationExpression) {
+                return listOf(this.getColumnDefinitionReference()?.text?.unquoteAndCleanup() ?: "")
+            }
+
+            val names = mutableListOf<String>()
+            var element = (this.getColumnDefinitionReference() as ArrayCreationExpression).firstPsiChild
+            names += element?.text?.unquoteAndCleanup() ?: ""
+
+            while (element?.nextPsiSibling != null) {
+                element = element.nextPsiSibling
+                names += element?.text?.unquoteAndCleanup() ?: ""
+            }
+
+            return names
         }
 
         fun MethodReference.isInsideUpMigration() = this.parentOfType<Method>()?.name == "up"

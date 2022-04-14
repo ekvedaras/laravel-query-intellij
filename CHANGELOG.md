@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Parse migration file to auto complete columns and indexes from the file itself.
 
 ## [3.1.1]
 ### Added

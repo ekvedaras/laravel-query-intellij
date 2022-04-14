@@ -165,7 +165,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("index_new_column", "orders_new_column_2_index");
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
-            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3", ""
         );
     }
 
@@ -176,7 +176,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("unique_new_column", "orders_new_column_2_unique", "orders_new_column_3_unique", "orders_new_column_2_new_column_3_unique");
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
-            "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
+            "user_id", "email", "new_column_1", "new_column_2", "new_column_3", ""
         );
     }
 
@@ -188,7 +188,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
-            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique", ""
         );
     }
 
@@ -200,7 +200,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
-            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique", ""
         );
     }
 
@@ -213,7 +213,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
             "testProject1", "testProject2", "orders", "users", "customers",
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
             "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
-            "orders_new_column_1_primary",
+            "orders_new_column_1_primary", ""
         );
     }
 
@@ -226,7 +226,7 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
             "testProject1", "testProject2", "orders", "users", "customers",
             "user_id", "email", "new_column_1", "new_column_2", "new_column_3",
             "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
-            "orders_id_primary",
+            "orders_id_primary", "",
         );
     }
 
@@ -237,9 +237,22 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
         assertCompletion("new_column_1", "new_column_2");
         assertNoCompletion(
             "testProject1", "testProject2", "orders", "users", "customers",
-            "user_id", "email", "new_column_1",
+            "user_id", "email",
             "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
-            "orders_id_primary",
+            "orders_id_primary", "",
+        );
+    }
+
+    fun testCompletesIndexColumnsInDropIndexInDown() {
+        myFixture.configureByFile("schema/dropIndexColumnsScanMigration.php")
+        myFixture.completeBasic()
+
+        assertCompletion("new_column_1", "new_column_2", "new_column_5");
+        assertNoCompletion(
+            "testProject1", "testProject2", "orders", "users", "customers",
+            "user_id", "email", "new_column_3", "new_column_4",
+            "unique_new_column", "orders_new_column_3_index", "orders_new_column_1_new_column_2_unique",
+            "orders_id_primary", "",
         );
     }
 }
