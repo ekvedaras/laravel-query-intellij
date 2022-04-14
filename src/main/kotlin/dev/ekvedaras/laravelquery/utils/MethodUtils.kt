@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.utils
 
 import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.database.util.isInstanceOf
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -157,9 +158,13 @@ fun PsiElement.findParamIndex(allowArray: Boolean = false): Int {
     }
 }
 
-fun PsiElement.findParameterList(): ParameterList? =
+fun PsiElement.findParameterListUp(): ParameterList? =
     if (this is ParameterList) this
-    else this.parent?.findParameterList()
+    else this.parent?.findParameterListUp()
+
+fun PsiElement.findParameterListDown(): ParameterList? =
+    if (this is ParameterList) this
+    else this.children.firstOrNull { it.findParameterListDown() != null }?.findParameterListDown()
 
 fun MethodReference.isJoinOrRelation(project: Project): Boolean =
     MethodUtils.resolveMethodClasses(this, project).any { it.isJoinOrRelation() }

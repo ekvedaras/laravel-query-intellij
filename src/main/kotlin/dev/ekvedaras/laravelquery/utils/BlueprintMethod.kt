@@ -8,8 +8,11 @@ import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
-import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
+import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.nextSiblingInTreeWithText
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import icons.DatabaseIcons
@@ -81,6 +84,13 @@ class BlueprintMethod private constructor() {
         fun MethodReference.isTimestamps() = this.name == "timestamps" || this.name == "timestampsTz"
         fun MethodReference.isSoftDeletes() = this.name == "softDeletes" || this.name == "softDeletesTz"
         fun MethodReference.isColumnDefinition() = BlueprintColumnMethods.contains(this.name)
+        fun MethodReference.wantsColumn() = this.isColumnDefinition() || this.name == "dropColumn" ||
+            (this.findParameterListDown()?.getParameter(0) is ArrayCreationExpression && (
+                this.isBuilderMethodForIndexes() ||
+                    this.isBuilderMethodForKeys() ||
+                    this.isBuilderMethodForUniqueIndexes()
+                ))
+
         fun MethodReference.getColumnDefinitionReference() = this.firstPsiChild?.nextPsiSibling?.firstPsiChild
         fun MethodReference.getColumnName(): String? {
             if (this.getColumnDefinitionReference() is ArrayCreationExpression) {

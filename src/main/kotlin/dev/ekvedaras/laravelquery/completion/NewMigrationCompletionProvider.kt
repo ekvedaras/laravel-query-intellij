@@ -33,6 +33,7 @@ import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isInsideUpMigr
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isPrimary
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isSoftDeletes
 import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.isTimestamps
+import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.wantsColumn
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBlueprintMethod
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
@@ -131,7 +132,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
                     return@referenceLoop
                 }
 
-                if (method.isColumnDefinition()) {
+                if (method.wantsColumn()) {
                     if (referenceMethod.isId() && !columns.contains("id")) {
                         items.add(
                             LookupElementBuilder
