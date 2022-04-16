@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.2.1]
 ### Fixed
 - Do not show settings notification if project does not have QueryBuilder class.
 
