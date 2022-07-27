@@ -169,4 +169,8 @@ internal class EdgeCasesTest : BaseTestCase() {
 
         UsefulTestCase.assertSize(0, usages)
     }
+
+    fun testItDoesNotReportUnknownColumnForArraysAsValuesWithingCreate() {
+        assertInspection("edgeCases/arrayWithinCreate.php", UnknownColumnInspection())
+    }
 }
