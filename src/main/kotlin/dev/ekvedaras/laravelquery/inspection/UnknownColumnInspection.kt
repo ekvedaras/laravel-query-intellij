@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
 import com.jetbrains.php.lang.inspections.PhpInspection
+import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
+import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl
@@ -131,6 +133,7 @@ class UnknownColumnInspection : PhpInspection() {
                     !expression.isColumnIn(method, allowArray) ||
                     expression.isInsideRegularFunction() ||
                     (expression.isInsidePhpArrayOrValue() && !method.canHaveColumnsInArrayValues()) ||
+                    (expression.parent.parent is ArrayCreationExpression && expression.parent.parent.parent.parent is ArrayHashElement) ||
                     (method.isTestCase(project) && !method.isDatabaseAssertion(project)) ||
                     !method.isInteresting(project) ||
                     method.isSchemaBuilderMethod(project) ||

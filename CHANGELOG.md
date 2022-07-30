@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Do not inspect for unknown columns when value is an array. #92
 
 ## [3.2.1]
 ### Fixed
