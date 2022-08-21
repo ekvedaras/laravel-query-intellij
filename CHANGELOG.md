@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Added
+- Add support for `whereNot` and `orWhereNot`. #94
 ### Fixed
 - Do not inspect for unknown columns when value contains quotes. #91
 
