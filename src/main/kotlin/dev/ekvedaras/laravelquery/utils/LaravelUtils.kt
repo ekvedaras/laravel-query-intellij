@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.util.parentOfType
+import com.jetbrains.php.lang.psi.elements.ConcatenationExpression
 import com.jetbrains.php.lang.psi.elements.FunctionReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
@@ -17,6 +18,7 @@ import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import org.eclipse.xtend2.lib.StringConcatenation
 
 object LaravelClasses {
     const val QueryBuilder = "\\Illuminate\\Database\\Query\\Builder"
@@ -613,9 +615,13 @@ class LaravelUtils private constructor() {
             this.position.parent?.parent?.isArrayValue() ?: false
 
         fun PsiElement.isInsidePhpArrayOrValue(): Boolean =
-            (this.parent?.parent?.isPhpArray() ?: false) ||
-                (this.parent?.parent?.isArrayValue() ?: false) ||
-                this.parent?.parent is ArrayHashElementImpl?
+            if (this.parent?.parent is ConcatenationExpression) {
+                this.parent.isInsidePhpArrayOrValue()
+            } else {
+                (this.parent?.parent?.isPhpArray() ?: false) ||
+                    (this.parent?.parent?.isArrayValue() ?: false) ||
+                    this.parent?.parent is ArrayHashElementImpl?
+            }
 
         fun PsiElement.isAssocArrayValue(): Boolean =
             (

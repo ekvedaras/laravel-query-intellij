@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Do not inspect for unknown columns when value contains quotes. #91
 
 ## [3.2.2]
 ### Fixed
