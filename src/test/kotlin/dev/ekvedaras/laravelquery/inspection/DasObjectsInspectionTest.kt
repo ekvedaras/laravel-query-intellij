@@ -94,4 +94,8 @@ internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testDoesNotWarnAboutKnownJsonColumn() {
         assertInspection("inspection/knownJsonColumn.php", UnknownColumnInspection())
     }
+
+    fun testItDoesNotWarnAboutUnknownColumnInObjectsAsCreateFunctionValues() {
+        assertInspection("inspection/newObjectWithinCreateValue.php", UnknownColumnInspection())
+    }
 }

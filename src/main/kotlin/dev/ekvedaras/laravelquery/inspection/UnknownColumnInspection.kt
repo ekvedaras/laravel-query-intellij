@@ -10,6 +10,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.elements.impl.ArrayIndexImpl
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor
@@ -126,6 +127,7 @@ class UnknownColumnInspection : PhpInspection() {
 
                 return !ApplicationManager.getApplication().isReadAccessAllowed ||
                     expression.parent is ArrayIndexImpl ||
+                    (expression.parent is ParameterList && expression.parent.parent != method) ||
                     expression.containsVariable() ||
                     expression.selectsAllColumns() ||
                     expression.isOperatorParam(allowArray) ||
