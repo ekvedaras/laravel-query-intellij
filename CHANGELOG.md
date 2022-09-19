@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.3.1]
 ### Fixed
 - Do not inspect for unknown column in case its value of object. #96
 
