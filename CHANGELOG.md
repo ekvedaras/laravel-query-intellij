@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.3.2]
 ### Fixed
 - Do not crash if table param is not provided yet. #98
 
