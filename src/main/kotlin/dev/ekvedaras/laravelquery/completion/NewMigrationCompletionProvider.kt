@@ -64,6 +64,10 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
         }
 
         val target = DbReferenceExpression(parameters.position, DbReferenceExpression.Companion.Type.Column)
+        if (target.tablesAndAliases.isEmpty()) {
+            return
+        }
+
         val items = Collections.synchronizedList(mutableListOf<LookupElement>())
 
         var table: DasTable? = null;

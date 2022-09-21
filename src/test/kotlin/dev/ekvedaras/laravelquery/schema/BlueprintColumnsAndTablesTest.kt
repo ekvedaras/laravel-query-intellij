@@ -255,4 +255,11 @@ internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
             "orders_id_primary", "",
         );
     }
+
+    fun testItDoesNotCrashIfTableIsNotThere() {
+        myFixture.configureByFile("schema/noTableCaretInDown.php")
+        myFixture.completeBasic()
+
+        assertTrue(myFixture.lookupElements?.isEmpty() ?: true)
+    }
 }
