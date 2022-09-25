@@ -22,7 +22,7 @@ class LaravelQuerySettingsConfigurable(val project: Project) : SearchableConfigu
         val settings = LaravelQuerySettings.getInstance(project)
         settings.filterDataSources = settingsForm?.shouldFilterDataSources() ?: false
         settings.filteredDataSources = settingsForm?.filteredDataSources() ?: setOf()
-        settings.tablePrefix = settingsForm?.tablePrefix() ?: ""
+        settings.tablePrefix = settingsForm?.tablePrefix()?.trim() ?: ""
     }
 
     override fun reset() {
