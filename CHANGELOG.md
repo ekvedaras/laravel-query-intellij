@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [3.3.3]
 ### Fixed
 - Trim table prefix. #100
 
