@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+
+## [4.0.0]
 ### Changed
 - Increase minimum build to `222`
 - Use gradle `7.5.1`
