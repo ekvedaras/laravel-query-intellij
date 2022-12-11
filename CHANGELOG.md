@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Invalid casting. #104
 
 ## [3.3.3]
 ### Fixed

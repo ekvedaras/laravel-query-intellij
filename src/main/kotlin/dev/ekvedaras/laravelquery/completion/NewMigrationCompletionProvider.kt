@@ -128,7 +128,7 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
     ) {
         migrationMethod.statementsForTable(target.tablesAndAliases.first().key).forEach { statementMethod ->
             statementMethod.blueprintTableParam()?.references()?.forEach referenceLoop@{ reference ->
-                val referenceMethod = (reference.element as Variable).parent as MethodReference
+                val referenceMethod = (reference.element as Variable).parent as? MethodReference ?: return@referenceLoop
 
                 if (referenceMethod.isSameInSameFile(method)) {
                     return@referenceLoop
