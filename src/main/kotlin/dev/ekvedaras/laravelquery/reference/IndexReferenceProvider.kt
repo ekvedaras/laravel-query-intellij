@@ -33,9 +33,9 @@ class IndexReferenceProvider : PsiReferenceProvider() {
 
         var references = arrayOf<PsiReference>()
 
-        if (method.isBuilderMethodForIndexes() || method.isBuilderMethodForUniqueIndexes()) {
+        if (method.isBuilderMethodForIndexes()) {
             references += IndexPsiReference(element)
-        } else if (method.isBuilderMethodForKeys()) {
+        } else if (method.isBuilderMethodForKeys() || method.isBuilderMethodForUniqueIndexes()) {
             references += KeyPsiReference(element)
         } else if (method.isBuilderMethodForForeignKeys()) {
             references += ForeignKeyPsiReference(element)

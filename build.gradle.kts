@@ -6,10 +6,9 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     // Java support
     id("java")
-    // Kotlin support
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.7.22"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.4.0"
+    id("org.jetbrains.intellij") version "1.10.0"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "1.3.1"
 }
@@ -22,14 +21,15 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
 }
-dependencies {
-    implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
-    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.8.2")
-    implementation(kotlin("stdlib-jdk8"))
+
+// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
-// Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
+// Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
@@ -46,24 +46,6 @@ changelog {
 }
 
 tasks {
-    // Set the JVM compatibility versions
-    properties("javaVersion").let {
-        withType<JavaCompile> {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
-        withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = it
-        }
-    }
-
-    test {
-        // Support "setUp" like "BasePlatformTestCase::setUp" as valid test structure
-        useJUnitPlatform {
-            includeEngines("junit-vintage")
-        }
-    }
-
     wrapper {
         gradleVersion = properties("gradleVersion")
     }
@@ -94,14 +76,6 @@ tasks {
         })
     }
 
-    runIde {
-        if (environment.contains("IDE_DIR")) {
-            ideDir.set(File(environment["IDE_DIR"].toString()))
-        }
-
-        systemProperty("idea.platform.prefix", "PhpStorm")
-    }
-
     // Configure UI tests plugin
     // Read more: https://github.com/JetBrains/intellij-ui-test-robot
     runIdeForUiTests {
@@ -111,15 +85,15 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
-    runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(','))
+    buildSearchableOptions {
+        enabled = false
     }
 
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
+//    signPlugin {
+//        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+//        privateKey.set(System.getenv("PRIVATE_KEY"))
+//        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+//    }
 
     publishPlugin {
         dependsOn("patchChangelog")
@@ -130,12 +104,16 @@ tasks {
         channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
+dependencies {
+    implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
+    implementation(kotlin("stdlib-jdk8"))
+}
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "11"
+    jvmTarget = "17"
 }

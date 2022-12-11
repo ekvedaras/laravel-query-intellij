@@ -3,6 +3,13 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Changed
+- Increase minimum build to `222`
+- Use gradle `7.5.1`
+- Use intellij plugin `1.10.0`
+- Use kotlin `1.7.22`
+- Use jvm `17`
+
 ### Fixed
 - Invalid casting. #104
 
