@@ -29,7 +29,7 @@ class ClassUtils private constructor() {
         }
 
         @JvmStatic
-        fun PhpClassImpl.isChildOf(clazz: String): Boolean {
+        fun PhpClassImpl.isChildOf(clazz: String, depth: Int = 1): Boolean {
             if (this.fqn == clazz.asPhpClass(project)?.fqn) {
                 return true
             }
@@ -43,7 +43,11 @@ class ClassUtils private constructor() {
                 return (original as PhpClassImpl).isChildOf(clazz)
             }
 
-            return (superClass as PhpClassImpl).isChildOf(clazz)
+            if (depth > 20) {
+                return false
+            }
+
+            return (superClass as PhpClassImpl).isChildOf(clazz, depth + 1)
         }
 
         @JvmStatic

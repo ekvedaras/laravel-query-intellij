@@ -3,6 +3,8 @@
 # Laravel Query Changelog
 
 ## [Unreleased]
+### Fixed
+- Limit class child check to max depth of 20 to avoid stack overflow. #106
 
 ## [4.0.0]
 ### Changed
