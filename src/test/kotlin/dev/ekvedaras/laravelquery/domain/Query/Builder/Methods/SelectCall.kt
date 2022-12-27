@@ -6,7 +6,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters.Column
 
-class GetCall(val method: MethodReference) : MethodCall {
+class SelectCall(val method: MethodReference) : MethodCall {
     private val columnsParameter = method.getParameter(0)
 
     val columns: Set<Column> = when (this.columnsParameter) {

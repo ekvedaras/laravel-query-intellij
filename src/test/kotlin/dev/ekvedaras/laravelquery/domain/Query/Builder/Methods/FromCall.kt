@@ -5,7 +5,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters.Alias
 import dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters.Table
 
-class FromCall(val method: MethodReference) {
+class FromCall(val method: MethodReference): MethodCall {
     private val tableParameter = method.getParameter(0)
     private val aliasParameter = method.getParameter(1)
 
