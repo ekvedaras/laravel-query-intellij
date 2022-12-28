@@ -76,31 +76,5 @@ class DatabaseUtils private constructor() {
 
         fun String.withoutTablePrefix(project: Project): String =
             this.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
-
-
-        // --- Functions for V5 ----
-
-        @OptIn(ExperimentalStdlibApi::class)
-        fun DbDataSource.findNamespace(name: String): DasNamespace? =
-            this.schemasInParallel()
-                .filter { it.name == name }
-                .findFirst()
-                .getOrNull()
-
-        @OptIn(ExperimentalStdlibApi::class)
-        fun DasNamespace.findTable(name: String, project: Project): DasTable? =
-            this.tablesInParallel(project)
-                .filter { it.name == name }
-                .findFirst()
-                .getOrNull()
-
-        @OptIn(ExperimentalStdlibApi::class)
-        fun DbDataSource.findFirstTable(name: String): DasTable? =
-            this.tablesInParallel()
-                .filter { it.name == name }
-                .findFirst()
-                .getOrNull()
-
-        fun DasTable.getNamespace(): DasNamespace = this.dasParent as DasNamespace
     }
 }

@@ -1,4 +1,4 @@
-package dev.ekvedaras.laravelquery.domain.Model
+package dev.ekvedaras.laravelquery.domain.model
 
 import com.cesarferreira.pluralize.pluralize
 import com.jetbrains.php.lang.psi.elements.Field

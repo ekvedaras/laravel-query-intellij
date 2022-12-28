@@ -1,9 +1,9 @@
-package dev.ekvedaras.laravelquery.domain.Query.Builder.Methods
+package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters.Alias
-import dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters.Table
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Alias
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Table
 
 class FromCall(val method: MethodReference): MethodCall {
     private val tableParameter = method.getParameter(0)

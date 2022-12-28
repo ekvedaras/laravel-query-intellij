@@ -1,4 +1,4 @@
-package dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters
+package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 
