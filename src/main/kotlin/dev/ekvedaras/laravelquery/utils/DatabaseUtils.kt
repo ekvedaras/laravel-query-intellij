@@ -8,12 +8,14 @@ import com.intellij.database.model.DasTable
 import com.intellij.database.model.DasTableKey
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.psi.DbDataSource
+import com.intellij.database.psi.DbTable
 import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import java.util.stream.Stream
+import kotlin.jvm.optionals.getOrNull
 
 private val SchemasToSkip = listOf(
     "sys", "information_schema", "mysql", "performance_schema",
@@ -74,5 +76,31 @@ class DatabaseUtils private constructor() {
 
         fun String.withoutTablePrefix(project: Project): String =
             this.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
+
+
+        // --- Functions for V5 ----
+
+        @OptIn(ExperimentalStdlibApi::class)
+        fun DbDataSource.findNamespace(name: String): DasNamespace? =
+            this.schemasInParallel()
+                .filter { it.name == name }
+                .findFirst()
+                .getOrNull()
+
+        @OptIn(ExperimentalStdlibApi::class)
+        fun DasNamespace.findTable(name: String, project: Project): DasTable? =
+            this.tablesInParallel(project)
+                .filter { it.name == name }
+                .findFirst()
+                .getOrNull()
+
+        @OptIn(ExperimentalStdlibApi::class)
+        fun DbDataSource.findFirstTable(name: String): DasTable? =
+            this.tablesInParallel()
+                .filter { it.name == name }
+                .findFirst()
+                .getOrNull()
+
+        fun DasTable.getNamespace(): DasNamespace = this.dasParent as DasNamespace
     }
 }

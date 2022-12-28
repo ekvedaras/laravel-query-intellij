@@ -1,6 +1,11 @@
 package dev.ekvedaras.laravelquery.domain.Query.Builder.Methods.Parameters
 
+import com.intellij.database.model.DasTable
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.findFirstTable
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.findNamespace
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.findTable
 
 class Table(val element: StringLiteralExpression) {
     val name: String
@@ -22,5 +27,21 @@ class Table(val element: StringLiteralExpression) {
 
         this.name = parts[0]
         this.database = parts.getOrNull(1)
+    }
+
+    fun asDasTable(): DasTable? {
+        val tables = mutableListOf<DasTable>()
+
+        element.project.dbDataSourcesInParallel().forEach { dataSource ->
+            (
+                if (this.database != null) {
+                    dataSource.findNamespace(name = database)?.findTable(this.name)
+                } else {
+                    dataSource.findFirstTable(this.name)
+                } ?: return@forEach
+            ).also { tables += it }
+        }
+
+        return tables.firstOrNull()
     }
 }
