@@ -7,15 +7,15 @@ import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
 
-class TableCompletionProvider : CompletionProvider<CompletionParameters>() {
+class DatabaseElementsCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
-        result: CompletionResultSet
+        result: CompletionResultSet,
     ) {
         val string = parameters.position.parent as StringLiteralExpression
 
@@ -24,8 +24,12 @@ class TableCompletionProvider : CompletionProvider<CompletionParameters>() {
         }
 
         val methodReference = string.parentOfType<MethodReference>() ?: return
-        val statement = QueryStatement(methodReference.parentOfType<Statement>() ?: return)
+        val statement = QueryStatement(methodReference.parentOfType() ?: return)
 
-        val methodCall = statement.methodCallFor(methodReference)
+        val methodCall = statement.methodCallFor(methodReference) ?: return
+
+        result.addAllElements(
+            methodCall.completeFor(StringParameter( string))
+        )
     }
 }

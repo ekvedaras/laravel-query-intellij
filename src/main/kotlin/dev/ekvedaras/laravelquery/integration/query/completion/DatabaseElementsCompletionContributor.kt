@@ -19,7 +19,7 @@ class DatabaseElementsCompletionContributor : CompletionContributor() {
                 PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
                 PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
             ),
-            NamespaceCompletionProvider()
+            DatabaseElementsCompletionProvider()
         )
     }
 }

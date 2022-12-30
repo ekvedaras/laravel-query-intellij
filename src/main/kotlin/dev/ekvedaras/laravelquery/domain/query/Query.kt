@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.domain.query
 
+import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.FromCall
@@ -7,9 +8,10 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.FromCall
 class Query {
     private var statements: Set<QueryStatement> = setOf()
 
-    private var namespaces: Set<Namespace> = setOf()
-    private var tables: Set<Table> = setOf()
-    private var aliases: MutableMap<String, Table> = mutableMapOf()
+    var dataSource: DataSource? = null
+    var namespaces: Set<Namespace> = setOf()
+    var tables: Set<Table> = setOf()
+    var aliases: MutableMap<String, Table> = mutableMapOf()
 
     fun addStatement(statement: QueryStatement) {
         statements += statement
@@ -22,6 +24,7 @@ class Query {
                     this.tables += table
                     this.namespaces += table.namespace
                     this.aliases[methodCall.table.alias ?: return@forEach] = table
+                    this.dataSource = table.namespace.dataSource
                 }
             }
         }
