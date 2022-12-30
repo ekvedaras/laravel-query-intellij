@@ -1,9 +1,8 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
-import com.intellij.database.model.DasTable
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasedParam.Companion.toAliasedParam
-import dev.ekvedaras.laravelquery.support.Database
 
 class Table(val element: StringLiteralExpression) {
     val name: String
@@ -19,5 +18,5 @@ class Table(val element: StringLiteralExpression) {
         this.alias = aliasedParam.alias
     }
 
-    fun asDasTable(): DasTable? = Database.findFirstTable(element.project, this.name, this.namespace)
+    fun asDbTable(): Table? = Table.findFirst(table = name, project = element.project)
 }

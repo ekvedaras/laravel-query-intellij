@@ -13,13 +13,13 @@ class DatabaseElementsCompletionContributor : CompletionContributor() {
     }
 
     init {
-        val stringLiteralPattern = PlatformPatterns.or(
-            PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
-            PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+        extend(
+            CompletionType.BASIC,
+            PlatformPatterns.or(
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
+                PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
+            ),
+            NamespaceCompletionProvider()
         )
-
-        extend(CompletionType.BASIC, stringLiteralPattern, NamespaceCompletionProvider())
-        extend(CompletionType.BASIC, stringLiteralPattern, TableCompletionProvider())
-        extend(CompletionType.BASIC, stringLiteralPattern, ColumnCompletionProvider())
     }
 }

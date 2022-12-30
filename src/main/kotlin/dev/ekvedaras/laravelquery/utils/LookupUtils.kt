@@ -181,7 +181,7 @@ class LookupUtils private constructor() {
         private fun DasObject.getIcon(project: Project) =
             DasPsiWrappingSymbol(this, project).getIcon(false)
 
-        private fun LookupElementBuilder.withInsertHandler(
+        fun LookupElementBuilder.withInsertHandler(
             project: Project,
             triggerCompletion: Boolean = false,
             prefix: String = ""

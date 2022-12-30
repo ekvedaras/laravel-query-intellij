@@ -24,43 +24,47 @@
         <postStartupActivity implementation="dev.ekvedaras.laravelquery.services.Startup" />
 
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"
-                                order="first"/>
-        <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"
-                                order="first"/>
-        <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"
-                                order="first"/>
-        <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.completion.NewMigrationCompletionContributor"
-                                order="last"/>
+                                implementationClass="dev.ekvedaras.laravelquery.integration.query.completion.DatabaseElementsCompletionContributor"
+                                />
 
-        <psi.referenceContributor language="PHP"
-                                  implementation="dev.ekvedaras.laravelquery.reference.IndexReferenceContributor"/>
-        <psi.referenceContributor language="PHP"
-                                  implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>
-        <psi.referenceContributor language="PHP"
-                                  implementation="dev.ekvedaras.laravelquery.reference.ColumnReferenceContributor"/>
+<!--        <completion.contributor language="PHP"-->
+<!--                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"-->
+<!--                                order="first"/>-->
+<!--        <completion.contributor language="PHP"-->
+<!--                                implementationClass="dev.ekvedaras.laravelquery.completion.TableOrViewCompletionContributor"-->
+<!--                                order="first"/>-->
+<!--        <completion.contributor language="PHP"-->
+<!--                                implementationClass="dev.ekvedaras.laravelquery.completion.ColumnCompletionContributor"-->
+<!--                                order="first"/>-->
+<!--        <completion.contributor language="PHP"-->
+<!--                                implementationClass="dev.ekvedaras.laravelquery.completion.NewMigrationCompletionContributor"-->
+<!--                                order="last"/>-->
 
-        <localInspection language="PHP"
-                         groupPath="PHP"
-                         groupKey="databaseGroupName"
-                         shortName="UnknownTableOrViewInspection"
-                         enabledByDefault="true"
-                         bundle="messages.MyBundle"
-                         key="unknownTableOrViewDisplayName"
-                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection"
-        />
-        <localInspection language="PHP"
-                         groupPath="PHP"
-                         groupKey="databaseGroupName"
-                         shortName="UnknownColumnInspection"
-                         enabledByDefault="true"
-                         bundle="messages.MyBundle"
-                         key="unknownColumnDisplayName"
-                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection"
-        />
+<!--        <psi.referenceContributor language="PHP"-->
+<!--                                  implementation="dev.ekvedaras.laravelquery.reference.IndexReferenceContributor"/>-->
+<!--        <psi.referenceContributor language="PHP"-->
+<!--                                  implementation="dev.ekvedaras.laravelquery.reference.TableOrViewReferenceContributor"/>-->
+<!--        <psi.referenceContributor language="PHP"-->
+<!--                                  implementation="dev.ekvedaras.laravelquery.reference.ColumnReferenceContributor"/>-->
+
+<!--        <localInspection language="PHP"-->
+<!--                         groupPath="PHP"-->
+<!--                         groupKey="databaseGroupName"-->
+<!--                         shortName="UnknownTableOrViewInspection"-->
+<!--                         enabledByDefault="true"-->
+<!--                         bundle="messages.MyBundle"-->
+<!--                         key="unknownTableOrViewDisplayName"-->
+<!--                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection"-->
+<!--        />-->
+<!--        <localInspection language="PHP"-->
+<!--                         groupPath="PHP"-->
+<!--                         groupKey="databaseGroupName"-->
+<!--                         shortName="UnknownColumnInspection"-->
+<!--                         enabledByDefault="true"-->
+<!--                         bundle="messages.MyBundle"-->
+<!--                         key="unknownColumnDisplayName"-->
+<!--                         implementationClass="dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection"-->
+<!--        />-->
     </extensions>
 
     <applicationListeners>
