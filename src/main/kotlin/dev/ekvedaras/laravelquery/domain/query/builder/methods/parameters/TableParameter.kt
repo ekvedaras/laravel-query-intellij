@@ -7,8 +7,8 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import kotlin.streams.toList
 
 class TableParameter(val stringParameter: StringParameter) {
-    val tableName: String
-    val namespaceName: String?
+    private val tableName: String
+    private val namespaceName: String?
     val alias: String?
 
     init {
@@ -20,24 +20,25 @@ class TableParameter(val stringParameter: StringParameter) {
         this.alias = aliasedParam.alias
     }
 
-    fun table(): Table? = Table.findFirst(tableName, stringParameter.project)
-    fun namespace(): Namespace? {
-        return this.table()?.namespace ?: Namespace.findFirst(this.namespaceName ?: return null, stringParameter.project)
+    val namespace: Namespace? = if (this.namespaceName != null) {
+        Namespace.findFirst(this.namespaceName, stringParameter.project)
+    } else {
+        Table.findFirst(this.tableName, stringParameter.project)?.namespace
     }
 
-    fun getCompletionOptions(queryStatement: QueryStatement): List<LookupElement> {
+    val table: Table? = namespace?.findTable(this.tableName) ?: Table.findFirst(this.tableName, stringParameter.project)
+
+    fun getCompletionOptions(): List<LookupElement> {
         val completion = mutableListOf<LookupElement>()
 
         if (stringParameter.isEmpty) {
             completion += Namespace.list(stringParameter.project).map { it.asLookupElement() }.toList()
             completion += Table.list(stringParameter.project).map { it.asLookupElement() }.toList()
-        } else if (stringParameter.hasUncompletedPart && this.namespaceName != null) {
-            completion += queryStatement.query()
-                .dataSource
-                ?.findNamespace(this.namespaceName)
-                ?.tables()
-                ?.map { it.asLookupElement() }
-                ?.toList() ?: return completion
+        } else if (stringParameter.hasUncompletedPart && this.namespace != null) {
+            completion += this.namespace
+                .tables()
+                .map { it.asLookupElement() }
+                .toList()
         }
 
         return completion

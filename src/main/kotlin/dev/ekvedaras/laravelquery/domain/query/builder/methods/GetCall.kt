@@ -1,43 +1,28 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.childrenOfType
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
-import kotlin.streams.toList
+import dev.ekvedaras.laravelquery.support.elementsOfType
 
-class GetCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : MethodCall {
+class GetCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : MethodCall, ColumnSelectionCall {
     private val columnsParameter = reference.getParameter(0)
 
-    val columns: Set<Column> = when (this.columnsParameter) {
+    override val columns: Set<ColumnParameter> = when (this.columnsParameter) {
         is ArrayCreationExpression -> {
-            this.columnsParameter.childrenOfType<StringLiteralExpression>().map { Column(StringParameter(it)) }.toSet()
+            this.columnsParameter.elementsOfType<StringLiteralExpression>().map { ColumnParameter(StringParameter(it)) }.toSet()
         }
 
         is StringLiteralExpression -> {
-            setOf(Column(StringParameter(this.columnsParameter)))
+            setOf(ColumnParameter(StringParameter(this.columnsParameter)))
         }
 
         else -> {
             setOf()
         }
-    }
-
-    override fun completeFor(parameter: StringParameter): List<LookupElement> {
-        val completion = mutableListOf<LookupElement>()
-
-        if (parameter.isEmpty) {
-            completion += queryStatement.query().namespaces.map { it.asLookupElement() }.toList()
-            completion += queryStatement.query().tables.map { it.asLookupElement() }.toList()
-            completion += queryStatement.query().tables
-                .flatMap { table -> table.columns().map { it.asLookupElement() }.toList() }
-                .toList()
-        }
-
-        return completion
     }
 }

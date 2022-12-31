@@ -19,15 +19,17 @@ class Query {
         statement.callChain.forEach {methodCall ->
             when (methodCall) {
                 is FromCall -> {
-                    methodCall.tableParameter ?: return@forEach
+                    if (methodCall.tableParameter?.table != null) {
+                        tables += methodCall.tableParameter.table
 
-                    methodCall.tableParameter.table().apply {
-                        if (this != null) {
-                            tables += this
-                            aliases[methodCall.tableParameter.alias ?: return@forEach] = this
+                        if (methodCall.tableParameter.alias != null) {
+                            aliases[methodCall.tableParameter.alias] = methodCall.tableParameter.table
                         }
                     }
-                    methodCall.tableParameter.namespace().apply { if (this != null) namespaces += this }
+
+                    if (methodCall.tableParameter?.namespace != null) {
+                        namespaces += methodCall.tableParameter.namespace
+                    }
 
                     if (this.namespaces.isNotEmpty()) {
                         this.dataSource = this.namespaces.first().dataSource

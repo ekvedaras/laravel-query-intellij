@@ -19,7 +19,7 @@ class DatabaseElementsCompletionProvider : CompletionProvider<CompletionParamete
     ) {
         val string = parameters.position.parent as StringLiteralExpression
 
-        if (string.parent.parent !is MethodReference && !(string.parent.parent is ArrayCreationExpression && string.parent.parent.parent is MethodReference)) {
+        if (string.parent.parent !is MethodReference && !(string.parent.parent is ArrayCreationExpression && string.parent.parent.parent.parent is MethodReference)) {
             return
         }
 
@@ -29,7 +29,7 @@ class DatabaseElementsCompletionProvider : CompletionProvider<CompletionParamete
         val methodCall = statement.methodCallFor(methodReference) ?: return
 
         result.addAllElements(
-            methodCall.completeFor(StringParameter( string))
+            methodCall.completeFor(StringParameter(string))
         )
     }
 }

@@ -7,13 +7,15 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.MethodCall
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 
+val queryKey = Key<Query>("query")
+
 class QueryStatement(val statement: Statement) {
     val callChain: Set<MethodCall> = statement.descendantsOfType<MethodReference>()
         .mapNotNull { MethodCall.from(reference = it, queryStatement = this) }
         .toSet()
 
-    fun query(): Query = statement.getUserData(Key("query"))
-        ?: Query().apply { statement.putUserData(Key("query"), this) }
+    fun query(): Query = statement.getUserData(queryKey)
+        ?: Query().apply { statement.putUserData(queryKey, this) }
 
     init {
         this.query().addStatement(this)

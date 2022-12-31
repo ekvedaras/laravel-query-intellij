@@ -27,6 +27,6 @@ class FromCall(override val reference: MethodReference, override val queryStatem
             return mutableListOf()
         }
 
-        return this.tableParameter.getCompletionOptions(queryStatement)
+        return this.tableParameter.getCompletionOptions()
     }
 }
