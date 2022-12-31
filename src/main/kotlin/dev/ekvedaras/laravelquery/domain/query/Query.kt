@@ -22,8 +22,8 @@ class Query {
                     if (methodCall.tableParameter?.table != null) {
                         tables += methodCall.tableParameter.table
 
-                        if (methodCall.tableParameter.alias != null) {
-                            aliases[methodCall.tableParameter.alias] = methodCall.tableParameter.table
+                        if (methodCall.alias != null) {
+                            aliases[methodCall.alias] = methodCall.tableParameter.table
                         }
                     }
 

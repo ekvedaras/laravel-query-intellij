@@ -69,4 +69,22 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
         assertNoCompletion("billable_id", "connection", "migration")
     }
+
+    fun testItCompletesUsersTableAndItsColumnsInGetCallWithAliasedTableName() {
+        myFixture.configureByFile("integration/query/completion/inGetCallWithAliasedTableName.php")
+        myFixture.completeBasic()
+        assertNoCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesUsersTableAndItsColumnsInGetCallWithInlineAliasedTableName() {
+        myFixture.configureByFile("integration/query/completion/inGetCallWithInlineAliasedTableName.php")
+        myFixture.completeBasic()
+        assertNoCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
 }

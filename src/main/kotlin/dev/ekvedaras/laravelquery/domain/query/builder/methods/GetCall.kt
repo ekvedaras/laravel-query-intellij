@@ -1,6 +1,5 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
-import com.intellij.psi.util.childrenOfType
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression

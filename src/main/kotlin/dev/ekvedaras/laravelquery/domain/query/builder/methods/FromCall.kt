@@ -22,6 +22,8 @@ class FromCall(override val reference: MethodReference, override val queryStatem
         else -> null
     }
 
+    val alias: String? = this.aliasParameter?.name ?: this.tableParameter?.alias
+
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
         if (parameter != this.tableParameter?.stringParameter) {
             return mutableListOf()

@@ -42,7 +42,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
 
             completion += query.namespaces.find { it.name == this.tableOrNamespaceName }?.tables()?.map { it.asLookupElement() }?.toList() ?: listOf()
             completion += query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
-            completion += query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
+            completion += query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList() ?: listOf()
 
             return completion
         }
