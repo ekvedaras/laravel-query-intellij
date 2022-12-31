@@ -33,18 +33,24 @@ class ColumnParameter(val stringParameter: StringParameter) {
             return completion
         }
 
-        if (this.namespaceName != null) {
-            return query.namespaces.find { it.name == this.namespaceName }?.tables()?.map { it.asLookupElement() }?.toList() ?: listOf()
-        }
-
-        if (this.tableOrNamespaceName != null) {
+        if (this.stringParameter.hasThreeParts) {
             val completion = mutableListOf<LookupElement>()
 
-            completion += query.namespaces.find { it.name == this.tableOrNamespaceName }?.tables()?.map { it.asLookupElement() }?.toList() ?: listOf()
-            completion += query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
+            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
             completion += query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList() ?: listOf()
 
             return completion
+        }
+
+        if (this.stringParameter.hasTwoParts) {
+            val namespace = query.namespaces.find { it.name == this.tableOrNamespaceName }
+            if (namespace != null) {
+                return namespace.tables().map { it.asLookupElement() }.toList()
+            }
+
+            return query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList()
+                ?: query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
+                ?: listOf()
         }
 
         return listOf()
