@@ -8,7 +8,9 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.MethodCall
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 
 class QueryStatement(val statement: Statement) {
-    val callChain: Set<MethodCall> = statement.descendantsOfType<MethodReference>().map { TODO("Map to method call") }
+    val callChain: Set<MethodCall> = statement.descendantsOfType<MethodReference>()
+        .mapNotNull { MethodCall.from(reference = it, queryStatement = this) }
+        .toSet()
 
     fun query(): Query = statement.getUserData(Key("query"))
         ?: Query().apply { statement.putUserData(Key("query"), this) }

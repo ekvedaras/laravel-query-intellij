@@ -10,7 +10,7 @@ import junit.framework.TestCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-internal class SchemaTableReferenceTest : BaseTestCase() {
+internal class SchemaTableReferenceTestParameter : BaseTestCase() {
     fun testResolvesSchemaReference() {
         myFixture.configureByFile("inspection/knownSchema.php")
 

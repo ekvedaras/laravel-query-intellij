@@ -21,6 +21,10 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
     companion object {
         fun list(project: Project): Stream<out Namespace> = DataSource.list(project).flatMap { it.namespaces() }
         fun isImportant(namespace: DasNamespace) = ! unimportantSchemas.contains(namespace.name)
+        fun findFirst(namespace: String, project: Project) =
+            DataSource.list(project)
+                .firstWhereOrNull{ it.findNamespace(namespace) != null }
+                ?.findNamespace(namespace)
     }
 
     fun tables(): Stream<out Table> =

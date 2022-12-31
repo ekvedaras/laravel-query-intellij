@@ -19,12 +19,19 @@ class Query {
         statement.callChain.forEach {methodCall ->
             when (methodCall) {
                 is FromCall -> {
-                    val table = methodCall.table?.asDbTable() ?: return@forEach
+                    methodCall.tableParameter ?: return@forEach
 
-                    this.tables += table
-                    this.namespaces += table.namespace
-                    this.aliases[methodCall.table.alias ?: return@forEach] = table
-                    this.dataSource = table.namespace.dataSource
+                    methodCall.tableParameter.table().apply {
+                        if (this != null) {
+                            tables += this
+                            aliases[methodCall.tableParameter.alias ?: return@forEach] = this
+                        }
+                    }
+                    methodCall.tableParameter.namespace().apply { if (this != null) namespaces += this }
+
+                    if (this.namespaces.isNotEmpty()) {
+                        this.dataSource = this.namespaces.first().dataSource
+                    }
                 }
             }
         }

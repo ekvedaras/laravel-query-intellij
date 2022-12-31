@@ -15,11 +15,11 @@ class GetCall(override val reference: MethodReference, override val queryStateme
 
     val columns: Set<Column> = when (this.columnsParameter) {
         is ArrayCreationExpression -> {
-            this.columnsParameter.childrenOfType<StringLiteralExpression>().map { Column(it) }.toSet()
+            this.columnsParameter.childrenOfType<StringLiteralExpression>().map { Column(StringParameter(it)) }.toSet()
         }
 
         is StringLiteralExpression -> {
-            setOf(Column(this.columnsParameter))
+            setOf(Column(StringParameter(this.columnsParameter)))
         }
 
         else -> {

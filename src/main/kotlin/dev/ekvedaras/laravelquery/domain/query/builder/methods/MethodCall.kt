@@ -10,4 +10,15 @@ interface MethodCall {
     val queryStatement: QueryStatement
 
     fun completeFor(parameter: StringParameter): List<LookupElement>
+
+    companion object {
+        fun from(reference: MethodReference, queryStatement: QueryStatement): MethodCall? {
+            return when(reference.name) {
+                "from" -> FromCall(reference, queryStatement)
+                "get" -> GetCall(reference, queryStatement)
+                "select" -> SelectCall(reference, queryStatement)
+                else -> null
+            }
+        }
+    }
 }
