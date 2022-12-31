@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.jetbrains.rd.util.firstOrNull
 import dev.ekvedaras.laravelquery.domain.query.Query
 import kotlin.streams.toList
 
@@ -29,6 +30,8 @@ class ColumnParameter(val stringParameter: StringParameter) {
             completion += query.tables
                 .flatMap { table -> table.columns().map { it.asLookupElement() }.toList() }
                 .toList()
+            completion += query.aliases.keys.map { it.asLookupElement() }.toList()
+            completion += query.aliases.keys.flatMap { alias -> alias.table.columns().map { it.asLookupElement(alias = alias.name) }.toList() }
 
             return completion
         }
@@ -37,7 +40,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
             val completion = mutableListOf<LookupElement>()
 
             completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
-            completion += query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList() ?: listOf()
+            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList() ?: listOf()
 
             return completion
         }
@@ -49,7 +52,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
             }
 
             return query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList()
-                ?: query.aliases[this.tableOrNamespaceName]?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
+                ?: query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
                 ?: listOf()
         }
 

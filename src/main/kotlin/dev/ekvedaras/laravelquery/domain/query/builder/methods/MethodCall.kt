@@ -15,6 +15,7 @@ interface MethodCall {
         fun from(reference: MethodReference, queryStatement: QueryStatement): MethodCall? {
             return when(reference.name) {
                 "from" -> FromCall(reference, queryStatement)
+                "join" -> JoinCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select" -> SelectCall(reference, queryStatement)
                 else -> null

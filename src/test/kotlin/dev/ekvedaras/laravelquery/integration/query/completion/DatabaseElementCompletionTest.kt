@@ -105,4 +105,22 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("testProject1", "testProject2", "failed_jobs", "migrations")
         assertNoCompletion("billable_id", "connection", "migration")
     }
+
+    fun testItCompletesUsersTableAndItsColumnsInGetCallWithJoinedTable() {
+        myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTable.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "customers")
+        assertCompletion("email", "first_name", "billable_id")
+        assertNoCompletion("testProject2", "failed_jobs", "migrations")
+        assertNoCompletion("connection", "migration")
+    }
+
+    fun testItCompletesUsersTableAndItsColumnsInGetCallWithJoinedTableWithAlias() {
+        myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTableWithAlias.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "c1")
+        assertCompletion("email", "first_name", "billable_id")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("connection", "migration")
+    }
 }
