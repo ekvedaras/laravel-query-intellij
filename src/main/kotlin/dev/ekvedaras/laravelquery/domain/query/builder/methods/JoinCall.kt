@@ -11,6 +11,9 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableP
 class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : MethodCall, TableSelectionCall {
     private val rawTableParameter = reference.getParameter(0)
     private val rawFirstColumnParameter = reference.getParameter(1)
+    private val rawSecondColumnParameter = reference.getParameter(
+        if (reference.parameters.size > 3) 3 else 2
+    )
 
     override val tableParameter: TableParameter? =
         if (this.rawTableParameter is StringLiteralExpression) TableParameter(
@@ -29,15 +32,17 @@ class JoinCall(override val reference: MethodReference, override val queryStatem
             StringParameter(this.rawFirstColumnParameter)
         ) else null
 
+    val secondColumnParameter: ColumnParameter? =
+        if (this.rawSecondColumnParameter is StringLiteralExpression) ColumnParameter(
+            StringParameter(this.rawSecondColumnParameter)
+        ) else null
+
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
-        if (parameter == this.tableParameter?.stringParameter) {
-            return this.tableParameter.getCompletionOptions()
+        return when (parameter) {
+            this.tableParameter?.stringParameter -> this.tableParameter.getCompletionOptions()
+            this.firstColumnParameter?.stringParameter -> this.firstColumnParameter.getCompletionOptions(queryStatement.query())
+            this.secondColumnParameter?.stringParameter -> this.secondColumnParameter.getCompletionOptions(queryStatement.query())
+            else -> listOf()
         }
-
-        if (parameter == this.firstColumnParameter?.stringParameter) {
-            return this.firstColumnParameter.getCompletionOptions(queryStatement.query())
-        }
-
-        return listOf()
     }
 }
