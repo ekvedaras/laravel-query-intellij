@@ -1,11 +1,11 @@
-package dev.ekvedaras.laravelquery.domain.model
+package dev.ekvedaras.laravelquery.domain.query.model
 
 import com.cesarferreira.pluralize.pluralize
 import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 
-class Model(val clazz: PhpClass) {
+class Model(clazz: PhpClass) {
     private val tableField = clazz.findFieldByName("table", false)
 
     val table: String? = if (tableField is Field) {
