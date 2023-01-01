@@ -2,12 +2,16 @@ package dev.ekvedaras.laravelquery.domain.query
 
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.Key
+import com.intellij.psi.util.childrenOfType
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
+import com.jetbrains.php.lang.psi.elements.NewExpression
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.MethodCall
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryStatementElement
 import dev.ekvedaras.laravelquery.domain.query.model.Model
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 import dev.ekvedaras.laravelquery.utils.getClass
@@ -20,9 +24,16 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
     }
 
     private val firstPsiChild = statement.firstPsiChild
-    private val secondPsiDescendant = firstPsiChild?.firstPsiChild
+    private val lastMethodReference = firstPsiChild?.descendantsOfType<MethodReference>()?.lastOrNull().run {
+        if (this is MethodReference) this
+        else if (firstPsiChild is MethodReference) firstPsiChild
+        else null
+    }
 
-    val callChain: Set<MethodCall> = if (firstPsiChild is AssignmentExpression) {
+    val callChain: Set<QueryStatementElement> = if (firstPsiChild is AssignmentExpression && firstPsiChild.childrenOfType<NewExpression>().isNotEmpty()) {
+        val newExpression = firstPsiChild.childrenOfType<NewExpression>().first()
+        setOf(NewModelExpression(reference = newExpression, queryStatement = this))
+    } else if (firstPsiChild is AssignmentExpression) {
         firstPsiChild
             .descendantsOfType<MethodReference>()
             .mapNotNull { MethodCall.from(reference = it, queryStatement = this) }
@@ -36,13 +47,13 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
     fun query(): Query = statement.getUserData(queryKey)
         ?: Query().apply { statement.putUserData(queryKey, this) }
 
-    val isIncompleteQuery = secondPsiDescendant is Variable
+    val isIncompleteQuery = lastMethodReference?.firstPsiChild is Variable
     val queryVariable: QueryVariable? =
         if (this.isIncompleteQuery) QueryVariable(
-            variable = secondPsiDescendant as Variable,
+            variable = lastMethodReference?.firstPsiChild as Variable,
             query = query()
-        ) else if (secondPsiDescendant is AssignmentExpression && secondPsiDescendant.firstPsiChild is Variable) QueryVariable(
-            variable = secondPsiDescendant.firstPsiChild as Variable,
+        ) else if (lastMethodReference?.firstPsiChild is AssignmentExpression && lastMethodReference?.firstPsiChild?.firstPsiChild is Variable) QueryVariable(
+            variable = lastMethodReference.firstPsiChild?.firstPsiChild as Variable,
             query = query()
         ) else null
 
@@ -63,5 +74,5 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
     }
 
     fun methodCallFor(methodReference: MethodReference): MethodCall? =
-        this.callChain.firstOrNull { it.reference == methodReference }
+        this.callChain.filterIsInstance<MethodCall>().firstOrNull { it.reference == methodReference }
 }

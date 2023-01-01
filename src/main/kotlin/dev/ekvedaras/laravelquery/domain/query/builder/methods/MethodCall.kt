@@ -8,10 +8,9 @@ import com.jetbrains.php.lang.psi.elements.ParenthesizedExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
 
-interface MethodCall {
-    val reference: MethodReference
-    val queryStatement: QueryStatement
-    val classReference: ClassReference?
+interface MethodCall : QueryStatementElement {
+    override val reference: MethodReference
+    override val classReference: ClassReference?
         get() =
             if (this.reference.firstPsiChild is ClassReference) this.reference.firstPsiChild as ClassReference
             else if (this.reference.firstPsiChild is ParenthesizedExpression && this.reference.firstPsiChild?.firstPsiChild is NewExpression && this.reference.firstPsiChild?.firstPsiChild?.firstPsiChild is ClassReference) this.reference.firstPsiChild!!.firstPsiChild!!.firstPsiChild as ClassReference

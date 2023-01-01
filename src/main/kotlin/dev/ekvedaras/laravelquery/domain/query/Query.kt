@@ -6,6 +6,7 @@ import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.domain.query.model.Model
 

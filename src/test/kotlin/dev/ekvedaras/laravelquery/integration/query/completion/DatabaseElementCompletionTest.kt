@@ -197,7 +197,6 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements() {
-        TODO("Support this")
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
