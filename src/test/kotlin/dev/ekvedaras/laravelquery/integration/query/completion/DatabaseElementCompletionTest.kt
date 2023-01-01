@@ -16,7 +16,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("testProject1", "testProject2", "failed_jobs", "migrations")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInSelectCall() {
+    fun testItCompletesInSelectCall() {
         myFixture.configureByFile("integration/query/completion/inSelectCall.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
@@ -25,7 +25,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInSelectCallUsingArray() {
+    fun testItCompletesInSelectCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inSelectCallUsingArray.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
@@ -34,7 +34,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInSelectCallUsingMultipleParameters() {
+    fun testItCompletesInSelectCallUsingMultipleParameters() {
         myFixture.configureByFile("integration/query/completion/inSelectCallUsingMultipleParameters.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
@@ -43,7 +43,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCall() {
+    fun testItCompletesInGetCall() {
         myFixture.configureByFile("integration/query/completion/inGetCall.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
@@ -52,7 +52,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallUsingArray() {
+    fun testItCompletesInGetCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inGetCallUsingArray.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
@@ -61,7 +61,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithTableName() {
+    fun testItCompletesInGetCallWithTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithTableName.php")
         myFixture.completeBasic()
         assertNoCompletion("testProject1", "users")
@@ -70,7 +70,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithAliasedTableName() {
+    fun testItCompletesInGetCallWithAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithAliasedTableName.php")
         myFixture.completeBasic()
         assertNoCompletion("testProject1", "users")
@@ -79,7 +79,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithInlineAliasedTableName() {
+    fun testItCompletesInGetCallWithInlineAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithInlineAliasedTableName.php")
         myFixture.completeBasic()
         assertNoCompletion("testProject1", "users")
@@ -88,7 +88,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithNamespaceAndTableName() {
+    fun testItCompletesInGetCallWithNamespaceAndTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithNamespaceAndTableName.php")
         myFixture.completeBasic()
         assertNoCompletion("testProject1", "users")
@@ -97,7 +97,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithNamespaceName() {
+    fun testItCompletesInGetCallWithNamespaceName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithNamespaceName.php")
         myFixture.completeBasic()
         assertCompletion("users", "customers")
@@ -106,7 +106,7 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithJoinedTable() {
+    fun testItCompletesInGetCallWithJoinedTable() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTable.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users", "customers")
@@ -115,12 +115,21 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("connection", "migration")
     }
 
-    fun testItCompletesUsersTableAndItsColumnsInGetCallWithJoinedTableWithAlias() {
+    fun testItCompletesInGetCallWithJoinedTableWithAlias() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTableWithAlias.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users", "c1")
         assertCompletion("email", "first_name", "billable_id")
         assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("connection", "migration")
+    }
+
+    fun testItCompletesInJoinCallFirstColumn() {
+        myFixture.configureByFile("integration/query/completion/inJoinCallFirstColumn.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users", "customers")
+        assertCompletion("email", "first_name", "billable_id")
+        assertNoCompletion("testProject2", "failed_jobs", "migrations")
         assertNoCompletion("connection", "migration")
     }
 }
