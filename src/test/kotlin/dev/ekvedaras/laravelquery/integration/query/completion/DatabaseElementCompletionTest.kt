@@ -159,4 +159,50 @@ internal class DatabaseElementCompletionTest : BaseTestCase() {
         assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
         assertNoCompletion("billable_id", "connection", "migration")
     }
+
+    fun testItCompletesInGetCallOfEloquentQuery() {
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQuery.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInGetCallOfEloquentQueryWhenModelHasTableField() {
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWhenModelHasTableField.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInGetCallOfEloquentQueryWithMultipleStatements() {
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithMultipleStatements.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInGetCallOfEloquentQueryWithNewInstanceCreation() {
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithNewInstanceCreation.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements() {
+        TODO("Support this")
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
 }

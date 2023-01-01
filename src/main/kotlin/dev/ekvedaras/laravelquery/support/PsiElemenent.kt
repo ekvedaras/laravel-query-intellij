@@ -18,6 +18,3 @@ inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
 
 inline fun <reified T: PsiElement> ArrayCreationExpression.elementsOfType(): Set<T> =
     this.childrenOfType<PhpPsiElement>().filter { it.firstPsiChild is T }.map { it.firstPsiChild as T }.toSet()
-
-inline fun <reified T: PsiElement> ParameterList.elementsOfType(): Set<T> =
-    this.childrenOfType<PhpPsiElement>().filter { it.firstPsiChild is T }.map { it.firstPsiChild as T }.toSet()
