@@ -26,7 +26,7 @@ class Query {
 
         statements += statement
 
-        statement.callChain.forEach {methodCall ->
+        statement.callChain.elements.forEach { methodCall ->
             when (methodCall) {
                 is TableSelectionCall -> {
                     val tableParameter = methodCall.tableParameter ?: return@forEach

@@ -26,7 +26,7 @@ class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
         val methodReference = string.parentOfType<MethodReference>() ?: return
         val statement = QueryStatement(methodReference.parentOfType() ?: return)
 
-        val methodCall = statement.methodCallFor(methodReference) ?: return
+        val methodCall = statement.callChain.methodCallFor(methodReference) ?: return
 
         result.addAllElements(
             methodCall.completeFor(StringParameter(string))
