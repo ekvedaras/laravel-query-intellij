@@ -3,12 +3,10 @@ package dev.ekvedaras.laravelquery.integration.query.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
@@ -27,14 +25,6 @@ class DatabaseElementsCompletionProvider : CompletionProvider<CompletionParamete
 
         val methodReference = string.parentOfType<MethodReference>() ?: return
         val statement = QueryStatement(methodReference.parentOfType() ?: return)
-
-        if (statement.isIncompleteQuery && statement.queryVariable != null) {
-            ReferencesSearch.search(statement.queryVariable.originalElement, statement.queryVariable.resolveScope, false)
-                .toList()
-                .mapNotNull { it.element.parentOfType<Statement>() }
-                .filterNot { it.originalElement == statement.statement.originalElement }
-                .forEach { QueryStatement(it, statement.query()) }
-        }
 
         val methodCall = statement.methodCallFor(methodReference) ?: return
 

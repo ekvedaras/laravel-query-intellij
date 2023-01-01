@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.domain.query
 
+import com.intellij.database.util.containsElements
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
@@ -15,6 +16,10 @@ class Query {
     var aliases: MutableMap<Alias, Table> = mutableMapOf()
 
     fun addStatement(statement: QueryStatement) {
+        if (statements.contains(statement)) {
+            return
+        }
+
         statements += statement
 
         statement.callChain.forEach {methodCall ->
@@ -38,6 +43,13 @@ class Query {
                     }
                 }
             }
+        }
+
+        if (statement.isIncompleteQuery) {
+            statement.queryVariable
+                ?.usageStatements()
+                ?.filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
+                ?.forEach { QueryStatement(statement = it, query = this) }
         }
     }
 }

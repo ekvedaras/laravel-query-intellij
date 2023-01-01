@@ -26,8 +26,15 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
             .toSet()
     }
 
-    val queryVariable = statement.firstPsiChild?.firstPsiChild as? Variable
-    val isIncompleteQuery = queryVariable is Variable
+    val isIncompleteQuery = statement.firstPsiChild?.firstPsiChild is Variable
+    val queryVariable: QueryVariable? =
+        if (statement.firstPsiChild?.firstPsiChild is Variable) QueryVariable(
+            variable = statement.firstPsiChild!!.firstPsiChild!! as Variable,
+            query = query()
+        ) else if (statement.firstPsiChild?.firstPsiChild is AssignmentExpression && statement.firstPsiChild?.firstPsiChild?.firstPsiChild is Variable) QueryVariable(
+            variable = statement.firstPsiChild!!.firstPsiChild!!.firstPsiChild as Variable,
+            query = query()
+        ) else null
 
     fun query(): Query = statement.getUserData(queryKey)
         ?: Query().apply { statement.putUserData(queryKey, this) }
