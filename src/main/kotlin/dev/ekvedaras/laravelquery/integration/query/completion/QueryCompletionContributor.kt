@@ -6,7 +6,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.jetbrains.php.lang.lexer.PhpTokenTypes
 
-class DatabaseElementsCompletionContributor : CompletionContributor() {
+class QueryCompletionContributor : CompletionContributor() {
     @Deprecated("Overriden function is deprecated, but no clear replacement for this feature available")
     override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
         return typeChar == '\'' || typeChar == '"'
@@ -19,7 +19,7 @@ class DatabaseElementsCompletionContributor : CompletionContributor() {
                 PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE),
                 PlatformPatterns.psiElement(PhpTokenTypes.STRING_LITERAL),
             ),
-            DatabaseElementsCompletionProvider()
+            QueryCompletionProvider()
         )
     }
 }

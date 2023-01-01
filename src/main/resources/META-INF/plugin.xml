@@ -24,7 +24,7 @@
         <postStartupActivity implementation="dev.ekvedaras.laravelquery.services.Startup" />
 
         <completion.contributor language="PHP"
-                                implementationClass="dev.ekvedaras.laravelquery.integration.query.completion.DatabaseElementsCompletionContributor"
+                                implementationClass="dev.ekvedaras.laravelquery.integration.query.completion.QueryCompletionContributor"
                                 />
 
 <!--        <completion.contributor language="PHP"-->
