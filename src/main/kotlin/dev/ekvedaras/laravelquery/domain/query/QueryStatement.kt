@@ -7,12 +7,14 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.query.model.Model
 import dev.ekvedaras.laravelquery.support.descendantsOfType
+import dev.ekvedaras.laravelquery.support.tap
+import dev.ekvedaras.laravelquery.support.transform
 
 val queryKey = Key<Query>("query")
 
 class QueryStatement(val statement: Statement, query: Query? = null) {
     init {
-        if (query != null) statement.putUserData(queryKey, query)
+        query.tap { statement.putUserData(queryKey, it) }
     }
 
     fun query(): Query = statement.getUserData(queryKey)
@@ -40,7 +42,7 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
         forStatement = this,
     )
 
-    val model: Model? = Model.from(this.callChain.firstClassReference)
+    val model: Model? = this.callChain.firstClassReference.transform { Model.from(it) }
 
     init {
         this.query().addStatement(this)

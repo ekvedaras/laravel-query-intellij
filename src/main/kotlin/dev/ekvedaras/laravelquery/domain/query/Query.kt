@@ -9,6 +9,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.domain.query.model.Model
+import dev.ekvedaras.laravelquery.support.tap
 
 class Query {
     private var statements: Set<QueryStatement> = setOf()
@@ -26,7 +27,7 @@ class Query {
 
         statements += statement
 
-        statement.callChain.elements.forEach { methodCall ->
+        statement.callChain.forEach { methodCall ->
             when (methodCall) {
                 is TableSelectionCall -> {
                     val tableParameter = methodCall.tableParameter ?: return@forEach
@@ -38,9 +39,7 @@ class Query {
                         tables += tableParameter.table
                     }
 
-                    if (tableParameter.namespace != null) {
-                        namespaces += tableParameter.namespace
-                    }
+                    tableParameter.namespace.tap { namespaces += it }
                 }
             }
         }
@@ -49,9 +48,9 @@ class Query {
             if (this.model != null && statement.model != this.model) throw Exception("Cannot re-assign query model once defined")
             this.model = statement.model
 
-            if (statement.model.table != null) {
-                this.tables += statement.model.table
-                this.namespaces += statement.model.table.namespace
+            statement.model.table.tap {
+                this.tables += it
+                this.namespaces += it.namespace
             }
         }
 
