@@ -5,7 +5,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.childrenOfType
 import com.intellij.psi.util.descendantsOfType
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
-import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement
 
 inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
