@@ -6,7 +6,7 @@ import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.NewExpression
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.MethodCall
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryStatementElement
 import dev.ekvedaras.laravelquery.support.descendantsOfType
@@ -25,14 +25,14 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
                 return QueryStatementElementCallChain(
                     startingFrom
                         .descendantsOfType<MethodReference>()
-                        .mapNotNull { MethodCall.from(reference = it, queryStatement = forStatement) }
+                        .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
                         .toSet()
                 )
             }
 
             return QueryStatementElementCallChain(
                 forStatement.statement.descendantsOfType<MethodReference>()
-                    .mapNotNull { MethodCall.from(reference = it, queryStatement = forStatement) }
+                    .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
                     .toSet()
             )
         }
@@ -43,8 +43,8 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
             .firstOrNull { it.classReference != null }
             ?.classReference
 
-    fun methodCallFor(methodReference: MethodReference): MethodCall? =
-        this.elements.filterIsInstance<MethodCall>().firstOrNull { it.reference == methodReference }
+    fun methodCallFor(methodReference: MethodReference): QueryMethodCall? =
+        this.elements.filterIsInstance<QueryMethodCall>().firstOrNull { it.reference == methodReference }
 
     inline fun forEach(action: (QueryStatementElement) -> Unit) {
         for (element in elements) action(element)

@@ -6,9 +6,9 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.NewExpression
 import com.jetbrains.php.lang.psi.elements.ParenthesizedExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter
 
-interface MethodCall : QueryStatementElement {
+sealed interface QueryMethodCall : QueryStatementElement {
     override val reference: MethodReference
     override val classReference: ClassReference?
         get() =
@@ -19,7 +19,7 @@ interface MethodCall : QueryStatementElement {
     fun completeFor(parameter: StringParameter): List<LookupElement>
 
     companion object {
-        fun from(reference: MethodReference, queryStatement: QueryStatement): MethodCall? {
+        fun from(reference: MethodReference, queryStatement: QueryStatement): QueryMethodCall? {
             return when(reference.name) {
                 "newQuery" -> NewQueryCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)

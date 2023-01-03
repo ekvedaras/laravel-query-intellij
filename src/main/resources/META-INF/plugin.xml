@@ -26,6 +26,9 @@
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.integration.query.completion.QueryCompletionContributor"
                                 />
+        <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.laravelquery.integration.model.completion.ModelCompletionContributor"
+        />
 
 <!--        <completion.contributor language="PHP"-->
 <!--                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"-->

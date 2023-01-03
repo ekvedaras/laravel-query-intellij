@@ -5,7 +5,7 @@ import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
-import dev.ekvedaras.laravelquery.domain.query.model.Model
+import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transform

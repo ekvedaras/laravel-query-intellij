@@ -1,14 +1,12 @@
 package dev.ekvedaras.laravelquery.domain.query
 
 import com.intellij.database.util.containsElements
-import com.jetbrains.php.lang.psi.elements.Statement
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
-import dev.ekvedaras.laravelquery.domain.query.model.Model
+import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.support.tap
 
 class Query {
@@ -41,6 +39,8 @@ class Query {
 
                     tableParameter.namespace.tap { namespaces += it }
                 }
+
+                else -> {}
             }
         }
 

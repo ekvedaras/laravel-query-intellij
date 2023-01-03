@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
+import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.support.substringAfter
 import dev.ekvedaras.laravelquery.support.substringBefore
 

@@ -5,11 +5,11 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : MethodCall, TableSelectionCall {
+class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall {
     private val rawTableParameter = reference.getParameter(0)
     private val rawFirstColumnParameter = reference.getParameter(1)
     private val rawSecondColumnParameter = reference.getParameter(

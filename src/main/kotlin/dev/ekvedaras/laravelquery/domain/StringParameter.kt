@@ -1,6 +1,7 @@
-package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
+package dev.ekvedaras.laravelquery.domain
 
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasedParam
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 
 data class StringParameter(val element: StringLiteralExpression) {

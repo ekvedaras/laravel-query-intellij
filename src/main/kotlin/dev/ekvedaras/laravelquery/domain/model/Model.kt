@@ -1,4 +1,4 @@
-package dev.ekvedaras.laravelquery.domain.query.model
+package dev.ekvedaras.laravelquery.domain.model
 
 import com.cesarferreira.pluralize.pluralize
 import com.intellij.openapi.project.DumbService

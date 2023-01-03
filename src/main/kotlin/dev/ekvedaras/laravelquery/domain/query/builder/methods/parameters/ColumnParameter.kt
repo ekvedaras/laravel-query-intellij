@@ -2,6 +2,7 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.rd.util.firstOrNull
+import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.Query
 import kotlin.streams.toList
 
