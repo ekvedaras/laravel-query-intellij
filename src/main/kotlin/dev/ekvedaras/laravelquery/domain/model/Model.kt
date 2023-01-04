@@ -12,7 +12,15 @@ import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 
-class Model(private val clazz: PhpClass) {
+class Model private constructor(private val clazz: PhpClass) {
+    init {
+        if (DumbService.isDumb(clazz.project)) throw Exception("Cannot validate Model class while indexing");
+
+        val baseEloquentModel = BaseEloquentModel.find(clazz.project) ?: throw Exception("Cannot find Eloquent base model class")
+
+        if (! clazz.superClasses.contains(baseEloquentModel.clazz)) throw Exception("Given class does not extend Eloquent base model thus is not a model")
+    }
+
     private val tableField = clazz.findFieldByName("table", false)
     private val definedTableName =
         if (tableField is Field) tableField.defaultValue?.text?.unquoteAndCleanup()
@@ -46,7 +54,7 @@ class Model(private val clazz: PhpClass) {
             return PhpIndex.getInstance(classReference.project)
                 .getClassesByFQN(classReference.type.types.firstOrNull() ?: return null)
                 .firstOrNull()
-                .transform { Model(it) }
+                .transform { try{ Model(it) } catch (e: Exception) { null} }
         }
     }
 }
