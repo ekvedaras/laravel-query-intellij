@@ -12,12 +12,12 @@ import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.ArrayHashElementImpl
 import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asTableName
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayKey
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isPhpArray
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.asTableName
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.isArrayKey
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.isArrayValue
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.isPhpArray
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 import org.eclipse.xtend2.lib.StringConcatenation
 
 object LaravelClasses {

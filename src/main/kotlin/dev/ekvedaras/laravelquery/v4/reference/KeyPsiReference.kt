@@ -3,9 +3,9 @@ package dev.ekvedaras.laravelquery.v4.reference
 import com.intellij.database.util.DbUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
 
 class KeyPsiReference(element: PsiElement) : PsiReferenceBase<PsiElement>(element) {
     override fun resolve(): PsiElement? {

@@ -14,16 +14,16 @@ import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.VariableImpl
 import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.tableName
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsAlias
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.statementFirstPsiChild
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.tableName
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.containsAlias
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.statementFirstPsiChild
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 import java.util.Collections
 
 class TableAndAliasCollector(private val reference: DbReferenceExpression) {

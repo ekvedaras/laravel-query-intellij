@@ -9,10 +9,10 @@ import com.jetbrains.php.lang.psi.elements.impl.GroupStatementImpl
 import com.jetbrains.php.lang.psi.elements.impl.ParameterListImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpReturnImpl
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRelationClosure
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInsideRelationClosure
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 
 class ModelRelationResolver(
     private val reference: DbReferenceExpression,

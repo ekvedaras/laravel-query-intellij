@@ -6,10 +6,10 @@ import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
-import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
-import dev.ekvedaras.laravelquery.reference.ColumnPsiReference
-import dev.ekvedaras.laravelquery.reference.TableOrViewPsiReference
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownColumnInspection
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
+import dev.ekvedaras.laravelquery.v4.reference.ColumnPsiReference
+import dev.ekvedaras.laravelquery.v4.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
 internal class BlueprintColumnsAndTablesTest : BaseTestCase() {

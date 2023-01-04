@@ -7,14 +7,14 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isEloquentModel
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isTableParam
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
-import dev.ekvedaras.laravelquery.utils.MethodUtils
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForTableByName
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isEloquentModel
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isTableParam
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
+import dev.ekvedaras.laravelquery.v4.utils.MethodUtils
 
 class TableOrViewReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {

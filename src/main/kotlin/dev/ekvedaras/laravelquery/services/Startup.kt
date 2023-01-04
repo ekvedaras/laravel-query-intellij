@@ -3,8 +3,8 @@ package dev.ekvedaras.laravelquery.services
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import dev.ekvedaras.laravelquery.notifications.ConfigureSettingsNotification
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.asPhpClass
-import dev.ekvedaras.laravelquery.utils.LaravelClasses
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.asPhpClass
+import dev.ekvedaras.laravelquery.v4.utils.LaravelClasses
 
 class Startup : StartupActivity {
     override fun runActivity(project: Project) {

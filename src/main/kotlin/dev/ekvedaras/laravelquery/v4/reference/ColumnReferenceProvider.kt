@@ -7,16 +7,16 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isColumnIn
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
-import dev.ekvedaras.laravelquery.utils.MethodUtils
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.isArrayValue
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.canHaveColumnsInArrayValues
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isColumnIn
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.shouldCompleteOnlyColumns
+import dev.ekvedaras.laravelquery.v4.utils.MethodUtils
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.containsVariable
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.isArrayValue
 
 class ColumnReferenceProvider : PsiReferenceProvider() {
 

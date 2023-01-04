@@ -6,7 +6,6 @@ import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.reference.KeyPsiReference
 import junit.framework.TestCase
 
 internal class IndexReferenceTest : BaseTestCase() {

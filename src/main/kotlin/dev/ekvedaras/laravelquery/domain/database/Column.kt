@@ -4,7 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
-import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.withInsertHandler
+import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 
 data class Column(val entity: DasColumn, val table: Table) {
     val project = table.project

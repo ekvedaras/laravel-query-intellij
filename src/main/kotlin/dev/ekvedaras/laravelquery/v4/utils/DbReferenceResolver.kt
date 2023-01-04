@@ -6,15 +6,15 @@ import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.DasTableKey
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeysInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keysInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.columnsInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.foreignKeysInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.indexesInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.keysInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.schemasInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.tablesInParallel
 import java.util.Collections
 
 class DbReferenceResolver(private val reference: DbReferenceExpression) {

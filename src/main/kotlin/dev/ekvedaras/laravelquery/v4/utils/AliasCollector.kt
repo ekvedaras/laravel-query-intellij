@@ -2,11 +2,11 @@ package dev.ekvedaras.laravelquery.v4.utils
 
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.impl.StringLiteralExpressionImpl
-import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.canHaveAliasParam
+import dev.ekvedaras.laravelquery.v4.models.DbReferenceExpression
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.canHaveAliasParam
 
 class AliasCollector(private val reference: DbReferenceExpression) {
     fun extractAliasFromString(

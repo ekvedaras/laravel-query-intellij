@@ -1,8 +1,8 @@
 package dev.ekvedaras.laravelquery.v4.inspection
 
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
-import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownColumnInspection
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
 
 internal class DasObjectsInspectionTest : BaseTestCase() {
     fun testWarnsAboutUnknownSchema() {

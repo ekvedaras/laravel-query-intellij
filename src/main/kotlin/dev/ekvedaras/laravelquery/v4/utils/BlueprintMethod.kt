@@ -9,14 +9,14 @@ import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.getColumnName
-import dev.ekvedaras.laravelquery.utils.BlueprintMethod.Companion.wantsColumnForIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForColumns
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.nextSiblingInTreeWithText
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.utils.BlueprintMethod.Companion.getColumnName
+import dev.ekvedaras.laravelquery.v4.utils.BlueprintMethod.Companion.wantsColumnForIndexes
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForColumns
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForKeys
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.nextSiblingInTreeWithText
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 import icons.DatabaseIcons
 
 internal val BlueprintColumnMethods = listOf(

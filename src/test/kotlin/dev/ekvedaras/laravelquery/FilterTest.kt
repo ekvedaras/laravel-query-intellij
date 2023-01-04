@@ -1,6 +1,6 @@
 package dev.ekvedaras.laravelquery
 
-import dev.ekvedaras.laravelquery.models.SettingsSchema
+import dev.ekvedaras.laravelquery.v4.models.SettingsSchema
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 
 internal class FilterTest : BaseTestCase() {

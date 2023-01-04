@@ -11,9 +11,9 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import dev.ekvedaras.laravelquery.utils.DbReferenceResolver
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
-import dev.ekvedaras.laravelquery.utils.TableAndAliasCollector
+import dev.ekvedaras.laravelquery.v4.utils.DbReferenceResolver
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.utils.TableAndAliasCollector
 import org.apache.commons.lang.StringUtils.substringBefore
 
 class DbReferenceExpression(val expression: PsiElement, val type: Type) {

@@ -18,8 +18,8 @@ import com.jetbrains.php.lang.psi.elements.impl.ArrayCreationExpressionImpl
 import com.jetbrains.php.lang.psi.elements.impl.FunctionImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
-import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isJoinOrRelation
+import dev.ekvedaras.laravelquery.v4.utils.ClassUtils.Companion.isChildOf
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isJoinOrRelation
 
 class MethodUtils private constructor() {
     companion object {

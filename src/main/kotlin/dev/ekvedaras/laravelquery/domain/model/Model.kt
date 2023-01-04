@@ -10,7 +10,7 @@ import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import dev.ekvedaras.laravelquery.support.transform
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 
 class Model(private val clazz: PhpClass) {
     private val tableField = clazz.findFieldByName("table", false)

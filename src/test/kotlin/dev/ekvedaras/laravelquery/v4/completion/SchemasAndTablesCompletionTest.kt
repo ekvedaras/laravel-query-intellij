@@ -1,7 +1,7 @@
 package dev.ekvedaras.laravelquery.v4.completion
 
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.utils.LaravelUtils
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils
 
 internal class SchemasAndTablesCompletionTest : BaseTestCase() {
     private fun completeAllFor(method: String) {

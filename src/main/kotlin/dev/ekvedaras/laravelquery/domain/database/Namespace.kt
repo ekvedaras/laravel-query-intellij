@@ -8,8 +8,8 @@ import com.intellij.database.model.ObjectKind
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
-import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.buildLookup
-import dev.ekvedaras.laravelquery.utils.LookupUtils.Companion.withInsertHandler
+import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.buildLookup
+import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 import java.util.stream.Stream
 
 private val unimportantSchemas = listOf("sys", "information_schema", "mysql", "performance_schema")

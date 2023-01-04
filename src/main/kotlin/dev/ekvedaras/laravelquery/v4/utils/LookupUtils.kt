@@ -14,10 +14,10 @@ import com.intellij.database.model.DasTableKey
 import com.intellij.database.psi.DbDataSource
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
-import dev.ekvedaras.laravelquery.completion.DeclarativeInsertHandler
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tableNameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.withoutTablePrefix
+import dev.ekvedaras.laravelquery.v4.completion.DeclarativeInsertHandler
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.tableNameWithoutPrefix
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.withoutTablePrefix
 import icons.DatabaseIcons
 
 class LookupUtils private constructor() {

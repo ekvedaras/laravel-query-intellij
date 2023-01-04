@@ -9,9 +9,9 @@ import com.jetbrains.php.lang.psi.elements.ParameterList
 import com.jetbrains.php.lang.psi.elements.PhpExpression
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.rd.util.first
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
-import dev.ekvedaras.laravelquery.utils.SchemaMethod.Companion.isCreateOrTable
-import dev.ekvedaras.laravelquery.utils.SchemaMethod.Companion.tableName
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
+import dev.ekvedaras.laravelquery.v4.utils.SchemaMethod.Companion.isCreateOrTable
+import dev.ekvedaras.laravelquery.v4.utils.SchemaMethod.Companion.tableName
 
 class SchemaMethod private constructor() {
     companion object {

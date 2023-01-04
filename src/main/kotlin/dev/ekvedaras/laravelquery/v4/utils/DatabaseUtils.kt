@@ -13,7 +13,7 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.project.Project
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
+import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.tables
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrNull
 

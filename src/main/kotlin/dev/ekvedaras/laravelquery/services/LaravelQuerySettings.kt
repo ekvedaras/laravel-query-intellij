@@ -9,7 +9,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil.copyBean
-import dev.ekvedaras.laravelquery.models.SettingsSchema
+import dev.ekvedaras.laravelquery.v4.models.SettingsSchema
 import org.jetbrains.annotations.Nullable
 
 @State(name = "LaravelQuerySettings", storages = [Storage("laravel-query-settings.xml")])

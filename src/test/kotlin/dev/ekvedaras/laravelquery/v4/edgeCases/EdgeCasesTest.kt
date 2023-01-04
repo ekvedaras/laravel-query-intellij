@@ -8,8 +8,8 @@ import com.intellij.database.util.DbUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.UsefulTestCase
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.inspection.UnknownColumnInspection
-import dev.ekvedaras.laravelquery.inspection.UnknownTableOrViewInspection
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownColumnInspection
+import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
 
 internal class EdgeCasesTest : BaseTestCase() {
     fun testClassCastException1() {

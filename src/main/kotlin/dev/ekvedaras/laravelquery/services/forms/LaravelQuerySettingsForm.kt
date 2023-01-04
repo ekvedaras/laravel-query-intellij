@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.BooleanTableCellRenderer
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.table.JBTable
-import dev.ekvedaras.laravelquery.models.SettingsSchema
+import dev.ekvedaras.laravelquery.v4.models.SettingsSchema
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

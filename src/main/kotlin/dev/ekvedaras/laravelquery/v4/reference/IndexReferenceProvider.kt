@@ -7,19 +7,19 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForForeignKeys
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForKeys
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isForeignKeyIn
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isIndexIn
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInsideRegularFunction
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isKeyIn
-import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isUniqueIndexIn
-import dev.ekvedaras.laravelquery.utils.MethodUtils
-import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.containsVariable
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForForeignKeys
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForIndexes
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForKeys
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isBuilderMethodForUniqueIndexes
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isForeignKeyIn
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isIndexIn
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInsidePhpArrayOrValue
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInsideRegularFunction
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isInteresting
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isKeyIn
+import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils.Companion.isUniqueIndexIn
+import dev.ekvedaras.laravelquery.v4.utils.MethodUtils
+import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.containsVariable
 
 class IndexReferenceProvider : PsiReferenceProvider() {
 
