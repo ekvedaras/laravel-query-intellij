@@ -213,4 +213,32 @@ internal class QueryCompletionTest : BaseTestCase() {
         assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
         assertNoCompletion("billable_id", "connection", "migration")
     }
+
+    fun testItCompletesColumnsInCreateCallArrayHashKey() {
+        myFixture.configureByFile("integration/query/completion/inCreateCallArrayHashKey.php")
+        myFixture.completeBasic()
+        assertCompletion("email", "first_name")
+        assertNoCompletion("billable_id")
+        assertNoCompletion("testProject1", "testProject2", "users", "customers", "failed_jobs", "migrations")
+    }
+
+    fun testItCompletesColumnsInCreateCallArrayEntry() {
+        myFixture.configureByFile("integration/query/completion/inCreateCallArrayEntry.php")
+        myFixture.completeBasic()
+        assertCompletion("email", "first_name")
+        assertNoCompletion("billable_id")
+        assertNoCompletion("testProject1", "testProject2", "users", "customers", "failed_jobs", "migrations")
+    }
+
+    fun testItDoesNotCompleteColumnsInCreateCallArrayHashValue() {
+        myFixture.configureByFile("integration/query/completion/inCreateCallArrayHashValue.php")
+        myFixture.completeBasic()
+        assertEmpty(myFixture.lookupElements ?: arrayOf())
+    }
+
+    fun testItDoesNotCompleteColumnsInNonModelClasses() {
+        myFixture.configureByFile("integration/query/completion/inCreateCallOfNonModelClass.php")
+        myFixture.completeBasic()
+        assertEmpty(myFixture.lookupElements ?: arrayOf())
+    }
 }

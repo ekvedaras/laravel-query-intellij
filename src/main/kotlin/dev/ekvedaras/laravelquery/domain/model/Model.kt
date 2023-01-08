@@ -8,22 +8,22 @@ import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Table
+import dev.ekvedaras.laravelquery.support.LaravelClasses
+import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
+import dev.ekvedaras.laravelquery.support.isChildOf
 import dev.ekvedaras.laravelquery.support.transform
-import dev.ekvedaras.laravelquery.v4.utils.PsiUtils.Companion.unquoteAndCleanup
 
 class Model private constructor(private val clazz: PhpClass) {
     init {
-        if (DumbService.isDumb(clazz.project)) throw Exception("Cannot validate Model class while indexing");
-
-        val baseEloquentModel = BaseEloquentModel.find(clazz.project) ?: throw Exception("Cannot find Eloquent base model class")
-
-        if (! clazz.superClasses.contains(baseEloquentModel.clazz)) throw Exception("Given class does not extend Eloquent base model thus is not a model")
+        if (!clazz.isChildOf(LaravelClasses.Model)) {
+            throw Exception("Given class does not extend Eloquent base model thus is not a model")
+        }
     }
 
     private val tableField = clazz.findFieldByName("table", false)
     private val definedTableName =
-        if (tableField is Field) tableField.defaultValue?.text?.unquoteAndCleanup()
+        if (tableField is Field) tableField.defaultValue?.text?.cleanup()
         else null
     private val resolvedTableName: String
         get() {
@@ -52,9 +52,15 @@ class Model private constructor(private val clazz: PhpClass) {
             if (DumbService.isDumb(classReference.project)) return null
 
             return PhpIndex.getInstance(classReference.project)
-                .getClassesByFQN(classReference.type.types.firstOrNull() ?: return null)
+                .getClassesByFQN(classReference.fqn ?: return null)
                 .firstOrNull()
-                .transform { try{ Model(it) } catch (e: Exception) { null} }
+                .transform {
+                    try {
+                        Model(it)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
         }
     }
 }

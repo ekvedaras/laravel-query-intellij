@@ -16,9 +16,17 @@ data class Column(val entity: DasColumn, val table: Table) {
         alias: String? = null
     ): LookupElement {
         val prefix = buildString {
-            append(if (withNamespacePrefix) { table.namespace.name } else { "" })
+            append(if (withNamespacePrefix) {
+                table.namespace.name
+            } else {
+                ""
+            })
             append(".")
-            append(if (withTablePrefix) { table.nameWithoutPrefix } else { "" })
+            append(if (withTablePrefix) {
+                table.nameWithoutPrefix
+            } else {
+                ""
+            })
         }
 
         return LookupElementBuilder

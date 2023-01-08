@@ -3,11 +3,11 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.NewExpression
-import com.jetbrains.php.lang.psi.elements.ParenthesizedExpression
-import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.query.QueryStatement
+import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.classReference
+import dev.ekvedaras.laravelquery.support.isMemberOfAny
 
 sealed interface QueryMethodCall : QueryStatementElement {
     override val reference: MethodReference
@@ -18,8 +18,17 @@ sealed interface QueryMethodCall : QueryStatementElement {
 
     companion object {
         fun from(reference: MethodReference, queryStatement: QueryStatement): QueryMethodCall? {
-            return when(reference.name) {
+            if (!reference.isMemberOfAny(
+                    LaravelClasses.QueryBuilder,
+                    LaravelClasses.EloquentBuilder,
+                    LaravelClasses.DbFacade,
+                    LaravelClasses.DbFacadeAlias,
+                    LaravelClasses.Model,
+                )) return null
+
+            return when (reference.name) {
                 "newQuery" -> NewQueryCall(reference, queryStatement)
+                "create" -> CreateCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)
                 "join" -> JoinCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)

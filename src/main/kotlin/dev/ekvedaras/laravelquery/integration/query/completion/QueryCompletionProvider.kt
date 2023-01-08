@@ -7,8 +7,8 @@ import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -22,9 +22,9 @@ class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
         } ?: return
 
         if (
-            ! string.isMethodReferenceParameter
-            && ! string.isEntryOfArrayWhichIsMethodReferenceParameter
-            && ! string.isArrayHashKeyOfArrayWhichIsMethodReferenceParameter
+            !string.isMethodReferenceParameter
+            && !string.isEntryOfArrayWhichIsMethodReferenceParameter
+            && !string.isArrayHashKeyOfArrayWhichIsMethodReferenceParameter
         ) {
             return
         }

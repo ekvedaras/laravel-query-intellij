@@ -40,8 +40,10 @@ class ColumnParameter(val stringParameter: StringParameter) {
         if (this.stringParameter.hasThreeParts) {
             val completion = mutableListOf<LookupElement>()
 
-            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
-            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList() ?: listOf()
+            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList()
+                ?: listOf()
+            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
+                ?: listOf()
 
             return completion
         }

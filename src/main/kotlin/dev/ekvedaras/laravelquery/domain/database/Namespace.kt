@@ -8,7 +8,6 @@ import com.intellij.database.model.ObjectKind
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
-import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 import java.util.stream.Stream
 
@@ -20,10 +19,10 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
 
     companion object {
         fun list(project: Project): Stream<out Namespace> = DataSource.list(project).flatMap { it.namespaces() }
-        fun isImportant(namespace: DasNamespace) = ! unimportantSchemas.contains(namespace.name)
+        fun isImportant(namespace: DasNamespace) = !unimportantSchemas.contains(namespace.name)
         fun findFirst(namespace: String, project: Project) =
             DataSource.list(project)
-                .firstWhereOrNull{ it.findNamespace(namespace) != null }
+                .firstWhereOrNull { it.findNamespace(namespace) != null }
                 ?.findNamespace(namespace)
     }
 
@@ -37,7 +36,7 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
             .filter { Table.isPrefixed(it, dataSource.project) }
             .map { Table(entity = it, namespace = this) }
 
-    fun findTable(table: String): Table? = this.tables().firstWhereOrNull{ it.name == table }
+    fun findTable(table: String): Table? = this.tables().firstWhereOrNull { it.name == table }
 
     fun asLookupElement(): LookupElement = LookupElementBuilder
         .create(this, this.name)

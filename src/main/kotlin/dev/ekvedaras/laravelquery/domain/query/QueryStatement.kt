@@ -10,7 +10,7 @@ import dev.ekvedaras.laravelquery.support.descendantsOfType
 import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transform
 
-val queryKey = Key<Query>("query")
+private val queryKey = Key<Query>("query")
 
 class QueryStatement(val statement: Statement, query: Query? = null) {
     init {

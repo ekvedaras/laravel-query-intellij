@@ -33,6 +33,6 @@ data class DataSource(val entity: DbDataSource) {
 
     fun findFirstTable(table: String): Table? =
         this.namespaces()
-            .firstWhereOrNull{ it.findTable(table) != null }
+            .firstWhereOrNull { it.findTable(table) != null }
             ?.findTable(table)
 }

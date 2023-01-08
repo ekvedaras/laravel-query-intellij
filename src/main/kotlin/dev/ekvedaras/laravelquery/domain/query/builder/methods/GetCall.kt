@@ -3,9 +3,9 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.support.elementsOfType
 
 class GetCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {

@@ -2,9 +2,9 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import dev.ekvedaras.laravelquery.v4.completion.DeclarativeInsertHandler
-import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.database.Table
+import dev.ekvedaras.laravelquery.v4.completion.DeclarativeInsertHandler
 import icons.DatabaseIcons
 
 data class Alias(val name: String, val definitionParameter: StringParameter, val table: Table) {

@@ -6,8 +6,8 @@ import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.NewExpression
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryStatementElement
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 

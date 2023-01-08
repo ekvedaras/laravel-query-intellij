@@ -9,8 +9,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
-import dev.ekvedaras.laravelquery.v4.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.buildLookup
 import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 import java.util.stream.Stream
 
@@ -53,6 +51,10 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
             .withInsertHandler(
                 project,
                 triggerCompletion = triggerCompletionOnInsert,
-                prefix = if (withNamespacePrefix) { namespace.name ?: "" } else { "" }
+                prefix = if (withNamespacePrefix) {
+                    namespace.name
+                } else {
+                    ""
+                }
             )
 }
