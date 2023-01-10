@@ -10,19 +10,19 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableP
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class FromCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall {
-    private val rawTableParameter = reference.getParameter(0)
-    private val rawAliasParameter = reference.getParameter(1)
+    private val tableMethodParameter = reference.getParameter(0) as? StringLiteralExpression
+    private val aliasMethodParameter = reference.getParameter(1) as? StringLiteralExpression
 
-    override val tableParameter = this.rawTableParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
+    override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
         TableParameter(StringParameter(it))
     }
 
-    private val aliasParameter = this.rawAliasParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {
+    private val aliasParameter = this.aliasMethodParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {
         AliasParameter(StringParameter(it))
     }
 
     override val alias: Alias? = if (this.aliasParameter != null && this.tableParameter?.table != null) {
-        Alias(name = this.aliasParameter.name, definitionParameter = this.aliasParameter.element, table = this.tableParameter.table)
+        Alias(name = this.aliasParameter.name, definitionParameter = this.aliasParameter.stringParameter, table = this.tableParameter.table)
     } else if (this.tableParameter?.table != null && this.tableParameter.alias != null) {
         Alias(name = this.tableParameter.alias, definitionParameter = this.tableParameter.stringParameter, table = this.tableParameter.table)
     } else {

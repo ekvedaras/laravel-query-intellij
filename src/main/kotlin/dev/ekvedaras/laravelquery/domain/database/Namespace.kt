@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
+import com.intellij.database.psi.DbNamespace
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
@@ -43,4 +44,6 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
         .withIcon(DasPsiWrappingSymbol(entity, project).getIcon(false))
         .withTypeText(dataSource.name, true)
         .withInsertHandler(project, true)
+
+    fun asDbNamespace(): DbNamespace = this.dataSource.entity.findElement(this.entity) as DbNamespace
 }

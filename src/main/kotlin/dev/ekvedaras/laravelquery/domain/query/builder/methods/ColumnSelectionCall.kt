@@ -1,13 +1,27 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.database.psi.DbColumn
+import com.intellij.database.psi.DbNamespace
+import com.intellij.database.psi.DbTable
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 
-sealed interface ColumnSelectionCall : QueryMethodCall {
+sealed interface ColumnSelectionCall : QueryMethodCall, ReferencesColumn {
     val columns: Set<ColumnParameter>
 
+    private fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =
+        columns.find { it.stringParameter.element == stringParameter.element }
+
     override fun completeFor(parameter: StringParameter): List<LookupElement> =
-        columns.find { it.stringParameter.element == parameter.element }?.getCompletionOptions(queryStatement.query())
-            ?: listOf()
+        this.columnParameterFor(parameter)?.getCompletionOptions(queryStatement.query()) ?: listOf()
+
+    override fun findColumnReferencedIn(parameter: StringParameter): DbColumn? =
+        this.columnParameterFor(parameter)?.findColumnReference(queryStatement.query())
+
+    override fun findTableReferencedIn(parameter: StringParameter): DbTable? =
+        this.columnParameterFor(parameter)?.findTableReference(queryStatement.query())
+
+    override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? =
+        this.columnParameterFor(parameter)?.findNamespaceReference(queryStatement.query())
 }

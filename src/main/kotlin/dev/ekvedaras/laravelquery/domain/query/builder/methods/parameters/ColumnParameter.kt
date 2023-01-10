@@ -1,9 +1,13 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.database.psi.DbColumn
+import com.intellij.database.psi.DbNamespace
+import com.intellij.database.psi.DbTable
 import com.jetbrains.rd.util.firstOrNull
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.Query
+import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import kotlin.streams.toList
 
 class ColumnParameter(val stringParameter: StringParameter) {
@@ -60,5 +64,66 @@ class ColumnParameter(val stringParameter: StringParameter) {
         }
 
         return listOf()
+    }
+
+    fun findColumnReference(query: Query): DbColumn? {
+        if (stringParameter.isEmpty) return null
+
+        if (stringParameter.hasThreeParts) {
+            return query.tables
+                .firstOrNull { it.name == this.tableOrNamespaceName && it.namespace.name == this.namespaceName }
+                ?.columns()
+                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.asDbColumn()
+        }
+
+        if (stringParameter.hasTwoParts) {
+            return query.tables
+                .firstOrNull { it.name == this.tableOrNamespaceName }
+                ?.columns()
+                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.asDbColumn()
+        }
+
+        if (stringParameter.hasOnePart) {
+            return query
+                .tables
+                .firstOrNull { table -> table.columns().firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName } != null }
+                ?.columns()
+                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.asDbColumn()
+        }
+
+        return null
+    }
+
+    fun findTableReference(query: Query): DbTable? {
+        if (stringParameter.isEmpty) return null
+
+        if (stringParameter.hasThreeParts) {
+            return query.tables
+                .firstOrNull { it.name == this.tableOrNamespaceName && it.namespace.name == this.namespaceName }
+                ?.asDbTable()
+        }
+
+        if (stringParameter.hasTwoParts) {
+            return query.tables
+                .firstOrNull { it.name == this.tableOrNamespaceName }
+                ?.asDbTable()
+        }
+
+        return null
+    }
+
+    fun findNamespaceReference(query: Query): DbNamespace? {
+        if (stringParameter.isEmpty) return null
+
+        if (stringParameter.hasThreeParts) {
+            return query.namespaces
+                .firstOrNull { it.name == this.namespaceName }
+                ?.asDbNamespace()
+        }
+
+        return null
     }
 }

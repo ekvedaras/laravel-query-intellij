@@ -3,6 +3,7 @@ package dev.ekvedaras.laravelquery.domain.database
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
+import com.intellij.database.psi.DbColumn
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 
@@ -45,4 +46,6 @@ data class Column(val entity: DasColumn, val table: Table) {
                 alias ?: prefix.trim('.')
             )
     }
+
+    fun asDbColumn(): DbColumn = this.table.namespace.dataSource.entity.findElement(this.entity) as DbColumn
 }

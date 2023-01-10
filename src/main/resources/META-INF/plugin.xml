@@ -27,6 +27,9 @@
                                 implementationClass="dev.ekvedaras.laravelquery.integration.query.completion.QueryCompletionContributor"
                                 />
 
+        <psi.referenceContributor language="PHP"
+                                  implementation="dev.ekvedaras.laravelquery.integration.query.reference.QueryDatabaseElementsReferenceContributor"/>
+
 <!--        <completion.contributor language="PHP"-->
 <!--                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"-->
 <!--                                order="first"/>-->

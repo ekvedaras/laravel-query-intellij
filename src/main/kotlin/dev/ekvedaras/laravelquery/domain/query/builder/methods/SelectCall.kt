@@ -9,11 +9,11 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.support.elementsOfType
 
 class SelectCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
-    private val firstParameter = reference.getParameter(0)
+    private val columnsMethodParameter = reference.getParameter(0)
 
-    override val columns: Set<ColumnParameter> = when (this.firstParameter) {
+    override val columns: Set<ColumnParameter> = when (this.columnsMethodParameter) {
         is ArrayCreationExpression -> {
-            this.firstParameter.elementsOfType<StringLiteralExpression>().map { ColumnParameter(StringParameter(it)) }.toSet()
+            this.columnsMethodParameter.elementsOfType<StringLiteralExpression>().map { ColumnParameter(StringParameter(it)) }.toSet()
         }
 
         is StringLiteralExpression -> {

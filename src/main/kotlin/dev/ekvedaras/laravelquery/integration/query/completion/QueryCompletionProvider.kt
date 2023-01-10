@@ -3,12 +3,9 @@ package dev.ekvedaras.laravelquery.integration.query.completion
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
-import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -21,18 +18,9 @@ class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
             StringParameter(it)
         } ?: return
 
-        if (
-            !string.isMethodReferenceParameter
-            && !string.isEntryOfArrayWhichIsMethodReferenceParameter
-            && !string.isArrayHashKeyOfArrayWhichIsMethodReferenceParameter
-        ) {
-            return
-        }
+        if (! string.shouldBeInspected()) return
 
-        val methodReference = string.element.parentOfType<MethodReference>() ?: return
-        val statement = QueryStatement(methodReference.parentOfType() ?: return)
-
-        val methodCall = statement.callChain.methodCallFor(methodReference) ?: return
+        val methodCall = string.methodCall ?: return
 
         result.addAllElements(
             methodCall.completeFor(string)

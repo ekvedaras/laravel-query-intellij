@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
+import com.intellij.database.psi.DbTable
 import com.intellij.openapi.project.Project
 import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
@@ -57,4 +58,8 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
                     ""
                 }
             )
+
+    fun asDbTable(): DbTable = this.namespace.dataSource.entity.findElement(this.entity) as DbTable
+
+    fun findColumn(name: String) = columns().firstWhereOrNull { it.name == name }
 }

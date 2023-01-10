@@ -63,4 +63,15 @@ class Model private constructor(private val clazz: PhpClass) {
                 }
         }
     }
+
+    override fun equals(other: Any?): Boolean
+    {
+        if (other !is Model) return false
+
+        return this.clazz == other.clazz
+    }
+
+    override fun hashCode(): Int {
+        return clazz.hashCode()
+    }
 }
