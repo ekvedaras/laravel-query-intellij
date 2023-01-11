@@ -6,6 +6,7 @@ import com.intellij.psi.util.childrenOfType
 import com.intellij.psi.util.descendantsOfType
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement
 
 inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
     val descendants = PsiTreeUtil.getChildrenOfTypeAsList(this, T::class.java).toMutableSet()

@@ -31,6 +31,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "create" -> CreateCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)
                 "join" -> JoinCall(reference, queryStatement)
+                "where" -> WhereCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select" -> SelectCall(reference, queryStatement)
                 else -> null

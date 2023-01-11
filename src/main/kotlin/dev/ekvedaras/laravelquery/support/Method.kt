@@ -7,6 +7,7 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.NewExpression
 import com.jetbrains.php.lang.psi.elements.ParenthesizedExpression
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement
+import com.jetbrains.php.lang.psi.elements.Variable
 
 fun MethodReference.classReference(depth: Int = 0): ClassReference? =
     if (this.firstPsiChild is ClassReference) this.firstPsiChild as ClassReference
