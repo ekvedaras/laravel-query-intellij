@@ -3,8 +3,8 @@ package dev.ekvedaras.laravelquery.domain.tests
 import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter
+import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.isMemberOfAny
 
@@ -14,7 +14,7 @@ sealed interface TestMethodCall {
         get() = setOf()
 
     fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =
-        columns.find { it.stringParameter.element == stringParameter.element }
+        columns.find { stringParameter.equals(it) }
 
     companion object {
         fun from(reference: MethodReference): TestMethodCall? {

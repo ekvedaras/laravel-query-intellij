@@ -19,6 +19,8 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableP
 import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
+import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter as TestsColumnParameter
+import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter as TestsTableParameter
 
 data class StringParameter(val element: StringLiteralExpression) {
     val project = element.project
@@ -71,6 +73,8 @@ data class StringParameter(val element: StringLiteralExpression) {
         is TableParameter -> other.stringParameter == this
         is ColumnParameter -> other.stringParameter == this
         is AliasParameter -> other.stringParameter == this
+        is TestsTableParameter -> other.stringParameter == this
+        is TestsColumnParameter -> other.stringParameter == this
         is StringParameter -> other.element.originalElement == this.element.originalElement
         is PsiElement -> other == this.element.originalElement
         else -> false

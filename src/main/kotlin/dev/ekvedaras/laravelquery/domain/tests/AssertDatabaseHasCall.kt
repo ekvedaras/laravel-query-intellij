@@ -7,8 +7,8 @@ import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter
+import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
@@ -17,16 +17,14 @@ class AssertDatabaseHasCall(reference: MethodReference) : TestMethodCall {
         .transformInstanceOf<StringLiteralExpression, StringParameter> { StringParameter(it) }
         .transform { TableParameter(it) }
 
-    private val rawColumnsParameter : ArrayCreationExpression? = reference.getParameter(1) as? ArrayCreationExpression
 
-    // TODO: Support ['caret']
-    override val columns: Set<ColumnParameter> = rawColumnsParameter
-        ?.childrenOfType<ArrayHashElement>()
-        ?.mapNotNull { hashEntry ->
-            hashEntry.key.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
-                ColumnParameter(StringParameter(it))
-            }
-        }
+    // TODO: support ['<caret>']
+    private val columnsMethodParameter = reference.getParameter(1) as? ArrayCreationExpression
+    override val columns: Set<ColumnParameter> = columnsMethodParameter
+        ?.hashElements
+        ?.map { it.key }
+        ?.filterIsInstance<StringLiteralExpression>()
+        ?.map { ColumnParameter(StringParameter(it)) }
         ?.toSet() ?: setOf()
 
 

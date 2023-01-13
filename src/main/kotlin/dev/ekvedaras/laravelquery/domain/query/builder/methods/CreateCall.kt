@@ -13,6 +13,7 @@ import kotlin.streams.toList
 class CreateCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
 
+    // TODO: support ['<caret>']
     override val columns: Set<ColumnParameter> = columnsMethodParameter
         ?.hashElements
         ?.map { it.key }

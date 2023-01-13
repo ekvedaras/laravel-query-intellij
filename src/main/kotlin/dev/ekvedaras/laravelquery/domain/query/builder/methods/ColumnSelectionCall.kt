@@ -11,7 +11,7 @@ sealed interface ColumnSelectionCall : QueryMethodCall, ReferencesColumn {
     val columns: Set<ColumnParameter>
 
     private fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =
-        columns.find { it.stringParameter.element == stringParameter.element }
+        columns.find { stringParameter.equals(it) }
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> =
         this.columnParameterFor(parameter)?.getCompletionOptions(queryStatement.query()) ?: listOf()
