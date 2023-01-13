@@ -1,6 +1,7 @@
 package dev.ekvedaras.laravelquery.domain
 
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.text.findTextRange
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
@@ -11,7 +12,11 @@ import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasedParam
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
 
@@ -58,5 +63,18 @@ data class StringParameter(val element: StringLiteralExpression) {
     private val methodReference: MethodReference? get() = element.parentOfType()
     private val statement: Statement? get() = methodReference?.parentOfType()
     private val queryStatement: QueryStatement? get() = statement.transform { QueryStatement(it) }
-    val methodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
+    val queryMethodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
+
+    val testMethodCall: TestMethodCall? get() = methodReference.transform { TestMethodCall.from(it) }
+
+    override fun equals(other: Any?): Boolean = when (other) {
+        is TableParameter -> other.stringParameter == this
+        is ColumnParameter -> other.stringParameter == this
+        is AliasParameter -> other.stringParameter == this
+        is StringParameter -> other.element.originalElement == this.element.originalElement
+        is PsiElement -> other == this.element.originalElement
+        else -> false
+    }
+
+    override fun hashCode(): Int = element.hashCode()
 }

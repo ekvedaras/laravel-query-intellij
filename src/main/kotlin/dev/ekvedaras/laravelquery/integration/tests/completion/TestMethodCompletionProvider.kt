@@ -1,4 +1,4 @@
-package dev.ekvedaras.laravelquery.integration.query.completion
+package dev.ekvedaras.laravelquery.integration.tests.completion
 
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
@@ -8,7 +8,7 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
+class TestMethodCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
@@ -20,7 +20,7 @@ class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
 
         if (! string.shouldBeInspected()) return
 
-        val methodCall = string.queryMethodCall ?: return
+        val methodCall = string.testMethodCall ?: return
 
         result.addAllElements(
             methodCall.completeFor(string)

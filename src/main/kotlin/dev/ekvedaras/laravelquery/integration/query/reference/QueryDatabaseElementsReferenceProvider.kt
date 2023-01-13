@@ -18,7 +18,7 @@ class QueryDatabaseElementsReferenceProvider : PsiReferenceProvider() {
 
         if (! string.shouldBeInspected()) return PsiReference.EMPTY_ARRAY
 
-        val methodCall = string.methodCall ?: return PsiReference.EMPTY_ARRAY
+        val methodCall = string.queryMethodCall ?: return PsiReference.EMPTY_ARRAY
 
         var references = arrayOf<PsiReference>()
 
