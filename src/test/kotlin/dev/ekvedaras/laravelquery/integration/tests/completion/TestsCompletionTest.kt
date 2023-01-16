@@ -13,9 +13,18 @@ internal class TestsCompletionTest : BaseTestCase() {
         assertNoCompletion("id", "email", "billable_id")
     }
 
-    fun testItCompletesInAssertDatabaseHasCallColumnsProperty()
-    {
+    fun testItCompletesInAssertDatabaseHasCallColumnsPropertyArrayHashKey() {
         myFixture.configureByFile("integration/tests/completion/inAssertDatabaseHasCallColumnsProperty.php")
+        myFixture.completeBasic()
+
+        assertCompletion("id", "email")
+        assertNoCompletion("billable_id")
+        assertNoCompletion("testProject1", "testProject2")
+        assertNoCompletion("users", "customers", "failed_jobs", "migrations")
+    }
+
+    fun testItCompletesInAssertDatabaseHasCallColumnsPropertyArrayEntry() {
+        myFixture.configureByFile("integration/tests/completion/inAssertDatabaseHasCallColumnsPropertyArrayEntry.php")
         myFixture.completeBasic()
 
         assertCompletion("id", "email")
