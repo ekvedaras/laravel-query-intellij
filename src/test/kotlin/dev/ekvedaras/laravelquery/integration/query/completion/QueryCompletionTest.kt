@@ -242,8 +242,17 @@ internal class QueryCompletionTest : BaseTestCase() {
         assertEmpty(myFixture.lookupElements ?: arrayOf())
     }
 
-    fun testItCompletesInWhereMethodWithinModelScope() {
+    fun testItCompletesInWhereCallWithinModelScope() {
         myFixture.configureByFile("integration/query/completion/inWhereCallWithinModelScope.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInWhereCallStaticallyOnModel() {
+        myFixture.configureByFile("integration/query/completion/inWhereCallStaticallyOnModel.php")
         myFixture.completeBasic()
         assertCompletion("testProject1", "users")
         assertCompletion("email", "first_name")
