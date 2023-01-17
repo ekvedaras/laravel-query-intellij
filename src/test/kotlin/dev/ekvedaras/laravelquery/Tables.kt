@@ -19,7 +19,7 @@ internal enum class Tables {
             ?: throw Exception("Cannot find testProject2.migrations table")
     },
 
-    failedJobs {
+    failed_jobs {
         override fun find(project: Project): Table = Namespaces.testProject2.find(project).findTable("failed_jobs")
             ?: throw Exception("Cannot find testProject2.failed_jobs table")
     };

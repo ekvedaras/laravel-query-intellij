@@ -25,7 +25,7 @@ internal enum class Columns {
     },
 
     failedJobsQueue {
-        override fun find(project: Project): Column = Tables.failedJobs.find(project).findColumn("queue")
+        override fun find(project: Project): Column = Tables.failed_jobs.find(project).findColumn("queue")
             ?: throw Exception("Cannot find testProject2.failed_jobs.queue column")
     };
 
