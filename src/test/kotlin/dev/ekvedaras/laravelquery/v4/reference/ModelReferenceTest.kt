@@ -2,9 +2,9 @@ package dev.ekvedaras.laravelquery.v4.reference
 
 import com.intellij.database.util.DasUtil
 import com.intellij.testFramework.TestDataFile
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 
-internal class ModelReferenceTest : BaseTestCase() {
+internal class ModelReferenceTest : LegacyV4BaseTestCase() {
     fun testResolveTableNameFromModelTableProperty() {
         this.assertResolvesUsersTable("v4/model/modelWithTableProperty.php")
     }

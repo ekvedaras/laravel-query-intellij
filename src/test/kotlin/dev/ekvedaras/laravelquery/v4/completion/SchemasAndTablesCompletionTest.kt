@@ -1,9 +1,9 @@
 package dev.ekvedaras.laravelquery.v4.completion
 
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils
 
-internal class SchemasAndTablesCompletionTest : BaseTestCase() {
+internal class SchemasAndTablesCompletionTest : LegacyV4BaseTestCase() {
     private fun completeAllFor(method: String) {
         myFixture.configureByText(
             "test.php",

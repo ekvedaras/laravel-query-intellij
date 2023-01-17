@@ -5,14 +5,14 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import dev.ekvedaras.laravelquery.v4.inspection.UnknownColumnInspection
 import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
 import dev.ekvedaras.laravelquery.v4.reference.ColumnPsiReference
 import dev.ekvedaras.laravelquery.v4.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
-internal class BlueprintColumnsAndTablesTest : BaseTestCase() {
+internal class BlueprintColumnsAndTablesTest : LegacyV4BaseTestCase() {
     fun testCompletesColumnsForRename() {
         val table = DasUtil.getTables(dataSource()).first { it.name == "users" }
 

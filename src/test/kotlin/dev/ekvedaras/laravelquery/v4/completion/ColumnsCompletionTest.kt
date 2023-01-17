@@ -3,10 +3,10 @@ package dev.ekvedaras.laravelquery.v4.completion
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.DasUtil
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import dev.ekvedaras.laravelquery.v4.utils.LaravelUtils
 
-internal class ColumnsCompletionTest : BaseTestCase() {
+internal class ColumnsCompletionTest : LegacyV4BaseTestCase() {
     private fun completeFor(
         from: String,
         prefix: String,

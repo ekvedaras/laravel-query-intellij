@@ -4,13 +4,13 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
 import dev.ekvedaras.laravelquery.v4.reference.SchemaPsiReference
 import dev.ekvedaras.laravelquery.v4.reference.TableOrViewPsiReference
 import junit.framework.TestCase
 
-internal class SchemaBuilderTest : BaseTestCase() {
+internal class SchemaBuilderTest : LegacyV4BaseTestCase() {
     fun testCompletesTables() {
         myFixture.configureByFile("v4/schema/table.php")
         myFixture.completeBasic()

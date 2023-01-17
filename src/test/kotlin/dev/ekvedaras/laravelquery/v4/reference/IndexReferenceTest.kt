@@ -5,10 +5,10 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import junit.framework.TestCase
 
-internal class IndexReferenceTest : BaseTestCase() {
+internal class IndexReferenceTest : LegacyV4BaseTestCase() {
     fun testResolvesUniqueIndexReference() {
         myFixture.configureByFile("v4/inspection/knownUniqueIndex.php")
 

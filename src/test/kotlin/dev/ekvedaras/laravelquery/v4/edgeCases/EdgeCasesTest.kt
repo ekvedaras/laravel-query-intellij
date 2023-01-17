@@ -7,11 +7,11 @@ import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.UsefulTestCase
-import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import dev.ekvedaras.laravelquery.v4.inspection.UnknownColumnInspection
 import dev.ekvedaras.laravelquery.v4.inspection.UnknownTableOrViewInspection
 
-internal class EdgeCasesTest : BaseTestCase() {
+internal class EdgeCasesTest : LegacyV4BaseTestCase() {
     fun testClassCastException1() {
         myFixture.configureByFile("v4/edgeCases/classCastException1.php")
         myFixture.completeBasic()

@@ -5,13 +5,10 @@ import com.intellij.database.util.DasUtil
 import com.intellij.database.util.DbImplUtil
 import com.intellij.database.util.DbUtil
 import com.intellij.testFramework.UsefulTestCase
-import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.v4.reference.ColumnPsiReference
-import dev.ekvedaras.laravelquery.v4.reference.SchemaPsiReference
-import dev.ekvedaras.laravelquery.v4.reference.TableOrViewPsiReference
+import dev.ekvedaras.laravelquery.LegacyV4BaseTestCase
 import junit.framework.TestCase
 
-internal class SchemaTableColumnReferenceTest : BaseTestCase() {
+internal class SchemaTableColumnReferenceTest : LegacyV4BaseTestCase() {
     fun testResolvesColumnReference() {
         myFixture.configureByFile("v4/inspection/knownColumn.php")
 

@@ -1,9 +1,9 @@
 package dev.ekvedaras.laravelquery
 
-import dev.ekvedaras.laravelquery.v4.models.SettingsSchema
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import dev.ekvedaras.laravelquery.v4.models.SettingsSchema
 
-internal class FilterTest : BaseTestCase() {
+internal class FilterTest : LegacyV4BaseTestCase() {
     private fun complete(method: String, caretPrefix: String = "", methodPrefix: String = "") {
         myFixture.configureByText(
             "test.php",
