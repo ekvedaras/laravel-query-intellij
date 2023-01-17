@@ -1,15 +1,15 @@
 package dev.ekvedaras.laravelquery.integration.query.reference
 
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.domain.database.Table
+import dev.ekvedaras.laravelquery.Columns
+import dev.ekvedaras.laravelquery.Namespaces
+import dev.ekvedaras.laravelquery.Tables
 
 internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testItResolvesColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
 
-        val userIdColumn = Table.findFirst("users", project)
-            ?.findColumn("id")
-            ?: return fail("Cannot find users.id column")
+        val userIdColumn = Columns.usersId.find(project)
 
         val usages = myFixture.findUsages(userIdColumn.asDbColumn())
 
@@ -22,19 +22,14 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
 
     fun testItDoesNotResolvesWrongColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
-
-        val userEmailColumn = Table.findFirst("users", project)
-            ?.findColumn("email")
-            ?: return fail("Cannot find users.email column")
-
-        assertEmpty(myFixture.findUsages(userEmailColumn.asDbColumn()))
+        assertEmpty(myFixture.findUsages(Columns.usersEmail.find(project).asDbColumn()))
     }
 
     fun testResolvesTableAndColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/tableAndColumnInGetCall.php")
 
-        val usersTable = Table.findFirst("users", project) ?: return fail("Cannot find users table")
-        val userIdColumn = usersTable.findColumn("id") ?: return fail("Cannot find users.id column")
+        val usersTable = Tables.users.find(project)
+        val userIdColumn = Columns.usersId.find(project)
 
         val tableUsages = myFixture.findUsages(usersTable.asDbTable())
         val columnUsages = myFixture.findUsages(userIdColumn.asDbColumn())
@@ -61,8 +56,8 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testResolvesNamespaceAndTableAndColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/namespaceAndTableAndColumnInGetCall.php")
 
-        val usersTable = Table.findFirst("users", project) ?: return fail("Cannot find users table")
-        val userIdColumn = usersTable.findColumn("id") ?: return fail("Cannot find users.id column")
+        val usersTable = Tables.users.find(project)
+        val userIdColumn = Columns.usersId.find(project)
 
         val namespaceUsages = myFixture.findUsages(usersTable.namespace.asDbNamespace())
         val tableUsages = myFixture.findUsages(usersTable.asDbTable())
@@ -101,9 +96,7 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testResolvesJsonColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/jsonColumnInGetCall.php")
 
-        val userIdColumn = Table.findFirst("users", project)
-            ?.findColumn("id")
-            ?: return fail("Cannot find users.id column")
+        val userIdColumn = Columns.usersId.find(project)
 
         val usages = myFixture.findUsages(userIdColumn.asDbColumn())
 
@@ -117,17 +110,15 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testItResolvesNamespaceTablesAndColumnsInJoinCall() {
         myFixture.configureByFile("integration/query/reference/joinCallWithAllParameters.php")
 
-        val usersTable = Table.findFirst("users", project)
-        val userIdColumn = usersTable
-            ?.findColumn("id")
-            ?: return fail("Cannot find users.id column")
+        val testProject1Namespace = Namespaces.testProject1.find(project)
 
-        val customersTable = Table.findFirst("customers", project)
-        val billableIdColumn = customersTable
-            ?.findColumn("billable_id")
-            ?: return fail("Cannot find customers.billable_id column")
+        val usersTable = Tables.users.find(project)
+        val userIdColumn = Columns.usersId.find(project)
 
-        val namespaceUsages = myFixture.findUsages(usersTable.namespace.asDbNamespace()).toList()
+        val customersTable = Tables.customers.find(project)
+        val billableIdColumn = Columns.customersBillableId.find(project)
+
+        val namespaceUsages = myFixture.findUsages(testProject1Namespace.asDbNamespace()).toList()
         val usersTableUsages = myFixture.findUsages(usersTable.asDbTable())
         val userIdColumnUsages = myFixture.findUsages(userIdColumn.asDbColumn())
         val customersTableUsages = myFixture.findUsages(customersTable.asDbTable())
@@ -142,7 +133,7 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
         assertEquals(NamespaceReference::class.java, namespaceUsages[0].referenceClass)
         assertTrue(namespaceUsages[0].element?.textMatches("'testProject1.users'") ?: false)
         assertEquals(60, namespaceUsages[0].navigationRange.startOffset)
-        assertEquals(60 + usersTable.namespace.name.length, namespaceUsages[0].navigationRange.endOffset)
+        assertEquals(60 + testProject1Namespace.name.length, namespaceUsages[0].navigationRange.endOffset)
 
         assertEquals(TableReference::class.java, usersTableUsages.first().referenceClass)
         assertTrue(usersTableUsages.first().element?.textMatches("'testProject1.users'") ?: false)
@@ -177,7 +168,7 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
         assertEquals(NamespaceReference::class.java, namespaceUsages[3].referenceClass)
         assertTrue(namespaceUsages[3].element?.textMatches("'testProject1.users.id'") ?: false)
         assertEquals(157, namespaceUsages[3].navigationRange.startOffset)
-        assertEquals(157 + usersTable.namespace.name.length, namespaceUsages[3].navigationRange.endOffset)
+        assertEquals(157 + testProject1Namespace.name.length, namespaceUsages[3].navigationRange.endOffset)
 
         assertEquals(TableReference::class.java, usersTableUsages.last().referenceClass)
         assertTrue(usersTableUsages.last().element?.textMatches("'testProject1.users.id'") ?: false)

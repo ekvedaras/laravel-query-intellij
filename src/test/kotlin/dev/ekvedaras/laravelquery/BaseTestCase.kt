@@ -73,4 +73,5 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
 
         myFixture.testHighlighting(true, false, false, file.virtualFile)
     }
+
 }
