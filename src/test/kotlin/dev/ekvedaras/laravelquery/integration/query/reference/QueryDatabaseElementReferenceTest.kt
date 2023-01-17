@@ -113,4 +113,80 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
         assertEquals(82, usages.first().navigationRange.startOffset)
         assertEquals(82 + userIdColumn.name.length, usages.first().navigationRange.endOffset)
     }
+
+    fun testItResolvesNamespaceTablesAndColumnsInJoinCall() {
+        myFixture.configureByFile("integration/query/reference/joinCallWithAllParameters.php")
+
+        val usersTable = Table.findFirst("users", project)
+        val userIdColumn = usersTable
+            ?.findColumn("id")
+            ?: return fail("Cannot find users.id column")
+
+        val customersTable = Table.findFirst("customers", project)
+        val billableIdColumn = customersTable
+            ?.findColumn("billable_id")
+            ?: return fail("Cannot find customers.billable_id column")
+
+        val namespaceUsages = myFixture.findUsages(usersTable.namespace.asDbNamespace()).toList()
+        val usersTableUsages = myFixture.findUsages(usersTable.asDbTable())
+        val userIdColumnUsages = myFixture.findUsages(userIdColumn.asDbColumn())
+        val customersTableUsages = myFixture.findUsages(customersTable.asDbTable())
+        val billableIdColumnUsages = myFixture.findUsages(billableIdColumn.asDbColumn())
+
+        assertSize(4, namespaceUsages)
+        assertSize(2, usersTableUsages)
+        assertSize(1, userIdColumnUsages)
+        assertSize(2, customersTableUsages)
+        assertSize(1, billableIdColumnUsages)
+
+        assertEquals(NamespaceReference::class.java, namespaceUsages[0].referenceClass)
+        assertTrue(namespaceUsages[0].element?.textMatches("'testProject1.users'") ?: false)
+        assertEquals(60, namespaceUsages[0].navigationRange.startOffset)
+        assertEquals(60 + usersTable.namespace.name.length, namespaceUsages[0].navigationRange.endOffset)
+
+        assertEquals(TableReference::class.java, usersTableUsages.first().referenceClass)
+        assertTrue(usersTableUsages.first().element?.textMatches("'testProject1.users'") ?: false)
+        assertEquals(73, usersTableUsages.first().navigationRange.startOffset)
+        assertEquals(73 + usersTable.name.length, usersTableUsages.first().navigationRange.endOffset)
+
+        assertEquals(NamespaceReference::class.java, namespaceUsages[1].referenceClass)
+        assertTrue(namespaceUsages[1].element?.textMatches("'testProject1.customers'") ?: false)
+        assertEquals(93, namespaceUsages[1].navigationRange.startOffset)
+        assertEquals(93 + customersTable.namespace.name.length, namespaceUsages[1].navigationRange.endOffset)
+
+        assertEquals(TableReference::class.java, customersTableUsages.first().referenceClass)
+        assertTrue(customersTableUsages.first().element?.textMatches("'testProject1.customers'") ?: false)
+        assertEquals(106, customersTableUsages.first().navigationRange.startOffset)
+        assertEquals(106 + customersTable.name.length, customersTableUsages.first().navigationRange.endOffset)
+
+        assertEquals(NamespaceReference::class.java, namespaceUsages[2].referenceClass)
+        assertTrue(namespaceUsages[2].element?.textMatches("'testProject1.customers.billable_id'") ?: false)
+        assertEquals(119, namespaceUsages[2].navigationRange.startOffset)
+        assertEquals(119 + customersTable.namespace.name.length, namespaceUsages[2].navigationRange.endOffset)
+
+        assertEquals(TableReference::class.java, customersTableUsages.last().referenceClass)
+        assertTrue(customersTableUsages.last().element?.textMatches("'testProject1.customers.billable_id'") ?: false)
+        assertEquals(132, customersTableUsages.last().navigationRange.startOffset)
+        assertEquals(132 + customersTable.name.length, customersTableUsages.last().navigationRange.endOffset)
+
+        assertEquals(ColumnReference::class.java, billableIdColumnUsages.first().referenceClass)
+        assertTrue(billableIdColumnUsages.first().element?.textMatches("'testProject1.customers.billable_id'") ?: false)
+        assertEquals(142, billableIdColumnUsages.first().navigationRange.startOffset)
+        assertEquals(142 + billableIdColumn.name.length, billableIdColumnUsages.first().navigationRange.endOffset)
+
+        assertEquals(NamespaceReference::class.java, namespaceUsages[3].referenceClass)
+        assertTrue(namespaceUsages[3].element?.textMatches("'testProject1.users.id'") ?: false)
+        assertEquals(157, namespaceUsages[3].navigationRange.startOffset)
+        assertEquals(157 + usersTable.namespace.name.length, namespaceUsages[3].navigationRange.endOffset)
+
+        assertEquals(TableReference::class.java, usersTableUsages.last().referenceClass)
+        assertTrue(usersTableUsages.last().element?.textMatches("'testProject1.users.id'") ?: false)
+        assertEquals(170, usersTableUsages.last().navigationRange.startOffset)
+        assertEquals(170 + usersTable.name.length, usersTableUsages.last().navigationRange.endOffset)
+
+        assertEquals(ColumnReference::class.java, userIdColumnUsages.first().referenceClass)
+        assertTrue(userIdColumnUsages.first().element?.textMatches("'testProject1.users.id'") ?: false)
+        assertEquals(176, userIdColumnUsages.first().navigationRange.startOffset)
+        assertEquals(176 + userIdColumn.name.length, userIdColumnUsages.first().navigationRange.endOffset)
+    }
 }
