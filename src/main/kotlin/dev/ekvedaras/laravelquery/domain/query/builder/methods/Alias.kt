@@ -10,7 +10,7 @@ import icons.DatabaseIcons
 data class Alias(val name: String, val definitionParameter: StringParameter, val table: Table) {
     fun asLookupElement(): LookupElement =
         LookupElementBuilder
-            .createWithSmartPointer(name, definitionParameter.element)
+            .createWithSmartPointer(name, definitionParameter.element.originalElement)
             .withIcon(DatabaseIcons.Synonym)
             .withTailText("(${table.name})", true)
             .withTypeText(table.namespace.dataSource.name, true)

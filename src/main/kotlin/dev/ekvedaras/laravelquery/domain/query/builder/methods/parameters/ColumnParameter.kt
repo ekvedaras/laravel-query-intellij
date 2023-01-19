@@ -31,7 +31,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
             val completion = mutableListOf<LookupElement>()
 
             completion += query.namespaces.map { it.asLookupElement() }.toList()
-            completion += query.tables.map { it.asLookupElement() }.toList()
+            completion += query.tables.map { it.asLookupElement(triggerCompletionOnInsert = true) }.toList()
             completion += query.tables
                 .flatMap { table -> table.columns().map { it.asLookupElement() }.toList() }
                 .toList()
@@ -44,10 +44,18 @@ class ColumnParameter(val stringParameter: StringParameter) {
         if (this.stringParameter.hasThreeParts) {
             val completion = mutableListOf<LookupElement>()
 
-            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList()
-                ?: listOf()
-            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
-                ?: listOf()
+            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map {
+                it.asLookupElement(
+                    withNamespacePrefix = true,
+                    withTablePrefix = true
+                )
+            }?.toList() ?: listOf()
+            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map {
+                it.asLookupElement(
+                    withNamespacePrefix = true,
+                    alias = this.tableOrNamespaceName
+                )
+            }?.toList() ?: listOf()
 
             return completion
         }
@@ -55,10 +63,10 @@ class ColumnParameter(val stringParameter: StringParameter) {
         if (this.stringParameter.hasTwoParts) {
             val namespace = query.namespaces.find { it.name == this.tableOrNamespaceName }
             if (namespace != null) {
-                return namespace.tables().map { it.asLookupElement() }.toList()
+                return namespace.tables().map { it.asLookupElement(triggerCompletionOnInsert = true, withNamespacePrefix = true) }.toList()
             }
 
-            return query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement() }?.toList()
+            return query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement(withTablePrefix = true) }?.toList()
                 ?: query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
                 ?: listOf()
         }

@@ -37,7 +37,7 @@ class TableParameter(val stringParameter: StringParameter) {
         } else if (stringParameter.hasUncompletedPart && this.namespace != null) {
             completion += this.namespace
                 .tables()
-                .map { it.asLookupElement() }
+                .map { it.asLookupElement(withNamespacePrefix = true) }
                 .toList()
         }
 
