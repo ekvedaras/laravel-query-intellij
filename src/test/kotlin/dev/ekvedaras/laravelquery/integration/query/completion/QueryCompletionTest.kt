@@ -1,40 +1,44 @@
 package dev.ekvedaras.laravelquery.integration.query.completion
 
 import dev.ekvedaras.laravelquery.BaseTestCase
+import dev.ekvedaras.laravelquery.Columns
 import dev.ekvedaras.laravelquery.Namespaces
+import dev.ekvedaras.laravelquery.Tables
 
 internal class QueryCompletionTest : BaseTestCase() {
     fun testItCompletesNamespacesAndTablesInEmptyFromCall() {
         myFixture.configureByFile("integration/query/completion/inFromCall.php")
         myFixture.completeBasic()
-        assertCompletesNamespaces()
-        assertCompletesTables()
-        assertDoesNotCompleteColumns()
+        Namespaces.assertAllSuggested(myFixture)
+        Tables.assertAllSuggested(myFixture)
+        Columns.assertNoneAreSuggested(myFixture)
     }
 
     fun testItCompletesNamespaceTablesInFromCall() {
         myFixture.configureByFile("integration/query/completion/inFromCallWithNamespace.php")
         myFixture.completeBasic()
-        assertCompletesTables(Namespaces.testProject1)
-        assertDoesNotCompleteTables(Namespaces.testProject2)
+        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
+        Tables.assertNoneAreSuggested(myFixture)
+        Columns.assertNoneAreSuggested(myFixture)
     }
 
     fun testItCompletesInSelectCall() {
         myFixture.configureByFile("integration/query/completion/inSelectCall.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
+        Tables.users
+            .assertIsTheOnlyOneSuggested(myFixture)
+            .assertColumnsAreSuggestedOnlyForThisTable(myFixture)
     }
 
     fun testItCompletesInSelectCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inSelectCallUsingArray.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
+        Tables.users
+            .assertIsTheOnlyOneSuggested(myFixture)
+            .assertColumnsAreSuggestedOnlyForThisTable(myFixture)
     }
 
     fun testItCompletesInSelectCallUsingMultipleParameters() {
@@ -73,10 +77,19 @@ internal class QueryCompletionTest : BaseTestCase() {
         assertNoCompletion("billable_id", "connection", "migration")
     }
 
-    fun testItCompletesInGetCallWithAliasedTableName() {
+    fun testItCompletesColumnsInGetCallWithAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithAliasedTableName.php")
         myFixture.completeBasic()
-        assertNoCompletion("testProject1", "users")
+        assertCompletion("testProject1", "users")
+        assertCompletion("email", "first_name")
+        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
+        assertNoCompletion("billable_id", "connection", "migration")
+    }
+
+    fun testItCompletesInGetCallWithAliasedTableName() {
+        myFixture.configureByFile("integration/query/completion/inEmptyGetCallWithAliasedTableName.php")
+        myFixture.completeBasic()
+        assertCompletion("testProject1", "u1")
         assertCompletion("email", "first_name")
         assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
         assertNoCompletion("billable_id", "connection", "migration")

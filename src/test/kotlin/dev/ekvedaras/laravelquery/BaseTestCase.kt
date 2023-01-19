@@ -8,6 +8,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.sql.database.SqlCommonTestUtils
 import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
 import java.io.File
 import kotlin.streams.toList
@@ -45,17 +46,25 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
         return prefix
     }
 
-    protected fun assertCompletion(vararg shouldContain: String) {
-        val strings = myFixture.lookupElementStrings ?: return fail("Empty completion result")
+    companion object {
+        fun assertLookupContains(vararg strings: String, inFixture: CodeInsightTestFixture) {
+            val suggestedStrings = inFixture.lookupElementStrings ?: return fail("Empty completion result")
 
-        assertContainsElements(strings, shouldContain.asList())
+            assertContainsElements(suggestedStrings, strings.asList())
+        }
+
+        fun assertLookupDoesNotContain(vararg strings: String, inFixture: CodeInsightTestFixture) {
+            val suggestedStrings = inFixture.lookupElementStrings ?: return
+
+            assertDoesntContain(suggestedStrings, strings.asList())
+        }
     }
 
-    protected fun assertNoCompletion(vararg shouldNotContain: String) {
-        val strings = myFixture.lookupElementStrings ?: return
+    protected fun assertCompletion(vararg shouldContain: String) =
+        assertLookupContains(*shouldContain, inFixture = myFixture)
 
-        assertDoesntContain(strings, shouldNotContain.asList())
-    }
+    protected fun assertNoCompletion(vararg shouldNotContain: String) =
+        assertLookupDoesNotContain(*shouldNotContain, inFixture = myFixture)
 
     protected fun assertInspection(@TestDataFile filePath: String, inspection: InspectionProfileEntry) {
         myFixture.enableInspections(inspection)
@@ -89,12 +98,22 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
             ?: Tables.values().map { it.name }.toTypedArray())
     }
 
-    protected fun assertCompletesColumns(table: Tables) {
-        assertCompletion(*table.find(project).columns().map { it.name }.toList().toTypedArray())
+    protected fun assertCompletesColumns(table: Tables, only: Boolean = false) {
+        assertCompletion(
+            *table.find(project).columns().map { it.name }.toList().toTypedArray()
+        )
+
+        if (only) assertDoesNotCompleteColumns(exceptTable = table)
     }
 
-    protected fun assertDoesNotCompleteColumns(table: Tables? = null) {
-        assertNoCompletion(*table?.find(project)?.columns()?.map { it.name }?.toList()?.toTypedArray()
-            ?: Columns.values().map { it.find(project).name }.toTypedArray())
+    protected fun assertDoesNotCompleteColumns(table: Tables? = null, exceptTable: Tables? = null) {
+        assertNoCompletion(
+            *table?.find(project)?.columns()?.map { it.name }?.toList()?.toTypedArray()
+                ?: Columns.values()
+                    .map { it.find(project) }
+                    .filterNot { it.table.name == exceptTable?.name }
+                    .map { it.name }
+                    .toTypedArray()
+        )
     }
 }

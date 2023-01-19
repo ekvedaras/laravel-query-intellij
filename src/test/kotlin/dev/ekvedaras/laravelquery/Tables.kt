@@ -1,28 +1,78 @@
 package dev.ekvedaras.laravelquery
 
 import com.intellij.openapi.project.Project
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.domain.database.Table
 
 internal enum class Tables {
     users {
-        override fun find(project: Project): Table = Namespaces.testProject1.find(project).findTable("users")
-            ?: throw Exception("Cannot find testProject1.users table")
+        override fun namespace() = Namespaces.testProject1
     },
 
     customers {
-        override fun find(project: Project): Table = Namespaces.testProject1.find(project).findTable("customers")
-            ?: throw Exception("Cannot find testProject1.customers table")
+        override fun namespace() = Namespaces.testProject1
     },
 
     migrations {
-        override fun find(project: Project): Table = Namespaces.testProject2.find(project).findTable("migrations")
-            ?: throw Exception("Cannot find testProject2.migrations table")
+        override fun namespace() = Namespaces.testProject2
     },
 
     failed_jobs {
-        override fun find(project: Project): Table = Namespaces.testProject2.find(project).findTable("failed_jobs")
-            ?: throw Exception("Cannot find testProject2.failed_jobs table")
+        override fun namespace() = Namespaces.testProject2
     };
 
-    abstract fun find(project: Project): Table
+    abstract fun namespace(): Namespaces
+
+    fun find(project: Project): Table = namespace()
+        .find(project)
+        .findTable(this.name)
+        ?: throw Exception("Cannot find ${namespace().name}.${this.name} table")
+
+    fun assertIsSuggested(fixture: CodeInsightTestFixture) = this.apply { BaseTestCase.assertLookupContains(this.name, inFixture = fixture) }
+    fun assertIsTheOnlyOneSuggested(fixture: CodeInsightTestFixture) = this.apply {
+        this.assertIsSuggested(fixture)
+        BaseTestCase.assertLookupDoesNotContain(
+            *Tables.values()
+                .filterNot { it.name == this.name }
+                .map { it.name }
+                .toList()
+                .toTypedArray(),
+            inFixture = fixture,
+        )
+    }
+
+    fun assertIsNotSuggested(fixture: CodeInsightTestFixture) = this.apply { BaseTestCase.assertLookupDoesNotContain(this.name, inFixture = fixture) }
+
+    fun assertColumnsAreSuggested(fixture: CodeInsightTestFixture) = this.apply {
+        BaseTestCase.assertLookupContains(
+            *Columns.values()
+                .filter { it.table() == this }
+                .map { it.columnName() }
+                .toList()
+                .toTypedArray(),
+            inFixture = fixture
+        )
+    }
+
+    fun assertColumnsAreSuggestedOnlyForThisTable(fixture: CodeInsightTestFixture) = this.apply {
+        this.assertColumnsAreSuggested(fixture)
+        BaseTestCase.assertLookupDoesNotContain(
+            *Columns.values()
+                .filterNot { it.table() == this }
+                .map { it.columnName() }
+                .toList()
+                .toTypedArray(),
+            inFixture = fixture,
+        )
+    }
+
+    companion object {
+        fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
+            *Tables.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+        )
+
+        fun assertNoneAreSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupDoesNotContain(
+            *Tables.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+        )
+    }
 }
