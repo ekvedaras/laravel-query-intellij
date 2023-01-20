@@ -9,241 +9,339 @@ internal class QueryCompletionTest : BaseTestCase() {
     fun testItCompletesNamespacesAndTablesInEmptyFromCall() {
         myFixture.configureByFile("integration/query/completion/inFromCall.php")
         myFixture.completeBasic()
-        Namespaces.assertAllSuggested(myFixture)
-        Tables.assertAllSuggested(myFixture)
-        Columns.assertNoneAreSuggested(myFixture)
+
+        Namespaces.expect(myFixture).toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
     }
 
     fun testItCompletesNamespaceTablesInFromCall() {
         myFixture.configureByFile("integration/query/completion/inFromCallWithNamespace.php")
         myFixture.completeBasic()
-        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
-        Tables.assertNoneAreSuggested(myFixture)
-        Columns.assertNoneAreSuggested(myFixture)
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers()
+            .but().toHaveTablesCompleted().onlyFromThisNamespace()
+            .and().withoutAnyColumns()
     }
 
     fun testItCompletesInSelectCall() {
         myFixture.configureByFile("integration/query/completion/inSelectCall.php")
         myFixture.completeBasic()
-        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
         Tables.users
-            .assertIsTheOnlyOneSuggested(myFixture)
-            .assertColumnsAreSuggestedOnlyForThisTable(myFixture)
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInSelectCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inSelectCallUsingArray.php")
         myFixture.completeBasic()
 
-        Namespaces.testProject1.assertIsTheOnlyOneSuggested(myFixture)
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
         Tables.users
-            .assertIsTheOnlyOneSuggested(myFixture)
-            .assertColumnsAreSuggestedOnlyForThisTable(myFixture)
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInSelectCallUsingMultipleParameters() {
         myFixture.configureByFile("integration/query/completion/inSelectCallUsingMultipleParameters.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCall() {
         myFixture.configureByFile("integration/query/completion/inGetCall.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inGetCallUsingArray.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallWithTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithTableName.php")
         myFixture.completeBasic()
-        assertNoCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+
+        Tables.users
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItCompletesColumnsInGetCallWithAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithAliasedTableName.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+
+        Tables.users
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItCompletesInGetCallWithAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inEmptyGetCallWithAliasedTableName.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "u1")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
+            .and().toHaveAliasCompleted("u1")
     }
 
     fun testItCompletesInGetCallWithInlineAliasedTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithInlineAliasedTableName.php")
         myFixture.completeBasic()
-        assertNoCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+
+        Tables.users
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns().andAlias("u1")
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItCompletesInGetCallWithNamespaceAndTableName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithNamespaceAndTableName.php")
         myFixture.completeBasic()
-        assertNoCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+
+        Tables.users
+            .expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItCompletesInGetCallWithNamespaceName() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithNamespaceName.php")
         myFixture.completeBasic()
-        assertCompletion("users", "customers")
-        assertNoCompletion("email", "first_name")
-        assertNoCompletion("testProject1", "testProject2", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted()
+            .asWellAsOthersFromSameNamespace() // todo: should actually be without other tables
+
+        Columns.expect(myFixture).not().toBeCompleted()
     }
 
     fun testItCompletesInGetCallWithJoinedTable() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTable.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users", "customers")
-        assertCompletion("email", "first_name", "billable_id")
-        assertNoCompletion("testProject2", "failed_jobs", "migrations")
-        assertNoCompletion("connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
     fun testItCompletesInGetCallWithJoinedTableWithAlias() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithJoinedTableWithAlias.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users", "c1")
-        assertCompletion("email", "first_name", "billable_id")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers
+            .expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveAliasCompleted("c1").withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
     fun testItCompletesInJoinCallFirstColumn() {
         myFixture.configureByFile("integration/query/completion/inJoinCallFirstColumn.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users", "customers")
-        assertCompletion("email", "first_name", "billable_id")
-        assertNoCompletion("testProject2", "failed_jobs", "migrations")
-        assertNoCompletion("connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
     fun testItCompletesInJoinCallSecondColumn() {
         myFixture.configureByFile("integration/query/completion/inJoinCallSecondColumn.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users", "customers")
-        assertCompletion("email", "first_name", "billable_id")
-        assertNoCompletion("testProject2", "failed_jobs", "migrations")
-        assertNoCompletion("connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
     fun testItCompletesInJoinCallSecondColumnWithOperator() {
         myFixture.configureByFile("integration/query/completion/inJoinCallSecondColumnWithOperator.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users", "customers")
-        assertCompletion("email", "first_name", "billable_id")
-        assertNoCompletion("testProject2", "failed_jobs", "migrations")
-        assertNoCompletion("connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
     fun testItCompletesInGetCallWithMultipleQueryStatements() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithMultipleQueryStatements.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQuery() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQuery.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWhenModelHasTableField() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWhenModelHasTableField.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWhenParentModelHasTableField() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWhenParentModelHasTableField.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWithMultipleStatements() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithMultipleStatements.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWithNewInstanceCreation() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithNewInstanceCreation.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithNewInstanceCreationWithMultipleStatements.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesColumnsInCreateCallArrayHashKey() {
         myFixture.configureByFile("integration/query/completion/inCreateCallArrayHashKey.php")
         myFixture.completeBasic()
-        assertCompletion("email", "first_name")
-        assertNoCompletion("billable_id")
-        assertNoCompletion("testProject1", "testProject2", "users", "customers", "failed_jobs", "migrations")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItCompletesColumnsInCreateCallArrayEntry() {
         myFixture.configureByFile("integration/query/completion/inCreateCallArrayEntry.php")
         myFixture.completeBasic()
-        assertCompletion("email", "first_name")
-        assertNoCompletion("billable_id")
-        assertNoCompletion("testProject1", "testProject2", "users", "customers", "failed_jobs", "migrations")
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
     }
 
     fun testItDoesNotCompleteColumnsInCreateCallArrayHashValue() {
@@ -261,18 +359,22 @@ internal class QueryCompletionTest : BaseTestCase() {
     fun testItCompletesInWhereCallWithinModelScope() {
         myFixture.configureByFile("integration/query/completion/inWhereCallWithinModelScope.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInWhereCallStaticallyOnModel() {
         myFixture.configureByFile("integration/query/completion/inWhereCallStaticallyOnModel.php")
         myFixture.completeBasic()
-        assertCompletion("testProject1", "users")
-        assertCompletion("email", "first_name")
-        assertNoCompletion("testProject2", "customers", "failed_jobs", "migrations")
-        assertNoCompletion("billable_id", "connection", "migration")
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
     }
 }

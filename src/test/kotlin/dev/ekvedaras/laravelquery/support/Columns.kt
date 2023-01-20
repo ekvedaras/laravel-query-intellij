@@ -2,7 +2,6 @@ package dev.ekvedaras.laravelquery.support
 
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.domain.database.Column
 
 internal enum class Columns {
@@ -39,12 +38,7 @@ internal enum class Columns {
         ?: throw Exception("Cannot find ${table().namespace().name}.${table().name}.${columnName()} column")
 
     companion object {
-        fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
-            *values().map { it.columnName() }.toList().toTypedArray(), inFixture = fixture
-        )
-
-        fun assertNoneAreSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupDoesNotContain(
-            *values().map { it.columnName() }.toList().toTypedArray(), inFixture = fixture
-        )
+        fun expect(fixture: CodeInsightTestFixture) = ColumnsExpectation(fixture)
+        fun exceptFor(table: Tables) = values().filterNot { it.table() == table }
     }
 }

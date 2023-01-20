@@ -23,6 +23,8 @@ internal enum class Tables {
     };
 
     abstract fun namespace(): Namespaces
+    fun columns() = Columns.values().filter { it.table() == this }
+    fun expect(fixture: CodeInsightTestFixture) = TableExpectation(this, fixture)
 
     fun find(project: Project): Table = namespace()
         .find(project)
@@ -68,6 +70,10 @@ internal enum class Tables {
     }
 
     companion object {
+        fun expect(fixture: CodeInsightTestFixture) = TablesExpectation(fixture)
+        fun except(table: Tables) = values().filterNot { it == table }
+        fun exceptFor(namespace: Namespaces) = values().filterNot { it.namespace() == namespace }
+
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
             *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )

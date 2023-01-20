@@ -19,6 +19,9 @@ internal enum class Namespaces {
 
     abstract fun find(project: Project): Namespace
 
+    fun tables() = Tables.values().filter { it.namespace() == this }
+    fun expect(fixture: CodeInsightTestFixture) = NamespaceExpectation(this, fixture)
+
     fun assertIsSuggested(fixture: CodeInsightTestFixture) = this.apply { BaseTestCase.assertLookupContains(this.name, inFixture = fixture) }
     fun assertIsTheOnlyOneSuggested(fixture: CodeInsightTestFixture) = this.apply {
         this.assertIsSuggested(fixture)
@@ -33,6 +36,9 @@ internal enum class Namespaces {
     }
 
     companion object {
+        fun expect(fixture: CodeInsightTestFixture) = NamespacesExpectation(fixture)
+        fun except(namespace: Namespaces) = values().filterNot { it == namespace }
+
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
             *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )

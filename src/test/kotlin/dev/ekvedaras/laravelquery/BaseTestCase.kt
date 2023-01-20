@@ -61,6 +61,11 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
 
             assertDoesntContain(suggestedStrings, strings.asList())
         }
+
+        fun assertLookup(contains: Boolean, vararg strings: String, inFixture: CodeInsightTestFixture) {
+            if (contains) assertLookupContains(*strings, inFixture = inFixture)
+            else assertLookupDoesNotContain(*strings, inFixture = inFixture)
+        }
     }
 
     protected fun assertCompletion(vararg shouldContain: String) =
