@@ -1,7 +1,8 @@
-package dev.ekvedaras.laravelquery
+package dev.ekvedaras.laravelquery.support
 
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.domain.database.Table
 
 internal enum class Tables {
@@ -32,7 +33,7 @@ internal enum class Tables {
     fun assertIsTheOnlyOneSuggested(fixture: CodeInsightTestFixture) = this.apply {
         this.assertIsSuggested(fixture)
         BaseTestCase.assertLookupDoesNotContain(
-            *Tables.values()
+            *values()
                 .filterNot { it.name == this.name }
                 .map { it.name }
                 .toList()
@@ -68,11 +69,11 @@ internal enum class Tables {
 
     companion object {
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
-            *Tables.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+            *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )
 
         fun assertNoneAreSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupDoesNotContain(
-            *Tables.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+            *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )
     }
 }

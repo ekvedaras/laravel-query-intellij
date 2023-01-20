@@ -1,9 +1,9 @@
 package dev.ekvedaras.laravelquery.integration.query.reference
 
 import dev.ekvedaras.laravelquery.BaseTestCase
-import dev.ekvedaras.laravelquery.Columns
-import dev.ekvedaras.laravelquery.Namespaces
-import dev.ekvedaras.laravelquery.Tables
+import dev.ekvedaras.laravelquery.support.Columns
+import dev.ekvedaras.laravelquery.support.Namespaces
+import dev.ekvedaras.laravelquery.support.Tables
 
 internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testItResolvesColumnInGetCall() {

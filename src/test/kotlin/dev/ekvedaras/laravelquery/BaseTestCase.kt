@@ -10,6 +10,9 @@ import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
+import dev.ekvedaras.laravelquery.support.Columns
+import dev.ekvedaras.laravelquery.support.Namespaces
+import dev.ekvedaras.laravelquery.support.Tables
 import java.io.File
 import kotlin.streams.toList
 import kotlinx.coroutines.delay

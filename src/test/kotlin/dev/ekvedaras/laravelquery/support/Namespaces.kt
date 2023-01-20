@@ -1,7 +1,8 @@
-package dev.ekvedaras.laravelquery
+package dev.ekvedaras.laravelquery.support
 
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import dev.ekvedaras.laravelquery.BaseTestCase
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 
 internal enum class Namespaces {
@@ -22,7 +23,7 @@ internal enum class Namespaces {
     fun assertIsTheOnlyOneSuggested(fixture: CodeInsightTestFixture) = this.apply {
         this.assertIsSuggested(fixture)
         BaseTestCase.assertLookupDoesNotContain(
-            *Namespaces.values().filterNot { it.name == this.name }.map { it.name }.toList().toTypedArray(),
+            *values().filterNot { it.name == this.name }.map { it.name }.toList().toTypedArray(),
             inFixture = fixture
         )
     }
@@ -33,11 +34,11 @@ internal enum class Namespaces {
 
     companion object {
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
-            *Namespaces.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+            *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )
 
         fun assertNoneAreSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupDoesNotContain(
-            *Namespaces.values().map { it.name }.toList().toTypedArray(), inFixture = fixture
+            *values().map { it.name }.toList().toTypedArray(), inFixture = fixture
         )
     }
 }
