@@ -18,13 +18,15 @@ sealed interface ReferenceExpectation<T> {
             .onEach { UsefulTestCase.assertEquals(referenceClass, it.referenceClass) }
     var usage: UsageInfo?
 
-
-    fun once() = apply { UsefulTestCase.assertSize(1, usages) }.first()
-    fun twice() = apply { UsefulTestCase.assertSize(2, usages) }
+    fun once() = times(1).first()
+    fun twice() = times(2)
+    fun times(number: Int) = apply { UsefulTestCase.assertSize(number, usages) }
     fun never() = UsefulTestCase.assertEmpty(usages)
     fun nth(n: Int) = apply { usage = usages.elementAt(n) }
     fun first() = nth(0)
     fun second() = nth(1)
+    fun then() = nth(usages.indexOf(usage) + 1)
+    fun finally() = nth(usages.size - 1)
 
     fun at(position: Int) = apply {
         usage.tap {
