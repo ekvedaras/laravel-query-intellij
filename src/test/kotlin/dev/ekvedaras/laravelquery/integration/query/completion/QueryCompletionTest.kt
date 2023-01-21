@@ -221,6 +221,45 @@ internal class QueryCompletionTest : BaseTestCase() {
         Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
+    fun testItCompletesInLeftJoinCallFirstColumn() {
+        myFixture.configureByFile("integration/query/completion/inLeftJoinCallFirstColumn.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
+    fun testItCompletesInRightJoinCallFirstColumn() {
+        myFixture.configureByFile("integration/query/completion/inRightJoinCallFirstColumn.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
+    fun testItCompletesInCrossJoinCallFirstColumn() {
+        myFixture.configureByFile("integration/query/completion/inCrossJoinCallFirstColumn.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
     fun testItCompletesInJoinCallSecondColumn() {
         myFixture.configureByFile("integration/query/completion/inJoinCallSecondColumn.php")
         myFixture.completeBasic()

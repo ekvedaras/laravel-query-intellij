@@ -11,14 +11,14 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall, ColumnSelectionCall {
+open class JoinCall(final override val reference: MethodReference, final override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall, ColumnSelectionCall {
     private val tableMethodParameter = reference.getParameter(0)
     private val firstColumnMethodParameter = reference.getParameter(1)
     private val secondColumnMethodParameter = reference.getParameter(
         if (reference.parameters.size > 3) 3 else 2
     )
 
-    override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
+    final override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
         TableParameter(StringParameter(it))
     }
 
