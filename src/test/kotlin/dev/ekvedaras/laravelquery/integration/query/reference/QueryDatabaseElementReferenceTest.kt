@@ -9,48 +9,34 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testItResolvesColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
 
-        val userIdColumn = Columns.usersId.find(project)
-
-        val usages = myFixture.findUsages(userIdColumn.asDbColumn())
-
-        assertSize(1, usages)
-        assertEquals(ColumnReference::class.java, usages.first().referenceClass)
-        assertTrue(usages.first().element?.textMatches("'id'") ?: false)
-        assertEquals(82, usages.first().navigationRange.startOffset)
-        assertEquals(82 + userIdColumn.name.length, usages.first().navigationRange.endOffset)
+        Columns.usersId
+            .expect(myFixture)
+            .toBeReferenced()
+            .once()
+            .at(82)
+            .inString("id")
     }
 
     fun testItDoesNotResolvesWrongColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
-        assertEmpty(myFixture.findUsages(Columns.usersEmail.find(project).asDbColumn()))
+
+        Columns.usersEmail.expect(myFixture).toBeReferenced().never()
     }
 
     fun testResolvesTableAndColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/tableAndColumnInGetCall.php")
 
-        val usersTable = Tables.users.find(project)
-        val userIdColumn = Columns.usersId.find(project)
+        Tables.users
+            .expect(myFixture)
+            .toBeReferenced()
+            .twice()
+            .first().at(68).inString("testProject1.users")
+            .second().at(82).inString("users.id")
 
-        val tableUsages = myFixture.findUsages(usersTable.asDbTable())
-        val columnUsages = myFixture.findUsages(userIdColumn.asDbColumn())
-
-        assertSize(2, tableUsages) // from() + get()
-        assertSize(1, columnUsages)
-
-        assertEquals(TableReference::class.java, tableUsages.last().referenceClass)
-        assertEquals(ColumnReference::class.java, columnUsages.first().referenceClass)
-
-        assertTrue(tableUsages.last().element?.textMatches("'users.id'") ?: false)
-        assertTrue(columnUsages.first().element?.textMatches("'users.id'") ?: false)
-
-        assertEquals(82, tableUsages.last().navigationRange.startOffset)
-        assertEquals(82 + usersTable.name.length + 1, columnUsages.first().navigationRange.startOffset)
-
-        assertEquals(82 + usersTable.name.length, tableUsages.last().navigationRange.endOffset)
-        assertEquals(
-            82 + usersTable.name.length + 1 + userIdColumn.name.length,
-            columnUsages.first().navigationRange.endOffset
-        )
+        Columns.usersId
+            .expect(myFixture)
+            .toBeReferenced()
+            .once().at(82 + "${Tables.users.name}.".length).inString("users.id")
     }
 
     fun testResolvesNamespaceAndTableAndColumnInGetCall() {

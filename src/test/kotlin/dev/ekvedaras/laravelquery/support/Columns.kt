@@ -32,6 +32,7 @@ internal enum class Columns {
 
     abstract fun table(): Tables
     abstract fun columnName(): String
+    fun expect(fixture: CodeInsightTestFixture) = ColumnExpectation(this, fixture)
     fun find(project: Project): Column = table()
         .find(project)
         .findColumn(columnName())

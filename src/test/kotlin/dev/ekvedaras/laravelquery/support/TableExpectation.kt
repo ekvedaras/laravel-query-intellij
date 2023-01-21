@@ -10,6 +10,8 @@ internal data class TableExpectation(val table: Tables, val fixture: CodeInsight
     override fun but() = TableExpectation(table, fixture, not = false)
     override fun and() = this
 
+    fun toBeReferenced() = TableReferenceExpectation(table, fixture)
+
     fun toBeCompleted() = apply {
         BaseTestCase.assertLookup(
             contains,

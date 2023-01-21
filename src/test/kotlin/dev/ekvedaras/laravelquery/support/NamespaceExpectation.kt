@@ -12,6 +12,8 @@ internal data class NamespaceExpectation(val namespace: Namespaces, val fixture:
     override fun but() = NamespaceExpectation(namespace, fixture, not = false)
     override fun and() = this
 
+    fun toBeReferenced() = NamespaceReferenceExpectation(namespace, fixture)
+
     fun toBeCompleted() = apply {
         BaseTestCase.assertLookup(
             contains,
