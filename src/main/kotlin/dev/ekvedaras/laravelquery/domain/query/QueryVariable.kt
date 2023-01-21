@@ -36,4 +36,6 @@ data class QueryVariable(var variable: Variable, val query: Query) {
             .toList()
             .filterNot { it.element.originalElement == variable.originalElement }
             .mapNotNull { it.element.parentOfType() }
+
+    fun isJoinClause(): Boolean = clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
 }

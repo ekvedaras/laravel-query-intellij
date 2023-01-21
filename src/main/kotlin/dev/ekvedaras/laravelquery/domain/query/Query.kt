@@ -1,6 +1,9 @@
 package dev.ekvedaras.laravelquery.domain.query
 
 import com.intellij.database.util.containsElements
+import com.intellij.psi.util.parentOfType
+import com.jetbrains.php.lang.psi.elements.Function
+import com.jetbrains.php.lang.psi.elements.Statement
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
@@ -59,10 +62,16 @@ class Query {
         }
 
         if (statement.isIncompleteQuery) {
-            statement.queryVariable
-                ?.usageStatements()
-                ?.filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
-                ?.forEach { QueryStatement(statement = it, query = this) }
+            if (statement.queryVariable?.isJoinClause() == true) {
+                statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
+                    QueryStatement(statement = it, query = this)
+                }
+            } else {
+                statement.queryVariable
+                    ?.usageStatements()
+                    ?.filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
+                    ?.forEach { QueryStatement(statement = it, query = this) }
+            }
         }
     }
 }

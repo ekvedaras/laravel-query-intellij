@@ -247,6 +247,19 @@ internal class QueryCompletionTest : BaseTestCase() {
         Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
+    fun testItCompletesInJoinClosureOnCall() {
+        myFixture.configureByFile("integration/query/completion/inJoinClosureOnCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+        Tables.customers.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
     fun testItCompletesInGetCallWithMultipleQueryStatements() {
         myFixture.configureByFile("integration/query/completion/inGetCallWithMultipleQueryStatements.php")
         myFixture.completeBasic()
