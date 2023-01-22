@@ -21,6 +21,13 @@ class CreateCall(override val reference: MethodReference, override val queryStat
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
         if (parameter.parentMethodParameter != columnsMethodParameter) return listOf()
 
-        return this.queryStatement.query().model?.table?.columns()?.map { it.asLookupElement() }?.toList() ?: listOf()
+        return this.queryStatement.query()
+            .models
+            .firstOrNull()
+            ?.table
+            ?.columns()
+            ?.map { it.asLookupElement() }
+            ?.toList()
+            ?: listOf()
     }
 }

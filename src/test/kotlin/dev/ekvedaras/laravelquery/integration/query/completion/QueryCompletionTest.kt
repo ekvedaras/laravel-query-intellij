@@ -419,6 +419,24 @@ internal class QueryCompletionTest : BaseTestCase() {
             .but().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInWhereCallInsideRelationClosure() {
+        myFixture.configureByFile("integration/query/completion/inWhereCallInsideRelationClosure.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+
+        Tables.customers
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
     fun testItCompletesInWhereCallStaticallyOnModel() {
         myFixture.configureByFile("integration/query/completion/inWhereCallStaticallyOnModel.php")
         myFixture.completeBasic()

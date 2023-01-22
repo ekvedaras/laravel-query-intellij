@@ -15,7 +15,7 @@ import dev.ekvedaras.laravelquery.support.tap
 class Query {
     private var statements: Set<QueryStatement> = setOf()
 
-    var model: Model? = null
+    var models: Set<Model> = setOf()
     var dataSource: DataSource? = null
     var namespaces: Set<Namespace> = setOf()
     var tables: Set<Table> = setOf()
@@ -47,9 +47,8 @@ class Query {
             }
         }
 
-        if (statement.model != null) {
-            if (this.model != null && statement.model != this.model) throw Exception("Cannot re-assign query model once defined")
-            this.model = statement.model
+        if (statement.model != null && !this.models.contains(statement.model)) {
+            this.models += statement.model
 
             statement.model.table.tap {
                 this.tables += it
@@ -62,7 +61,7 @@ class Query {
         }
 
         if (statement.isIncompleteQuery) {
-            if (statement.queryVariable?.isJoinClause() == true) {
+            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isRelationClause() == true) {
                 statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
                     QueryStatement(statement = it, query = this)
                 }

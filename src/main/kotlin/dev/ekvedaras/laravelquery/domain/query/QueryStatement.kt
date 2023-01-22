@@ -55,6 +55,11 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
             queryVariable?.isModelScopeQuery() == true -> queryVariable.transform {
                 it.variable.parentOfType<PhpClass>().transform { clazz -> Model(clazz) }
             }
+
+            queryVariable?.isRelationClause() == true -> queryVariable.transform {
+                TODO("Load parent query model (see below), get relation name from array key and request relation model from parent model")
+            }
+
             else -> this.callChain.firstClassReference.transform { Model.from(it) }
         }
 

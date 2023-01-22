@@ -25,6 +25,7 @@ data class QueryVariable(var variable: Variable, val query: Query) {
                 LaravelClasses.DbFacade,
                 LaravelClasses.JoinClause,
                 LaravelClasses.Model,
+                LaravelClasses.Relation,
                 orIsAny = true,
             )) throw Exception("Variable ${variable.name} is not a query variable but an instance of ${clazz.fqn}")
     }
@@ -38,4 +39,5 @@ data class QueryVariable(var variable: Variable, val query: Query) {
             .mapNotNull { it.element.parentOfType() }
 
     fun isJoinClause(): Boolean = clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
+    fun isRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
 }
