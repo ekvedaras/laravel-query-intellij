@@ -2,6 +2,7 @@ package dev.ekvedaras.laravelquery.support
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.childrenOfType
 import com.intellij.psi.util.descendantsOfType
 
 inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
@@ -11,3 +12,5 @@ inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
 
     return descendants
 }
+
+inline fun <reified T : PsiElement> PsiElement.firstChildOfType(): T? = childrenOfType<T>().firstOrNull()

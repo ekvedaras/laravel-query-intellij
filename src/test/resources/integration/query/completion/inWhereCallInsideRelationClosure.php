@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Model
 {
-    public function customer(): HasOne;
+    public function customer(): HasOne
     {
         return $this->hasOne(Customer::class);
     }

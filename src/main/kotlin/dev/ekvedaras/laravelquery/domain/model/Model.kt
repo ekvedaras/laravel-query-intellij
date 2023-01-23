@@ -9,7 +9,7 @@ import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.PhpClass
-import com.jetbrains.php.lang.psi.elements.Variable
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.QueryVariable
@@ -52,12 +52,28 @@ class Model(private val clazz: PhpClass) {
         .firstWhereOrNull { it.findFirstTable(tableName) != null }
         ?.findFirstTable(tableName)
 
+    fun relation(name: String): Model? =
+        this.clazz
+            .methods
+            .firstOrNull { it.name == name }
+            ?.tryTransforming { Relation(it) }
+            ?.model
+
     companion object {
         fun from(classReference: ClassReference): Model? {
             if (DumbService.isDumb(classReference.project)) return null
 
             return PhpIndex.getInstance(classReference.project)
                 .getClassesByFQN(classReference.fqn ?: return null)
+                .firstOrNull()
+                .tryTransforming { Model(it) }
+        }
+
+        fun from(fqn: StringLiteralExpression): Model? {
+            if (DumbService.isDumb(fqn.project)) return null
+
+            return PhpIndex.getInstance(fqn.project)
+                .getClassesByFQN(fqn.text.cleanup())
                 .firstOrNull()
                 .tryTransforming { Model(it) }
         }
