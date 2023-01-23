@@ -1,17 +1,11 @@
 package dev.ekvedaras.laravelquery.domain.query
 
 import com.intellij.openapi.util.Key
-import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression
-import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.MethodReference
-import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.model.Model
-import dev.ekvedaras.laravelquery.domain.model.Model.Companion.isModelScopeQuery
-import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.descendantsOfType
 import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transform
@@ -53,31 +47,7 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
         forStatement = this,
     )
 
-    val model: Model? =
-        when {
-            queryVariable?.isModelScopeQuery() == true -> queryVariable.transform {
-                it.variable.parentOfType<PhpClass>().transform { clazz -> Model(clazz) }
-            }
-
-            queryVariable?.isRelationClause() == true ->
-                queryVariable
-                    .variable
-                    .parentOfType<Function>()
-                    ?.parentOfType<ArrayHashElement>()
-                    ?.key
-                    ?.text
-                    ?.cleanup()
-                    ?.tryTransforming { relationName ->
-                        queryVariable.variable
-                            .parentOfType<Function>()
-                            ?.parentOfType<Statement>()
-                            .tryTransforming { QueryStatement(it, query()) }
-                            ?.model
-                            ?.relation(relationName)
-                    }
-
-            else -> this.callChain.firstClassReference.transform { Model.from(it) }
-        }
+    val model: Model? = queryVariable?.model ?: this.callChain.firstClassReference.transform { Model.from(it) }
 
     init {
         this.query().addStatement(this)
