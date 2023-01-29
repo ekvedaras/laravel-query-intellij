@@ -29,6 +29,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
 
             return when (reference.name) {
                 "newQuery" -> NewQueryCall(reference, queryStatement)
+                "query" -> QueryCall(reference, queryStatement)
                 "create" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)

@@ -430,6 +430,26 @@ internal class QueryCompletionTest : BaseTestCase() {
             .but().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInWhereCallUsingArray() {
+        myFixture.configureByFile("integration/query/completion/inWhereCallUsingArray.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItDoesNotCompleteInGetCallUsingNestedArrayLikeWhere() {
+        myFixture.configureByFile("integration/query/completion/inGetCallUsingNestedArrayLikeWhere.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInWhereCallInsideRelationClosure() {
         myFixture.configureByFile("integration/query/completion/inWhereCallInsideRelationClosure.php")
         myFixture.completeBasic()

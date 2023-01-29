@@ -40,6 +40,7 @@ data class StringParameter(val element: StringLiteralExpression) {
     private val isMethodReferenceParameter = element.parent.parent is MethodReference
     private val isEntryOfArrayWhichIsMethodReferenceParameter = element.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent is MethodReference
     private val isArrayHashKeyOfArrayWhichIsMethodReferenceParameter = element.parent.parent is ArrayHashElement && (element.parent.parent as ArrayHashElement).key == element && element.parent.parent.parent.parent.parent is MethodReference
+    private val isNestedArrayFirstEntry = element.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent.parent.parent is MethodReference
 
     val parentMethodParameter = when (element.parent.parent) {
         is ArrayHashElement -> {
@@ -55,11 +56,11 @@ data class StringParameter(val element: StringLiteralExpression) {
 
     fun toAliasedParam(): AliasedParam = AliasedParam(this)
 
-    fun shouldBeInspected(): Boolean
-    {
+    fun shouldBeInspected(): Boolean {
         return this.isMethodReferenceParameter // ->get('parameter');
             || this.isEntryOfArrayWhichIsMethodReferenceParameter // ->get(['parameter'])
             || this.isArrayHashKeyOfArrayWhichIsMethodReferenceParameter // ->get(['parameter' => 'foo'])
+            || this.isNestedArrayFirstEntry // ->where([ ['parameter', '=', 'foo'] ])
     }
 
     private val methodReference: MethodReference? get() = element.parentOfType()

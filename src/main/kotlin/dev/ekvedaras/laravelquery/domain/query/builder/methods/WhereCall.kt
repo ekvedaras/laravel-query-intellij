@@ -7,6 +7,7 @@ import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
+import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 
 class WhereCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0)
@@ -16,7 +17,12 @@ class WhereCall(override val reference: MethodReference, override val queryState
             this.columnsMethodParameter
                 .hashKeysOrEntriesOfType<StringLiteralExpression>()
                 .map { ColumnParameter(StringParameter(it)) }
-                .toSet()
+                .toSet() +
+                this.columnsMethodParameter
+                    .nonHashEntriesOfType<ArrayCreationExpression>()
+                    .mapNotNull { it.nonHashEntriesOfType<StringLiteralExpression>().firstOrNull() }
+                    .map { ColumnParameter(StringParameter(it)) }
+                    .toSet()
         }
 
         is StringLiteralExpression -> {

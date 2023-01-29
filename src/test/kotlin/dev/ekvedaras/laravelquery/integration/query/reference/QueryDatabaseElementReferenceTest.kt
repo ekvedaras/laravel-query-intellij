@@ -105,4 +105,38 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .toBeReferenced()
             .once().at(142).inString("testProject1.customers.billable_id")
     }
+
+    fun testItResolvesColumnInWhereCallNestedArray() {
+        myFixture.configureByFile("integration/query/reference/inWhereCallNestedArray.php")
+
+        Columns.usersEmail
+            .expect(myFixture)
+            .toBeReferenced()
+            .once().at(50).inString("email")
+    }
+
+    fun testItDoesNotResolveColumnInGetCallUsingNestedArrayLikeWhere() {
+        myFixture.configureByFile("integration/query/reference/inGetCallUsingNestedArrayLikeWhere.php")
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeReferenced()
+            .never()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeReferenced()
+            .once()
+            .at(27).inString("users")
+
+        Columns.usersEmail
+            .expect(myFixture)
+            .toBeReferenced()
+            .never()
+
+        Columns.usersFirstName
+            .expect(myFixture)
+            .toBeReferenced()
+            .never()
+    }
 }
