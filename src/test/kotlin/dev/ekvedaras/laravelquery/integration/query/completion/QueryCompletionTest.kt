@@ -343,6 +343,17 @@ internal class QueryCompletionTest : BaseTestCase() {
             .but().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInGetCallOfEloquentQueryWhenCurrentClassHasTableButExtendsOtherModel() {
+        myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWhenCurrentClassHasTableButExtendsOtherModel.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.customers
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItCompletesInGetCallOfEloquentQueryWithMultipleStatements() {
         myFixture.configureByFile("integration/query/completion/inGetCallOfEloquentQueryWithMultipleStatements.php")
         myFixture.completeBasic()
