@@ -878,6 +878,11 @@ class Builder
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
+    /** @return $this */
+    public function when($case, \Closure $true, \Closure $false)
+    {
+    }
+
     /**
      * Set the columns to be selected.
      *

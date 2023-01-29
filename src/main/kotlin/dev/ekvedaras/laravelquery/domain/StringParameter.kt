@@ -70,6 +70,10 @@ data class StringParameter(val element: StringLiteralExpression) {
 
     val testMethodCall: TestMethodCall? get() = methodReference.transform { TestMethodCall.from(it) }
 
+    companion object {
+        fun StringLiteralExpression.asStringParameter() = StringParameter(this)
+    }
+
     override fun equals(other: Any?): Boolean = when (other) {
         is TableParameter -> other.stringParameter == this
         is ColumnParameter -> other.stringParameter == this

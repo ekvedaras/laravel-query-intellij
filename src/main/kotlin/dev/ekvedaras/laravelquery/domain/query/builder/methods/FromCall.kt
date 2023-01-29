@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
@@ -14,11 +15,11 @@ class FromCall(override val reference: MethodReference, override val queryStatem
     private val aliasMethodParameter = reference.getParameter(1) as? StringLiteralExpression
 
     override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
-        TableParameter(StringParameter(it))
+        TableParameter(it.asStringParameter())
     }
 
     private val aliasParameter = this.aliasMethodParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {
-        AliasParameter(StringParameter(it))
+        AliasParameter(it.asStringParameter())
     }
 
     override val alias: Alias? = if (this.aliasParameter != null && this.tableParameter?.table != null) {

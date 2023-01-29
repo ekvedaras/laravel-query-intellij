@@ -9,6 +9,10 @@ import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.classReference
 import dev.ekvedaras.laravelquery.support.isMemberOfAny
 
+/**
+ * Unlike QueryStatementElement,
+ * this interface represents only method calls (MethodReference) in query statement.
+ */
 sealed interface QueryMethodCall : QueryStatementElement {
     override val reference: MethodReference
     override val classReference: ClassReference?
@@ -32,6 +36,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "query" -> QueryCall(reference, queryStatement)
                 "create" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
+                "when" -> WhenCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)
                 "join" -> JoinCall(reference, queryStatement)
                 "leftJoin" -> LeftJoinCall(reference, queryStatement)

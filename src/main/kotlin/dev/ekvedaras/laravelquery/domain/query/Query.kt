@@ -8,6 +8,7 @@ import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.model.Model
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.AcceptsClosures
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.support.tap
@@ -61,7 +62,7 @@ class Query {
         }
 
         if (statement.isIncompleteQuery) {
-            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isWhereClause() == true) {
+            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isWhereClause() == true || statement.queryVariable?.isWhenClause() == true) {
                 statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
                     QueryStatement(statement = it, query = this)
                 }
@@ -72,5 +73,18 @@ class Query {
                     ?.forEach { QueryStatement(statement = it, query = this) }
             }
         }
+
+        statement.callChain
+            .elements
+            .filterIsInstance<AcceptsClosures>()
+            .forEach { methodCall ->
+                methodCall.closures
+                    .filter { it.shouldScan }
+                    .forEach { closureParameter ->
+                        closureParameter.queryParameter
+                            ?.usageStatements()
+                            ?.forEach { QueryStatement(statement = it, query = this) }
+                    }
+            }
     }
 }

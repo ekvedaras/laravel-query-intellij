@@ -5,6 +5,7 @@ import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
@@ -15,7 +16,7 @@ class CreateCall(override val reference: MethodReference, override val queryStat
 
     override val columns: Set<ColumnParameter> = columnsMethodParameter
         ?.hashKeysOrEntriesOfType<StringLiteralExpression>()
-        ?.map { ColumnParameter(StringParameter(it)) }
+        ?.map { ColumnParameter(it.asStringParameter()) }
         ?.toSet() ?: setOf()
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> {

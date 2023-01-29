@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
@@ -15,7 +16,7 @@ class QueryCompletionProvider : CompletionProvider<CompletionParameters>() {
         result: CompletionResultSet,
     ) {
         val string = parameters.position.parent.transformInstanceOf<StringLiteralExpression, StringParameter> {
-            StringParameter(it)
+            it.asStringParameter()
         } ?: return
 
         if (! string.shouldBeInspected()) return

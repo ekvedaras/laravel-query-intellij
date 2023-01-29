@@ -6,6 +6,7 @@ import com.intellij.database.psi.DbTable
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
@@ -19,7 +20,7 @@ open class JoinCall(final override val reference: MethodReference, final overrid
     )
 
     final override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
-        TableParameter(StringParameter(it))
+        TableParameter(it.asStringParameter())
     }
 
     override val alias: Alias? =
@@ -30,11 +31,11 @@ open class JoinCall(final override val reference: MethodReference, final overrid
         ) else null
 
     private val firstColumnParameter = this.firstColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
-        ColumnParameter(StringParameter(it))
+        ColumnParameter(it.asStringParameter())
     }
 
     private val secondColumnParameter = this.secondColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
-        ColumnParameter(StringParameter(it))
+        ColumnParameter(it.asStringParameter())
     }
     override val columns: Set<ColumnParameter> = setOf(this.firstColumnParameter, this.secondColumnParameter).filterNotNull().toSet()
 

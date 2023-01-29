@@ -2,7 +2,7 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.transform
@@ -14,7 +14,7 @@ class OnCall(override val reference: MethodReference, override val queryStatemen
     ) as? StringLiteralExpression
 
     override val columns: Set<ColumnParameter> = setOf(
-        this.firstColumnMethodParameter.transform { ColumnParameter(StringParameter(it)) },
-        this.secondColumnMethodParameter.transform { ColumnParameter(StringParameter(it)) },
+        this.firstColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
+        this.secondColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
     ).filterNotNull().toSet()
 }

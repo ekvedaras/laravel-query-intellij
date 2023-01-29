@@ -6,6 +6,7 @@ import com.intellij.psi.PsiReferenceProvider
 import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.ColumnSelectionCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
@@ -13,7 +14,7 @@ import dev.ekvedaras.laravelquery.support.transformInstanceOf
 class QueryDatabaseElementsReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val string = element.transformInstanceOf<StringLiteralExpression, StringParameter> {
-            StringParameter(it)
+            it.asStringParameter()
         } ?: return PsiReference.EMPTY_ARRAY
 
         if (!string.shouldBeInspected()) return PsiReference.EMPTY_ARRAY

@@ -6,6 +6,7 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.Function
+import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
@@ -46,8 +47,10 @@ data class QueryVariable(var variable: Variable, val query: Query) {
             .filterNot { it.element.originalElement == variable.originalElement }
             .mapNotNull { it.element.parentOfType() }
 
+    // TODO: refactor these to use ClosureParameter
     fun isJoinClause(): Boolean = clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
-    fun isWhereClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
+    fun isWhereClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "where" && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
+    fun isWhenClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "when" && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
     private fun isRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
 
     val model: Model? =

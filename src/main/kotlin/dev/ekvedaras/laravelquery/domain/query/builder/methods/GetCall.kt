@@ -3,7 +3,7 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 import com.jetbrains.php.lang.psi.elements.ArrayCreationExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
@@ -15,12 +15,12 @@ class GetCall(override val reference: MethodReference, override val queryStateme
         is ArrayCreationExpression -> {
             this.columnsMethodParameter
                 .nonHashEntriesOfType<StringLiteralExpression>()
-                .map { ColumnParameter(StringParameter(it)) }
+                .map { ColumnParameter(it.asStringParameter()) }
                 .toSet()
         }
 
         is StringLiteralExpression -> {
-            setOf(ColumnParameter(StringParameter(this.columnsMethodParameter)))
+            setOf(ColumnParameter(this.columnsMethodParameter.asStringParameter()))
         }
 
         else -> {
