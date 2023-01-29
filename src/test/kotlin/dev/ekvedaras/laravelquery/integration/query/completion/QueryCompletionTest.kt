@@ -425,16 +425,20 @@ internal class QueryCompletionTest : BaseTestCase() {
 
         Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
 
-        Tables.users
-            .expect(myFixture)
-            .toBeCompleted().withColumns()
-
         Tables.customers
             .expect(myFixture)
-            .toBeCompleted().withColumns()
+            .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
+    }
 
-        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
-        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    fun testItCompletesInWhereCallOnAQueryWithARelationClosure() {
+        myFixture.configureByFile("integration/query/completion/inWhereCallOnAQueryWithARelationClosure.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
     }
 
     fun testItCompletesInWhereCallStaticallyOnModel() {

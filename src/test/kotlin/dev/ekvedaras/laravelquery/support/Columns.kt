@@ -5,9 +5,9 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.domain.database.Column
 
 internal enum class Columns {
-    usersId {
+    usersFirstName {
         override fun table() = Tables.users
-        override fun columnName(): String = "id"
+        override fun columnName(): String = "first_name"
     },
 
     usersEmail {

@@ -22,7 +22,7 @@ class Query {
     var aliases: MutableMap<Alias, Table> = mutableMapOf()
 
     fun addStatement(statement: QueryStatement) {
-        if (statements.contains(statement)) {
+        if (statements.containsElements { it.statement.originalElement == statement.statement.originalElement }) {
             return
         }
 
@@ -61,7 +61,7 @@ class Query {
         }
 
         if (statement.isIncompleteQuery) {
-            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isRelationClause() == true) {
+            if (statement.queryVariable?.isJoinClause() == true) {
                 statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
                     QueryStatement(statement = it, query = this)
                 }

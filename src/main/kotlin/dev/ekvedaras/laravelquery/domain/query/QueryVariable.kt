@@ -66,7 +66,7 @@ data class QueryVariable(var variable: Variable, val query: Query) {
                         variable
                             .parentOfType<Function>()
                             ?.parentOfType<Statement>()
-                            .tryTransforming { QueryStatement(it, query) }
+                            .tryTransforming { QueryStatement(it) }
                             ?.model
                             ?.relation(relationName)
                     }

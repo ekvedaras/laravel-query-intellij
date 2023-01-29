@@ -31,7 +31,8 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
             }
 
             return QueryStatementElementCallChain(
-                forStatement.statement.descendantsOfType<MethodReference>()
+                forStatement.statement
+                    .descendantsOfType<MethodReference>()
                     .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
                     .toSet()
             )

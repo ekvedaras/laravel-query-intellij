@@ -1,1 +1,1 @@
-<?php (new Illuminate\Database\Query\Builder())->from('testProject1.users')->get('id->prop');
+<?php (new Illuminate\Database\Query\Builder())->from('testProject1.users')->get('email->prop');

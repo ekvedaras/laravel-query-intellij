@@ -347,6 +347,7 @@ namespace Illuminate\Database\Eloquent\Concerns {
 }
 
 namespace Illuminate\Database\Eloquent {
+    /** @mixin Builder */
     class Model {
         use \Illuminate\Database\Eloquent\Concerns\HasRelationships;
 

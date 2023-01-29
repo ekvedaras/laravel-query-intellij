@@ -9,16 +9,16 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
     fun testItResolvesColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
 
-        Columns.usersId
+        Columns.usersEmail
             .expect(myFixture)
             .toBeReferenced()
-            .once().at(82).inString("id")
+            .once().at(82).inString("email")
     }
 
     fun testItDoesNotResolvesWrongColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/columnInGetCall.php")
 
-        Columns.usersEmail.expect(myFixture).toBeReferenced().never()
+        Columns.usersFirstName.expect(myFixture).toBeReferenced().never()
     }
 
     fun testResolvesTableAndColumnInGetCall() {
@@ -29,12 +29,12 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .toBeReferenced()
             .twice()
             .first().at(68).inString("testProject1.users")
-            .second().at(82).inString("users.id")
+            .second().at(82).inString("users.email")
 
-        Columns.usersId
+        Columns.usersEmail
             .expect(myFixture)
             .toBeReferenced()
-            .once().at(88).inString("users.id")
+            .once().at(88).inString("users.email")
     }
 
     fun testResolvesNamespaceAndTableAndColumnInGetCall() {
@@ -45,28 +45,28 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .toBeReferenced()
             .twice()
             .first().at(55).inString("testProject1.users")
-            .second().at(82).inString("testProject1.users.id")
+            .second().at(82).inString("testProject1.users.email")
 
         Tables.users
             .expect(myFixture)
             .toBeReferenced()
             .twice()
             .first().at(68).inString("testProject1.users")
-            .second().at(95).inString("testProject1.users.id")
+            .second().at(95).inString("testProject1.users.email")
 
-        Columns.usersId
+        Columns.usersEmail
             .expect(myFixture)
             .toBeReferenced()
-            .once().at(101).inString("testProject1.users.id")
+            .once().at(101).inString("testProject1.users.email")
     }
 
     fun testResolvesJsonColumnInGetCall() {
         myFixture.configureByFile("integration/query/reference/jsonColumnInGetCall.php")
 
-        Columns.usersId
+        Columns.usersEmail
             .expect(myFixture)
             .toBeReferenced()
-            .once().at(82).inString("id->prop")
+            .once().at(82).inString("email->prop")
     }
 
     fun testItResolvesNamespaceTablesAndColumnsInJoinCall() {
@@ -79,14 +79,14 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .first().at(60).inString("testProject1.users")
             .second().at(93).inString("testProject1.customers")
             .then().at(119).inString("testProject1.customers.billable_id")
-            .finally().at(157).inString("testProject1.users.id")
+            .finally().at(157).inString("testProject1.users.email")
 
         Tables.users
             .expect(myFixture)
             .toBeReferenced()
             .twice()
             .first().at(73).inString("testProject1.users")
-            .second().at(170).inString("testProject1.users.id")
+            .second().at(170).inString("testProject1.users.email")
 
         Tables.customers
             .expect(myFixture)
@@ -95,10 +95,10 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .first().at(106).inString("testProject1.customers")
             .second().at(132).inString("testProject1.customers.billable_id")
 
-        Columns.usersId
+        Columns.usersEmail
             .expect(myFixture)
             .toBeReferenced()
-            .once().at(176).inString("testProject1.users.id")
+            .once().at(176).inString("testProject1.users.email")
 
         Columns.customersBillableId
             .expect(myFixture)

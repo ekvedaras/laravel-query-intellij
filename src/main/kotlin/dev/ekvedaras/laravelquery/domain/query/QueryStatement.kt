@@ -1,12 +1,12 @@
 package dev.ekvedaras.laravelquery.domain.query
 
 import com.intellij.openapi.util.Key
+import com.intellij.psi.util.childrenOfType
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.model.Model
-import dev.ekvedaras.laravelquery.support.descendantsOfType
 import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.tryTransforming
@@ -22,7 +22,7 @@ class QueryStatement(val statement: Statement, query: Query? = null) {
         ?: Query().apply { statement.putUserData(queryKey, this) }
 
     private val firstPsiChild = statement.firstPsiChild
-    private val lastMethodReference = firstPsiChild?.descendantsOfType<MethodReference>()?.lastOrNull().run {
+    private val lastMethodReference = firstPsiChild?.childrenOfType<MethodReference>()?.lastOrNull().run {
         if (this is MethodReference) this
         else if (firstPsiChild is MethodReference) firstPsiChild
         else null
