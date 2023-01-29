@@ -61,7 +61,7 @@ class Query {
         }
 
         if (statement.isIncompleteQuery) {
-            if (statement.queryVariable?.isJoinClause() == true) {
+            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isWhereClause() == true) {
                 statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
                     QueryStatement(statement = it, query = this)
                 }

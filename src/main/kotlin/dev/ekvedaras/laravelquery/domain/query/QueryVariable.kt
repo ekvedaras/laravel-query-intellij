@@ -47,7 +47,8 @@ data class QueryVariable(var variable: Variable, val query: Query) {
             .mapNotNull { it.element.parentOfType() }
 
     fun isJoinClause(): Boolean = clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
-    fun isRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
+    fun isWhereClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
+    private fun isRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
 
     val model: Model? =
         when {
