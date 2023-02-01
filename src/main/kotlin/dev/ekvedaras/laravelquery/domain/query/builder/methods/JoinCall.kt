@@ -42,8 +42,8 @@ open class JoinCall(final override val reference: MethodReference, final overrid
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
         return when (parameter) {
             this.tableParameter?.stringParameter -> this.tableParameter.getCompletionOptions()
-            this.firstColumnParameter?.stringParameter -> this.firstColumnParameter.getCompletionOptions(queryStatement.query())
-            this.secondColumnParameter?.stringParameter -> this.secondColumnParameter.getCompletionOptions(queryStatement.query())
+            this.firstColumnParameter?.stringParameter -> this.firstColumnParameter.getCompletionOptions(queryStatement.query)
+            this.secondColumnParameter?.stringParameter -> this.secondColumnParameter.getCompletionOptions(queryStatement.query)
             else -> listOf()
         }
     }

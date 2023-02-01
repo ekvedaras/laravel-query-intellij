@@ -65,7 +65,7 @@ data class StringParameter(val element: StringLiteralExpression) {
 
     private val methodReference: MethodReference? get() = element.parentOfType()
     private val statement: Statement? get() = methodReference?.parentOfType()
-    private val queryStatement: QueryStatement? get() = statement.transform { QueryStatement(it) }
+    private val queryStatement: QueryStatement? get() = statement.transform { QueryStatement.from(it) }
     val queryMethodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
 
     val testMethodCall: TestMethodCall? get() = methodReference.transform { TestMethodCall.from(it) }

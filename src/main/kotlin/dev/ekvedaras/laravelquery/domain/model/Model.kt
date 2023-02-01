@@ -19,7 +19,12 @@ import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import dev.ekvedaras.laravelquery.support.isChildOfAny
 import dev.ekvedaras.laravelquery.support.tryTransforming
 
-class Model(private val clazz: PhpClass) {
+/**
+ * This is a wrapper class for PHP classes that are Eloquent models.
+ *
+ * All the logic for fetching relations, table names and whatever else is directly related to model, should live here.
+ */
+data class Model(private val clazz: PhpClass) {
     init {
         if (!clazz.isChildOfAny(LaravelClasses.Model)) {
             throw Exception("Given class does not extend Eloquent base model thus is not a model")

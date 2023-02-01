@@ -15,9 +15,25 @@ import dev.ekvedaras.laravelquery.domain.model.Model.Companion.isModelScopeQuery
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.isChildOfAny
+import dev.ekvedaras.laravelquery.support.referenceVariable
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.tryTransforming
 
+/**
+ * A wrapper data class for a variable that is used to build and store the query.
+ * For example `$query = DB::table('users');` or `$query->where('users.id', 1)->get();` - in both cases $query is a query variable.
+ *
+ * If we have a statement with a query variable, we can ask this variable to give us all the other statements
+ * where this variable is used. This way we can build the full query that is split across different statements.
+ *
+ * In some cases the variable comes from function parameters like in `DB::table('users)->join('customers', function (JoinClause $join) { ... });`
+ * In the above case `$join` would also be considered a query variable.
+ *
+ * Furthermore, `$query` in model scope functions is a also a query variable.
+ *
+ * For scopes and relation clauses (in `with(['relation' => fn ($relation) => $relation])`) query variable can tell us
+ * to which model it is related.
+ */
 data class QueryVariable(var variable: Variable, val query: Query) {
     private val clazz = if (DumbService.isDumb(variable.project)) throw Exception("Cannot instantiate query variables while php index is building")
     else PhpIndex.getInstance(variable.project)
@@ -25,6 +41,13 @@ data class QueryVariable(var variable: Variable, val query: Query) {
         .types
         .flatMap { PhpIndex.getInstance(variable.project).getClassesByFQN(it) }
         .firstOrNull() ?: throw Exception("Cannot find a class of query variable")
+
+    companion object {
+        fun from(statement: QueryStatement): QueryVariable? = statement
+            .statement
+            .referenceVariable()
+            .tryTransforming { QueryVariable(it, statement.query) }
+    }
 
     init {
         if (!clazz.isChildOfAny(
@@ -70,7 +93,7 @@ data class QueryVariable(var variable: Variable, val query: Query) {
                         variable
                             .parentOfType<Function>()
                             ?.parentOfType<Statement>()
-                            .tryTransforming { QueryStatement(it) }
+                            .tryTransforming { QueryStatement.from(it) }
                             ?.model
                             ?.relation(relationName)
                     }

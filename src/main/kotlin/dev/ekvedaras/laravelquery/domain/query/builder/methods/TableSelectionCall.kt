@@ -11,14 +11,14 @@ sealed interface TableSelectionCall : QueryMethodCall, ReferencesTable {
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? =
         this.queryStatement
-            .query()
+            .query
             .tables
             .firstOrNull { it.name == this.tableParameter?.tableName && (this.tableParameter?.namespaceName == null || this.tableParameter?.namespaceName == it.namespace.name ) }
             ?.asDbTable()
 
     override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? =
         this.queryStatement
-            .query()
+            .query
             .namespaces
             .firstOrNull { it.name == this.tableParameter?.namespaceName }
             ?.asDbNamespace()

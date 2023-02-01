@@ -13,6 +13,10 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.support.tap
 
+/**
+ * This class represents the whole query even if it is split across multiple statements.
+ * Query class can tell which tables are being selected from, what aliases are used, etc.
+ */
 class Query {
     private var statements: Set<QueryStatement> = setOf()
 
@@ -22,7 +26,15 @@ class Query {
     var tables: Set<Table> = setOf()
     var aliases: MutableMap<Alias, Table> = mutableMapOf()
 
-    fun addStatement(statement: QueryStatement) {
+    fun scanStatements(startingFrom: QueryStatement) {
+        addStatement(statement = startingFrom)
+
+        scanUp(startingFrom)
+        scanFurther(startingFrom)
+        scanDown(startingFrom)
+    }
+
+    private fun addStatement(statement: QueryStatement) {
         if (statements.containsElements { it.statement.originalElement == statement.statement.originalElement }) {
             return
         }
@@ -60,21 +72,31 @@ class Query {
         if (this.namespaces.isNotEmpty()) {
             this.dataSource = this.namespaces.first().dataSource
         }
+    }
 
-        if (statement.isIncompleteQuery) {
-            if (statement.queryVariable?.isJoinClause() == true || statement.queryVariable?.isWhereClause() == true || statement.queryVariable?.isWhenClause() == true) {
-                statement.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
-                    QueryStatement(statement = it, query = this)
-                }
-            } else {
-                statement.queryVariable
-                    ?.usageStatements()
-                    ?.filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
-                    ?.forEach { QueryStatement(statement = it, query = this) }
+    private fun scanUp(startingFrom: QueryStatement) {
+        if (startingFrom.queryVariable == null) return
+
+        if (startingFrom.queryVariable.isJoinClause() || startingFrom.queryVariable.isWhereClause() || startingFrom.queryVariable.isWhenClause()) {
+            startingFrom.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
+                this.addStatement(QueryStatement(statement = it, query = this))
             }
         }
+    }
 
-        statement.callChain
+    private fun scanFurther(startingFrom: QueryStatement) {
+        if (startingFrom.queryVariable == null) return
+
+        if (!startingFrom.queryVariable.isJoinClause() && !startingFrom.queryVariable.isWhereClause() && !startingFrom.queryVariable.isWhenClause()) {
+            startingFrom.queryVariable
+                .usageStatements()
+                .filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
+                .forEach { this.addStatement(QueryStatement(statement = it, query = this)) }
+        }
+    }
+
+    private fun scanDown(startingFrom: QueryStatement) {
+        startingFrom.callChain
             .elements
             .filterIsInstance<AcceptsClosures>()
             .forEach { methodCall ->
@@ -83,7 +105,7 @@ class Query {
                     .forEach { closureParameter ->
                         closureParameter.queryParameter
                             ?.usageStatements()
-                            ?.forEach { QueryStatement(statement = it, query = this) }
+                            ?.forEach { this.addStatement(QueryStatement(statement = it, query = this)) }
                     }
             }
     }

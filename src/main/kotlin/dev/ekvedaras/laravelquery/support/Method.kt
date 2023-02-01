@@ -2,6 +2,7 @@ package dev.ekvedaras.laravelquery.support
 
 import com.intellij.openapi.project.DumbService
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.NewExpression
@@ -26,3 +27,11 @@ fun MethodReference.isMemberOfAny(vararg classes: String): Boolean =
         .flatMap { PhpIndex.getInstance(this.project).getClassesByFQN(it) }
         .flatMap { it.superClasses.map { parent -> parent.fqn } + it.fqn }
         .containsAny(*classes)
+
+fun MethodReference.isCalledOnAVariable() = firstPsiChild is Variable
+fun MethodReference.isAssignedToAVariable() = firstPsiChild is AssignmentExpression
+fun MethodReference.referenceVariable() = when {
+    isCalledOnAVariable() -> firstPsiChild as? Variable
+    isAssignedToAVariable() -> firstPsiChild?.firstPsiChild as? Variable
+    else -> null
+}
