@@ -9,7 +9,8 @@ import com.jetbrains.php.lang.psi.elements.NewExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.NewModelExpression
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryStatementElement
-import dev.ekvedaras.laravelquery.support.descendantsOfType
+import dev.ekvedaras.laravelquery.support.callChainOfType
+import dev.ekvedaras.laravelquery.support.firstChildOfType
 
 data class QueryStatementElementCallChain(val elements: Set<QueryStatementElement>) {
     companion object {
@@ -24,15 +25,16 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
             if (startingFrom is AssignmentExpression) {
                 return QueryStatementElementCallChain(
                     startingFrom
-                        .descendantsOfType<MethodReference>()
-                        .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
-                        .toSet()
+                        .firstChildOfType<MethodReference>()
+                        ?.callChainOfType<MethodReference>()
+                        ?.mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
+                        ?.toSet() ?: setOf()
                 )
             }
 
             return QueryStatementElementCallChain(
                 forStatement.statement
-                    .descendantsOfType<MethodReference>()
+                    .callChainOfType<MethodReference>()
                     .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
                     .toSet()
             )

@@ -1,16 +1,22 @@
 package dev.ekvedaras.laravelquery.support
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.childrenOfType
-import com.intellij.psi.util.descendantsOfType
 
-inline fun <reified T : PsiElement> PsiElement.descendantsOfType(): Set<T> {
-    val descendants = PsiTreeUtil.getChildrenOfTypeAsList(this, T::class.java).toMutableSet()
+inline fun <reified T : PsiElement> PsiElement.callChainOfType(): Set<T> {
+    val chain = mutableSetOf<T>()
 
-    descendants.forEach { descendants += it.descendantsOfType<T>() }
+    var element = when (this) {
+        is T -> this
+        else -> this.firstChild
+    }
 
-    return descendants
+    while (element is T) {
+        chain.add(element)
+        element = element.firstChild
+    }
+
+    return chain.toSet()
 }
 
 inline fun <reified T : PsiElement> PsiElement.firstChildOfType(): T? = childrenOfType<T>().firstOrNull()

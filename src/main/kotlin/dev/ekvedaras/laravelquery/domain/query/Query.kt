@@ -30,7 +30,7 @@ class Query {
         addStatement(statement = startingFrom)
 
         scanUp(startingFrom)
-        scanFurther(startingFrom)
+        scanAround(startingFrom)
         scanDown(startingFrom)
     }
 
@@ -84,7 +84,7 @@ class Query {
         }
     }
 
-    private fun scanFurther(startingFrom: QueryStatement) {
+    private fun scanAround(startingFrom: QueryStatement) {
         if (startingFrom.queryVariable == null) return
 
         if (!startingFrom.queryVariable.isJoinClause() && !startingFrom.queryVariable.isWhereClause() && !startingFrom.queryVariable.isWhenClause()) {
