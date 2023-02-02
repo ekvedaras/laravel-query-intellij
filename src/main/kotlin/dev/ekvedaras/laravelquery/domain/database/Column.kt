@@ -47,5 +47,5 @@ data class Column(val entity: DasColumn, val table: Table) {
             )
     }
 
-    fun asDbColumn(): DbColumn = this.table.namespace.dataSource.entity.findElement(this.entity) as DbColumn
+    fun asDbColumn(): DbColumn = table.namespace.dataSource.entity.findElement(entity) as DbColumn
 }

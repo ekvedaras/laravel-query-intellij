@@ -15,18 +15,18 @@ class TableParameter(val stringParameter: StringParameter) {
         val aliasedParam = stringParameter.toAliasedParam()
         val parts = aliasedParam.target.split('.').reversed()
 
-        this.tableName = parts[0]
-        this.namespaceName = parts.getOrNull(1)
-        this.alias = aliasedParam.alias
+        tableName = parts[0]
+        namespaceName = parts.getOrNull(1)
+        alias = aliasedParam.alias
     }
 
-    val namespace: Namespace? = if (this.namespaceName != null) {
-        Namespace.findFirst(this.namespaceName, stringParameter.project)
+    val namespace: Namespace? = if (namespaceName != null) {
+        Namespace.findFirst(namespaceName, stringParameter.project)
     } else {
-        Table.findFirst(this.tableName, stringParameter.project)?.namespace
+        Table.findFirst(tableName, stringParameter.project)?.namespace
     }
 
-    val table: Table? = namespace?.findTable(this.tableName) ?: Table.findFirst(this.tableName, stringParameter.project)
+    val table: Table? = namespace?.findTable(tableName) ?: Table.findFirst(tableName, stringParameter.project)
 
     fun getCompletionOptions(): List<LookupElement> {
         val completion = mutableListOf<LookupElement>()
@@ -34,8 +34,8 @@ class TableParameter(val stringParameter: StringParameter) {
         if (stringParameter.isEmpty) {
             completion += Namespace.list(stringParameter.project).map { it.asLookupElement() }.toList()
             completion += Table.list(stringParameter.project).map { it.asLookupElement() }.toList()
-        } else if (stringParameter.hasUncompletedPart && this.namespace != null) {
-            completion += this.namespace
+        } else if (stringParameter.hasUncompletedPart && namespace != null) {
+            completion += namespace
                 .tables()
                 .map { it.asLookupElement(withNamespacePrefix = true) }
                 .toList()

@@ -22,17 +22,17 @@ data class DataSource(val entity: DbDataSource) {
     }
 
     fun namespaces(): Stream<out Namespace> =
-        DasUtil.getSchemas(this.entity)
+        DasUtil.getSchemas(entity)
             .toList()
             .parallelStream()
-            .filter { LaravelQuerySettings.getInstance(this.project).interestedIn(it, this.entity) }
+            .filter { LaravelQuerySettings.getInstance(project).interestedIn(it, entity) }
             .filter { Namespace.isImportant(it) }
             .map { Namespace(entity = it, dataSource = this) }
 
-    fun findNamespace(namespace: String): Namespace? = this.namespaces().firstWhereOrNull { it.entity.name == namespace }
+    fun findNamespace(namespace: String): Namespace? = namespaces().firstWhereOrNull { it.entity.name == namespace }
 
     fun findFirstTable(table: String): Table? =
-        this.namespaces()
+        namespaces()
             .firstWhereOrNull { it.findTable(table) != null }
             ?.findTable(table)
 }

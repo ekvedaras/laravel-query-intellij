@@ -20,7 +20,7 @@ inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType
     .filterIsInstance<T>()
     .toSet()
 
-inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOrEntriesOfType(): Set<T> = this.hashKeysOfType<T>() + this.nonHashEntriesOfType()
+inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOrEntriesOfType(): Set<T> = hashKeysOfType<T>() + nonHashEntriesOfType()
 
 inline fun <reified T : PsiElement> ArrayCreationExpression.elementsOfType(): Set<T> =
-    this.childrenOfType<PhpPsiElement>().filter { it.firstPsiChild is T }.map { it.firstPsiChild as T }.toSet()
+    childrenOfType<PhpPsiElement>().filter { it.firstPsiChild is T }.map { it.firstPsiChild as T }.toSet()

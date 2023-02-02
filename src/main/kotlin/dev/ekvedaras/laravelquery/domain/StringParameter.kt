@@ -57,10 +57,10 @@ data class StringParameter(val element: StringLiteralExpression) {
     fun toAliasedParam(): AliasedParam = AliasedParam(this)
 
     fun shouldBeInspected(): Boolean {
-        return this.isMethodReferenceParameter // ->get('parameter');
-            || this.isEntryOfArrayWhichIsMethodReferenceParameter // ->get(['parameter'])
-            || this.isArrayHashKeyOfArrayWhichIsMethodReferenceParameter // ->get(['parameter' => 'foo'])
-            || this.isNestedArrayFirstEntry // ->where([ ['parameter', '=', 'foo'] ])
+        return isMethodReferenceParameter // ->get('parameter');
+            || isEntryOfArrayWhichIsMethodReferenceParameter // ->get(['parameter'])
+            || isArrayHashKeyOfArrayWhichIsMethodReferenceParameter // ->get(['parameter' => 'foo'])
+            || isNestedArrayFirstEntry // ->where([ ['parameter', '=', 'foo'] ])
     }
 
     private val methodReference: MethodReference? get() = element.parentOfType()
@@ -80,8 +80,8 @@ data class StringParameter(val element: StringLiteralExpression) {
         is AliasParameter -> other.stringParameter == this
         is TestsTableParameter -> other.stringParameter == this
         is TestsColumnParameter -> other.stringParameter == this
-        is StringParameter -> other.element.originalElement == this.element.originalElement
-        is PsiElement -> other == this.element.originalElement
+        is StringParameter -> other.element.originalElement == element.originalElement
+        is PsiElement -> other == element.originalElement
         else -> false
     }
 

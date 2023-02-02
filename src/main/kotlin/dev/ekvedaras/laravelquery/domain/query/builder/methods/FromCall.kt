@@ -14,27 +14,27 @@ class FromCall(override val reference: MethodReference, override val queryStatem
     private val tableMethodParameter = reference.getParameter(0) as? StringLiteralExpression
     private val aliasMethodParameter = reference.getParameter(1) as? StringLiteralExpression
 
-    override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
+    override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
         TableParameter(it.asStringParameter())
     }
 
-    private val aliasParameter = this.aliasMethodParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {
+    private val aliasParameter = aliasMethodParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {
         AliasParameter(it.asStringParameter())
     }
 
-    override val alias: Alias? = if (this.aliasParameter != null && this.tableParameter?.table != null) {
-        Alias(name = this.aliasParameter.name, definitionParameter = this.aliasParameter.stringParameter, table = this.tableParameter.table)
-    } else if (this.tableParameter?.table != null && this.tableParameter.alias != null) {
-        Alias(name = this.tableParameter.alias, definitionParameter = this.tableParameter.stringParameter, table = this.tableParameter.table)
+    override val alias: Alias? = if (aliasParameter != null && tableParameter?.table != null) {
+        Alias(name = aliasParameter.name, definitionParameter = aliasParameter.stringParameter, table = tableParameter.table)
+    } else if (tableParameter?.table != null && tableParameter.alias != null) {
+        Alias(name = tableParameter.alias, definitionParameter = tableParameter.stringParameter, table = tableParameter.table)
     } else {
         null
     }
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
-        if (parameter != this.tableParameter?.stringParameter) {
+        if (parameter != tableParameter?.stringParameter) {
             return mutableListOf()
         }
 
-        return this.tableParameter.getCompletionOptions()
+        return tableParameter.getCompletionOptions()
     }
 }

@@ -16,7 +16,7 @@ import dev.ekvedaras.laravelquery.support.isMemberOfAny
 sealed interface QueryMethodCall : QueryStatementElement {
     override val reference: MethodReference
     override val classReference: ClassReference?
-        get() = this.reference.classReference()
+        get() = reference.classReference()
 
     fun completeFor(parameter: StringParameter): List<LookupElement>
 

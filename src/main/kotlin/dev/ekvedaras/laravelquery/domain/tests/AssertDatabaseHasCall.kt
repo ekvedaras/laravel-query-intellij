@@ -29,8 +29,8 @@ class AssertDatabaseHasCall(reference: MethodReference) : TestMethodCall {
         if (parameter.equals(tableParameter)) return tableParameter.getCompletionOptions()
 
         if (tableParameter?.table == null) return listOf()
-        val columnParameter = this.columnParameterFor(parameter)
-        if (columnParameter != null) return columnParameter.getCompletionOptions(this.tableParameter.table)
+        val columnParameter = columnParameterFor(parameter)
+        if (columnParameter != null) return columnParameter.getCompletionOptions(tableParameter.table)
 
         return listOf()
     }

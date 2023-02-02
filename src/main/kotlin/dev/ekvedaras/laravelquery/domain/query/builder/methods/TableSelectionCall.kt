@@ -10,16 +10,16 @@ sealed interface TableSelectionCall : QueryMethodCall, ReferencesTable {
     val alias: Alias?
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? =
-        this.queryStatement
+        queryStatement
             .query
             .tables
-            .firstOrNull { it.name == this.tableParameter?.tableName && (this.tableParameter?.namespaceName == null || this.tableParameter?.namespaceName == it.namespace.name ) }
+            .firstOrNull { it.name == tableParameter?.tableName && (tableParameter?.namespaceName == null || tableParameter?.namespaceName == it.namespace.name) }
             ?.asDbTable()
 
     override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? =
-        this.queryStatement
+        queryStatement
             .query
             .namespaces
-            .firstOrNull { it.name == this.tableParameter?.namespaceName }
+            .firstOrNull { it.name == tableParameter?.namespaceName }
             ?.asDbNamespace()
 }

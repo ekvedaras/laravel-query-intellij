@@ -12,13 +12,13 @@ import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 class WhereCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0)
 
-    override val columns: Set<ColumnParameter> = when (this.columnsMethodParameter) {
+    override val columns: Set<ColumnParameter> = when (columnsMethodParameter) {
         is ArrayCreationExpression -> {
-            this.columnsMethodParameter
+            columnsMethodParameter
                 .hashKeysOrEntriesOfType<StringLiteralExpression>()
                 .map { ColumnParameter(it.asStringParameter()) }
                 .toSet() +
-                this.columnsMethodParameter
+                columnsMethodParameter
                     .nonHashEntriesOfType<ArrayCreationExpression>()
                     .mapNotNull { it.nonHashEntriesOfType<StringLiteralExpression>().firstOrNull() }
                     .map { ColumnParameter(it.asStringParameter()) }

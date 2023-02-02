@@ -14,17 +14,16 @@ private val queryKey = Key<Query>("query")
 class QueryStatement(val statement: Statement, val query: Query) {
     private val firstPsiChild = statement.firstPsiChild
 
-    val queryVariable: QueryVariable? = QueryVariable.from(this)
-
     val callChain: QueryStatementElementCallChain = QueryStatementElementCallChain.collect(
         startingFrom = firstPsiChild,
         forStatement = this,
     )
 
-    val model: Model? = queryVariable?.model ?: this.callChain.firstClassReference.transform { Model.from(it) }
+    val queryVariable: QueryVariable? = QueryVariable.from(this)
+    val model: Model? = queryVariable?.model ?: callChain.firstClassReference.transform { Model.from(it) }
 
     companion object {
-        fun Statement.query(): Query = this.getUserData(queryKey) ?: Query().also { this.putUserData(queryKey, it) }
+        fun Statement.query(): Query = getUserData(queryKey) ?: Query().also { putUserData(queryKey, it) }
         fun from(statement: Statement) = QueryStatement(statement, statement.query()).also {
             statement.query().scanStatements(it)
         }

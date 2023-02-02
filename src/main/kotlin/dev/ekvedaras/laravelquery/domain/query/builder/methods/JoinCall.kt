@@ -19,47 +19,47 @@ open class JoinCall(final override val reference: MethodReference, final overrid
         if (reference.parameters.size > 3) 3 else 2
     )
 
-    final override val tableParameter = this.tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
+    final override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
         TableParameter(it.asStringParameter())
     }
 
     override val alias: Alias? =
-        if (this.tableParameter?.table != null && this.tableParameter.alias != null) Alias(
-            name = this.tableParameter.alias,
-            definitionParameter = this.tableParameter.stringParameter,
-            table = this.tableParameter.table
+        if (tableParameter?.table != null && tableParameter.alias != null) Alias(
+            name = tableParameter.alias,
+            definitionParameter = tableParameter.stringParameter,
+            table = tableParameter.table
         ) else null
 
-    private val firstColumnParameter = this.firstColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
+    private val firstColumnParameter = firstColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
         ColumnParameter(it.asStringParameter())
     }
 
-    private val secondColumnParameter = this.secondColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
+    private val secondColumnParameter = secondColumnMethodParameter.transformInstanceOf<StringLiteralExpression, ColumnParameter> {
         ColumnParameter(it.asStringParameter())
     }
-    override val columns: Set<ColumnParameter> = setOf(this.firstColumnParameter, this.secondColumnParameter).filterNotNull().toSet()
+    override val columns: Set<ColumnParameter> = setOf(firstColumnParameter, secondColumnParameter).filterNotNull().toSet()
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> {
         return when (parameter) {
-            this.tableParameter?.stringParameter -> this.tableParameter.getCompletionOptions()
-            this.firstColumnParameter?.stringParameter -> this.firstColumnParameter.getCompletionOptions(queryStatement.query)
-            this.secondColumnParameter?.stringParameter -> this.secondColumnParameter.getCompletionOptions(queryStatement.query)
+            tableParameter?.stringParameter -> tableParameter.getCompletionOptions()
+            firstColumnParameter?.stringParameter -> firstColumnParameter.getCompletionOptions(queryStatement.query)
+            secondColumnParameter?.stringParameter -> secondColumnParameter.getCompletionOptions(queryStatement.query)
             else -> listOf()
         }
     }
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? {
         return when (parameter.element) {
-            this.tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findTableReferencedIn(parameter)
-            this.firstColumnParameter?.stringParameter?.element, this.secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findTableReferencedIn(parameter)
+            tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findTableReferencedIn(parameter)
+            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findTableReferencedIn(parameter)
             else -> null
         }
     }
 
     override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? {
         return when (parameter.element) {
-            this.tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findNamespaceReferencedIn(parameter)
-            this.firstColumnParameter?.stringParameter?.element, this.secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findNamespaceReferencedIn(parameter)
+            tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findNamespaceReferencedIn(parameter)
+            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findNamespaceReferencedIn(parameter)
             else -> null
         }
     }

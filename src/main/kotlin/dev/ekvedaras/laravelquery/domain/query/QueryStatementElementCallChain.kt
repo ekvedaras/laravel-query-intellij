@@ -42,12 +42,12 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
     }
 
     val firstClassReference: ClassReference? =
-        this.elements
+        elements
             .firstOrNull { it.classReference != null }
             ?.classReference
 
     fun methodCallFor(methodReference: MethodReference): QueryMethodCall? =
-        this.elements.filterIsInstance<QueryMethodCall>().firstOrNull { it.reference == methodReference }
+        elements.filterIsInstance<QueryMethodCall>().firstOrNull { it.reference == methodReference }
 
     inline fun forEach(action: (QueryStatementElement) -> Unit) {
         for (element in elements) action(element)

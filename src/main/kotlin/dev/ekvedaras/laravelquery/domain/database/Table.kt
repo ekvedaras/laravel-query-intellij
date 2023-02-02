@@ -16,7 +16,7 @@ import java.util.stream.Stream
 data class Table(val entity: DasTable, val namespace: Namespace) {
     val project = namespace.project
     val name = entity.name
-    val nameWithoutPrefix = this.name.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
+    val nameWithoutPrefix = name.substringAfter(LaravelQuerySettings.getInstance(project).tablePrefix)
 
     companion object {
         fun list(project: Project): Stream<out Table> =
@@ -34,7 +34,7 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
     }
 
     fun columns(): Stream<out Column> =
-        this.entity
+        entity
             .getDasChildren(ObjectKind.COLUMN)
             .toList()
             .parallelStream()
@@ -45,8 +45,8 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
         withNamespacePrefix: Boolean = false,
     ): LookupElement =
         LookupElementBuilder
-            .create(this, this.nameWithoutPrefix)
-            .withLookupString("${namespace.name}.${this.nameWithoutPrefix}")
+            .create(this, nameWithoutPrefix)
+            .withLookupString("${namespace.name}.${nameWithoutPrefix}")
             .withTypeText(namespace.name, true)
             .withIcon(DasPsiWrappingSymbol(entity, project).getIcon(false))
             .withInsertHandler(
@@ -59,7 +59,7 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
                 }
             )
 
-    fun asDbTable(): DbTable = this.namespace.dataSource.entity.findElement(this.entity) as DbTable
+    fun asDbTable(): DbTable = namespace.dataSource.entity.findElement(entity) as DbTable
 
     fun findColumn(name: String) = columns().firstWhereOrNull { it.name == name }
 }

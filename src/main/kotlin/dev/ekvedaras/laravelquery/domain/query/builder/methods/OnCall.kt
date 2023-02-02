@@ -14,7 +14,7 @@ class OnCall(override val reference: MethodReference, override val queryStatemen
     ) as? StringLiteralExpression
 
     override val columns: Set<ColumnParameter> = setOf(
-        this.firstColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
-        this.secondColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
+        firstColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
+        secondColumnMethodParameter.transform { ColumnParameter(it.asStringParameter()) },
     ).filterNotNull().toSet()
 }

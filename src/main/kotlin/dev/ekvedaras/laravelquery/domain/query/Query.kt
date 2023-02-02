@@ -60,26 +60,26 @@ class Query {
             }
         }
 
-        if (statement.model != null && !this.models.contains(statement.model)) {
-            this.models += statement.model
+        if (statement.model != null && !models.contains(statement.model)) {
+            models += statement.model
 
             statement.model.table.tap {
-                this.tables += it
-                this.namespaces += it.namespace
+                tables += it
+                namespaces += it.namespace
             }
         }
 
-        if (this.namespaces.isNotEmpty()) {
-            this.dataSource = this.namespaces.first().dataSource
+        if (namespaces.isNotEmpty()) {
+            dataSource = namespaces.first().dataSource
         }
     }
 
     private fun scanUp(startingFrom: QueryStatement) {
         if (startingFrom.queryVariable == null) return
 
-        if (startingFrom.queryVariable.isJoinClause() || startingFrom.queryVariable.isWhereClause() || startingFrom.queryVariable.isWhenClause()) {
+        if (startingFrom.queryVariable.isInsideJoinClause() || startingFrom.queryVariable.isInsideWhereClause() || startingFrom.queryVariable.isInsideWhenClause()) {
             startingFrom.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
-                this.addStatement(QueryStatement(statement = it, query = this))
+                addStatement(QueryStatement(statement = it, query = this))
             }
         }
     }
@@ -87,11 +87,11 @@ class Query {
     private fun scanAround(startingFrom: QueryStatement) {
         if (startingFrom.queryVariable == null) return
 
-        if (!startingFrom.queryVariable.isJoinClause() && !startingFrom.queryVariable.isWhereClause() && !startingFrom.queryVariable.isWhenClause()) {
+        if (!startingFrom.queryVariable.isInsideJoinClause() && !startingFrom.queryVariable.isInsideWhereClause() && !startingFrom.queryVariable.isInsideWhenClause()) {
             startingFrom.queryVariable
                 .usageStatements()
                 .filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }
-                .forEach { this.addStatement(QueryStatement(statement = it, query = this)) }
+                .forEach { addStatement(QueryStatement(statement = it, query = this)) }
         }
     }
 
@@ -105,7 +105,7 @@ class Query {
                     .forEach { closureParameter ->
                         closureParameter.queryParameter
                             ?.usageStatements()
-                            ?.forEach { this.addStatement(QueryStatement(statement = it, query = this)) }
+                            ?.forEach { addStatement(QueryStatement(statement = it, query = this)) }
                     }
             }
     }

@@ -58,7 +58,7 @@ data class Model(private val clazz: PhpClass) {
         ?.findFirstTable(tableName)
 
     fun relation(name: String): Model? =
-        this.clazz
+        clazz
             .methods
             .firstOrNull { it.name == name }
             ?.tryTransforming { Relation(it) }
@@ -83,16 +83,16 @@ data class Model(private val clazz: PhpClass) {
                 .tryTransforming { Model(it) }
         }
 
-        private fun PsiElement.isWithinModel(): Boolean = this.parentOfType<PhpClass>()?.isChildOfAny(LaravelClasses.Model) == true
-        private fun PsiElement.isWithinModelScopeMethod(): Boolean = this.isWithinModel() && this.parentOfType<Function>()?.name?.startsWith("scope") == true
-        fun QueryVariable.isModelScopeQuery(): Boolean = this.variable.isWithinModelScopeMethod() && this.variable.parentOfType<Function>()?.getParameter(0)?.name == this.variable.name
+        private fun PsiElement.isWithinModel(): Boolean = parentOfType<PhpClass>()?.isChildOfAny(LaravelClasses.Model) == true
+        private fun PsiElement.isWithinModelScopeMethod(): Boolean = isWithinModel() && parentOfType<Function>()?.name?.startsWith("scope") == true
+        fun QueryVariable.isInsideModelScope(): Boolean = variable.isWithinModelScopeMethod() && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
     }
 
     override fun equals(other: Any?): Boolean
     {
         if (other !is Model) return false
 
-        return this.clazz == other.clazz
+        return clazz == other.clazz
     }
 
     override fun hashCode(): Int {

@@ -28,7 +28,7 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
     }
 
     fun tables(): Stream<out Table> =
-        this.entity
+        entity
             .getDasChildren(ObjectKind.TABLE)
             .toList()
             .parallelStream()
@@ -37,13 +37,13 @@ data class Namespace(val entity: DasNamespace, val dataSource: DataSource) {
             .filter { Table.isPrefixed(it, dataSource.project) }
             .map { Table(entity = it, namespace = this) }
 
-    fun findTable(table: String): Table? = this.tables().firstWhereOrNull { it.name == table }
+    fun findTable(table: String): Table? = tables().firstWhereOrNull { it.name == table }
 
     fun asLookupElement(): LookupElement = LookupElementBuilder
-        .create(this, this.name)
+        .create(this, name)
         .withIcon(DasPsiWrappingSymbol(entity, project).getIcon(false))
         .withTypeText(dataSource.name, true)
         .withInsertHandler(project, true)
 
-    fun asDbNamespace(): DbNamespace = this.dataSource.entity.findElement(this.entity) as DbNamespace
+    fun asDbNamespace(): DbNamespace = dataSource.entity.findElement(entity) as DbNamespace
 }

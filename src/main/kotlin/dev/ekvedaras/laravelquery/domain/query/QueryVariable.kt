@@ -6,15 +6,16 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.ArrayHashElement
 import com.jetbrains.php.lang.psi.elements.Function
-import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.model.Model
-import dev.ekvedaras.laravelquery.domain.model.Model.Companion.isModelScopeQuery
+import dev.ekvedaras.laravelquery.domain.model.Model.Companion.isInsideModelScope
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.isChildOfAny
+import dev.ekvedaras.laravelquery.support.isFirstParameter
+import dev.ekvedaras.laravelquery.support.isInsideCallOfMethod
 import dev.ekvedaras.laravelquery.support.referenceVariable
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.tryTransforming
@@ -29,12 +30,12 @@ import dev.ekvedaras.laravelquery.support.tryTransforming
  * In some cases the variable comes from function parameters like in `DB::table('users)->join('customers', function (JoinClause $join) { ... });`
  * In the above case `$join` would also be considered a query variable.
  *
- * Furthermore, `$query` in model scope functions is a also a query variable.
+ * Furthermore, `$query` in model scope functions is also a query variable.
  *
  * For scopes and relation clauses (in `with(['relation' => fn ($relation) => $relation])`) query variable can tell us
  * to which model it is related.
  */
-data class QueryVariable(var variable: Variable, val query: Query) {
+data class QueryVariable(var variable: Variable, val queryStatement: QueryStatement) {
     private val clazz = if (DumbService.isDumb(variable.project)) throw Exception("Cannot instantiate query variables while php index is building")
     else PhpIndex.getInstance(variable.project)
         .completeType(variable.project, variable.type, mutableSetOf())
@@ -46,7 +47,7 @@ data class QueryVariable(var variable: Variable, val query: Query) {
         fun from(statement: QueryStatement): QueryVariable? = statement
             .statement
             .referenceVariable()
-            .tryTransforming { QueryVariable(it, statement.query) }
+            .tryTransforming { QueryVariable(it, statement) }
     }
 
     init {
@@ -70,19 +71,28 @@ data class QueryVariable(var variable: Variable, val query: Query) {
             .filterNot { it.element.originalElement == variable.originalElement }
             .mapNotNull { it.element.parentOfType() }
 
-    // TODO: refactor these to use ClosureParameter
-    fun isJoinClause(): Boolean = clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
-    fun isWhereClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "where" && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
-    fun isWhenClause(): Boolean = clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true) && variable.parentOfType<Function>()?.parentOfType<MethodReference>()?.name == "when" && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
-    private fun isRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
+    fun isInsideJoinClause(): Boolean =
+        clazz.isChildOfAny(LaravelClasses.JoinClause, orIsAny = true)
+
+    fun isInsideWhereClause(): Boolean =
+        clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true)
+            && variable.isInsideCallOfMethod("where")
+            && variable.isFirstParameter()
+
+    fun isInsideWhenClause(): Boolean =
+        clazz.isChildOfAny(LaravelClasses.QueryBuilder, LaravelClasses.EloquentBuilder, orIsAny = true)
+            && variable.isInsideCallOfMethod("when")
+            && variable.isFirstParameter()
+
+    private fun isInsideRelationClause(): Boolean = clazz.isChildOfAny(LaravelClasses.Relation, orIsAny = true)
 
     val model: Model? =
         when {
-            isModelScopeQuery() -> transform {
+            isInsideModelScope() -> transform {
                 it.variable.parentOfType<PhpClass>().transform { clazz -> Model(clazz) }
             }
 
-            isRelationClause() ->
+            isInsideRelationClause() ->
                 variable
                     .parentOfType<Function>()
                     ?.parentOfType<ArrayHashElement>()

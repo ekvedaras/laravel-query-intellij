@@ -11,9 +11,9 @@ import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 class SelectCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0)
 
-    override val columns: Set<ColumnParameter> = when (this.columnsMethodParameter) {
+    override val columns: Set<ColumnParameter> = when (columnsMethodParameter) {
         is ArrayCreationExpression -> {
-            this.columnsMethodParameter
+            columnsMethodParameter
                 .nonHashEntriesOfType<StringLiteralExpression>()
                 .map { ColumnParameter(it.asStringParameter()) }
                 .toSet()

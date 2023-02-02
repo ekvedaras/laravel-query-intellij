@@ -8,7 +8,7 @@ inline fun <reified T : PsiElement> PsiElement.callChainOfType(): Set<T> {
 
     var element = when (this) {
         is T -> this
-        else -> this.firstChild
+        else -> firstChild
     }
 
     while (element is T) {

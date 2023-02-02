@@ -11,16 +11,16 @@ import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 class GetCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0)
 
-    override val columns: Set<ColumnParameter> = when (this.columnsMethodParameter) {
+    override val columns: Set<ColumnParameter> = when (columnsMethodParameter) {
         is ArrayCreationExpression -> {
-            this.columnsMethodParameter
+            columnsMethodParameter
                 .nonHashEntriesOfType<StringLiteralExpression>()
                 .map { ColumnParameter(it.asStringParameter()) }
                 .toSet()
         }
 
         is StringLiteralExpression -> {
-            setOf(ColumnParameter(this.columnsMethodParameter.asStringParameter()))
+            setOf(ColumnParameter(columnsMethodParameter.asStringParameter()))
         }
 
         else -> {

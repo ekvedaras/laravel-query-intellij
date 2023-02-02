@@ -20,10 +20,10 @@ class ColumnParameter(val stringParameter: StringParameter) {
         val aliasedParam = stringParameter.toAliasedParam()
         val parts = aliasedParam.target.split('.').reversed()
 
-        this.columnOrTableOrNamespaceName = parts[0]
-        this.tableOrNamespaceName = parts.getOrNull(1)
-        this.namespaceName = parts.getOrNull(2)
-        this.alias = aliasedParam.alias
+        columnOrTableOrNamespaceName = parts[0]
+        tableOrNamespaceName = parts.getOrNull(1)
+        namespaceName = parts.getOrNull(2)
+        alias = aliasedParam.alias
     }
 
     fun getCompletionOptions(query: Query): List<LookupElement> {
@@ -41,33 +41,33 @@ class ColumnParameter(val stringParameter: StringParameter) {
             return completion
         }
 
-        if (this.stringParameter.hasThreeParts) {
+        if (stringParameter.hasThreeParts) {
             val completion = mutableListOf<LookupElement>()
 
-            completion += query.tables.find { it.name == this.tableOrNamespaceName || it.name == this.columnOrTableOrNamespaceName }?.columns()?.map {
+            completion += query.tables.find { it.name == tableOrNamespaceName || it.name == columnOrTableOrNamespaceName }?.columns()?.map {
                 it.asLookupElement(
                     withNamespacePrefix = true,
                     withTablePrefix = true
                 )
             }?.toList() ?: listOf()
-            completion += query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map {
+            completion += query.aliases.filterKeys { it.name == tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map {
                 it.asLookupElement(
                     withNamespacePrefix = true,
-                    alias = this.tableOrNamespaceName
+                    alias = tableOrNamespaceName
                 )
             }?.toList() ?: listOf()
 
             return completion
         }
 
-        if (this.stringParameter.hasTwoParts) {
-            val namespace = query.namespaces.find { it.name == this.tableOrNamespaceName }
+        if (stringParameter.hasTwoParts) {
+            val namespace = query.namespaces.find { it.name == tableOrNamespaceName }
             if (namespace != null) {
                 return namespace.tables().map { it.asLookupElement(triggerCompletionOnInsert = true, withNamespacePrefix = true) }.toList()
             }
 
-            return query.tables.find { it.name == this.tableOrNamespaceName }?.columns()?.map { it.asLookupElement(withTablePrefix = true) }?.toList()
-                ?: query.aliases.filterKeys { it.name == this.tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = this.tableOrNamespaceName) }?.toList()
+            return query.tables.find { it.name == tableOrNamespaceName }?.columns()?.map { it.asLookupElement(withTablePrefix = true) }?.toList()
+                ?: query.aliases.filterKeys { it.name == tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = tableOrNamespaceName) }?.toList()
                 ?: listOf()
         }
 
@@ -79,26 +79,26 @@ class ColumnParameter(val stringParameter: StringParameter) {
 
         if (stringParameter.hasThreeParts) {
             return query.tables
-                .firstOrNull { it.name == this.tableOrNamespaceName && it.namespace.name == this.namespaceName }
+                .firstOrNull { it.name == tableOrNamespaceName && it.namespace.name == namespaceName }
                 ?.columns()
-                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.firstWhereOrNull { it.name == columnOrTableOrNamespaceName }
                 ?.asDbColumn()
         }
 
         if (stringParameter.hasTwoParts) {
             return query.tables
-                .firstOrNull { it.name == this.tableOrNamespaceName }
+                .firstOrNull { it.name == tableOrNamespaceName }
                 ?.columns()
-                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.firstWhereOrNull { it.name == columnOrTableOrNamespaceName }
                 ?.asDbColumn()
         }
 
         if (stringParameter.hasOnePart) {
             return query
                 .tables
-                .firstOrNull { table -> table.columns().firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName } != null }
+                .firstOrNull { table -> table.columns().firstWhereOrNull { it.name == columnOrTableOrNamespaceName } != null }
                 ?.columns()
-                ?.firstWhereOrNull { it.name == this.columnOrTableOrNamespaceName }
+                ?.firstWhereOrNull { it.name == columnOrTableOrNamespaceName }
                 ?.asDbColumn()
         }
 
@@ -110,13 +110,13 @@ class ColumnParameter(val stringParameter: StringParameter) {
 
         if (stringParameter.hasThreeParts) {
             return query.tables
-                .firstOrNull { it.name == this.tableOrNamespaceName && it.namespace.name == this.namespaceName }
+                .firstOrNull { it.name == tableOrNamespaceName && it.namespace.name == namespaceName }
                 ?.asDbTable()
         }
 
         if (stringParameter.hasTwoParts) {
             return query.tables
-                .firstOrNull { it.name == this.tableOrNamespaceName }
+                .firstOrNull { it.name == tableOrNamespaceName }
                 ?.asDbTable()
         }
 
@@ -128,7 +128,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
 
         if (stringParameter.hasThreeParts) {
             return query.namespaces
-                .firstOrNull { it.name == this.namespaceName }
+                .firstOrNull { it.name == namespaceName }
                 ?.asDbNamespace()
         }
 
