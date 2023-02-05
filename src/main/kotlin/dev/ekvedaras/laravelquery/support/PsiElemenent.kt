@@ -16,7 +16,12 @@ inline fun <reified T : PsiElement> PsiElement.callChainOfType(): Set<T> {
         element = element.firstChild
     }
 
-    return chain.toSet()
+    /**
+     * In case of `$query->from('users')->where('id', 1)->get();`,
+     * the chain would be: get, where, from due to nested structure being used in PSI tree.
+     * Therefore, were return this list as reversed to make it easier to reason about.
+     */
+    return chain.reversed().toSet()
 }
 
 inline fun <reified T : PsiElement> PsiElement.firstChildOfType(): T? = childrenOfType<T>().firstOrNull()

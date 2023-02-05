@@ -8,11 +8,14 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpReturn
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import com.jetbrains.php.lang.psi.elements.Variable
+import dev.ekvedaras.laravelquery.support.callChainOfType
 import dev.ekvedaras.laravelquery.support.firstChildOfType
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 private val relationMethods = setOf(
-    "hasOne", "hasMany", "belongsTo",
+    "hasOne", "belongsTo", "hasMany",
+    "hasOneThrough", "hasManyThrough", "belongsToMany",
+    "morphTo", "morphEagerTo", "morphInstanceTo", "morphOne", "morphMany", "morphToMany", "morphedByMany",
 )
 
 data class Relation(val method: Method) {
@@ -21,6 +24,8 @@ data class Relation(val method: Method) {
     private val returnStatement = groupStatement.firstChildOfType<PhpReturn>()
         ?: throw Exception("Relation method group statement has no PhpReturn statement: return ... ");
     private val definitionMethod = returnStatement.firstChildOfType<MethodReference>()
+        ?.callChainOfType<MethodReference>()
+        ?.firstOrNull()
         ?: throw Exception("Relation method return statement must return a MethodReference: return \$this->methodCall(...)");
 
     init {
