@@ -10,11 +10,7 @@ import com.intellij.testFramework.TestDataFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.services.LaravelQuerySettings
-import dev.ekvedaras.laravelquery.support.Columns
-import dev.ekvedaras.laravelquery.support.Namespaces
-import dev.ekvedaras.laravelquery.support.Tables
 import java.io.File
-import kotlin.streams.toList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
@@ -90,38 +86,5 @@ internal abstract class BaseTestCase : BasePlatformTestCase() {
         runBlocking { delay(500L) }
 
         myFixture.testHighlighting(true, false, false, file.virtualFile)
-    }
-
-    protected fun assertCompletesNamespaces() {
-        assertCompletion(*Namespaces.values().map { it.name }.toTypedArray())
-    }
-
-    protected fun assertCompletesTables(namespace: Namespaces? = null) {
-        assertCompletion(*namespace?.find(project)?.tables()?.map { it.name }?.toList()?.toTypedArray()
-            ?: Tables.values().map { it.name }.toTypedArray())
-    }
-
-    protected fun assertDoesNotCompleteTables(namespace: Namespaces? = null) {
-        assertNoCompletion(*namespace?.find(project)?.tables()?.map { it.name }?.toList()?.toTypedArray()
-            ?: Tables.values().map { it.name }.toTypedArray())
-    }
-
-    protected fun assertCompletesColumns(table: Tables, only: Boolean = false) {
-        assertCompletion(
-            *table.find(project).columns().map { it.name }.toList().toTypedArray()
-        )
-
-        if (only) assertDoesNotCompleteColumns(exceptTable = table)
-    }
-
-    protected fun assertDoesNotCompleteColumns(table: Tables? = null, exceptTable: Tables? = null) {
-        assertNoCompletion(
-            *table?.find(project)?.columns()?.map { it.name }?.toList()?.toTypedArray()
-                ?: Columns.values()
-                    .map { it.find(project) }
-                    .filterNot { it.table.name == exceptTable?.name }
-                    .map { it.name }
-                    .toTypedArray()
-        )
     }
 }
