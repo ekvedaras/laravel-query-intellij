@@ -3,6 +3,7 @@ package dev.ekvedaras.laravelquery.domain.query
 import com.intellij.openapi.util.Key
 import com.jetbrains.php.lang.psi.elements.Statement
 import dev.ekvedaras.laravelquery.domain.model.Model
+import dev.ekvedaras.laravelquery.domain.query.queryVariable.QueryVariable
 import dev.ekvedaras.laravelquery.support.transform
 
 private val queryKey = Key<Query>("query")

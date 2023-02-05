@@ -11,6 +11,8 @@ import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.AcceptsClosures
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
+import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInSurroundingScope
+import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInUpperScope
 import dev.ekvedaras.laravelquery.support.tap
 
 /**
@@ -75,9 +77,7 @@ class Query {
     }
 
     private fun scanUp(startingFrom: QueryStatement) {
-        if (startingFrom.queryVariable == null) return
-
-        if (startingFrom.queryVariable.isInsideJoinClause() || startingFrom.queryVariable.isInsideWhereClause() || startingFrom.queryVariable.isInsideWhenClause()) {
+        if (startingFrom.queryVariable is InterestedInUpperScope) {
             startingFrom.statement.parentOfType<Function>()?.parentOfType<Statement>().tap {
                 addStatement(QueryStatement(statement = it, query = this))
             }
@@ -85,9 +85,7 @@ class Query {
     }
 
     private fun scanAround(startingFrom: QueryStatement) {
-        if (startingFrom.queryVariable == null) return
-
-        if (!startingFrom.queryVariable.isInsideJoinClause() && !startingFrom.queryVariable.isInsideWhereClause() && !startingFrom.queryVariable.isInsideWhenClause()) {
+        if (startingFrom.queryVariable is InterestedInSurroundingScope) {
             startingFrom.queryVariable
                 .usageStatements()
                 .filterNot { statements.containsElements { queryStatement -> queryStatement.statement.originalElement == it.originalElement } }

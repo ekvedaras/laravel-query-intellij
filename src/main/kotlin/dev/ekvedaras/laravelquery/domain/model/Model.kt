@@ -12,7 +12,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Table
-import dev.ekvedaras.laravelquery.domain.query.QueryVariable
+import dev.ekvedaras.laravelquery.domain.query.queryVariable.QueryVariable
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
@@ -84,7 +84,7 @@ data class Model(private val clazz: PhpClass) {
         }
 
         private fun PsiElement.isWithinModel(): Boolean = parentOfType<PhpClass>()?.isChildOfAny(LaravelClasses.Model) == true
-        private fun PsiElement.isWithinModelScopeMethod(): Boolean = isWithinModel() && parentOfType<Function>()?.name?.startsWith("scope") == true
+        fun PsiElement.isWithinModelScopeMethod(): Boolean = isWithinModel() && parentOfType<Function>()?.name?.startsWith("scope") == true
         fun QueryVariable.isInsideModelScope(): Boolean = variable.isWithinModelScopeMethod() && variable.parentOfType<Function>()?.getParameter(0)?.name == variable.name
     }
 
