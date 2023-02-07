@@ -38,6 +38,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "with" -> WithCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
                 "from" -> FromCall(reference, queryStatement)
+                "table" -> TableCall(reference, queryStatement)
                 "join" -> JoinCall(reference, queryStatement)
                 "leftJoin" -> LeftJoinCall(reference, queryStatement)
                 "rightJoin" -> RightJoinCall(reference, queryStatement)
