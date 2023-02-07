@@ -44,6 +44,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "crossJoin" -> CrossJoinCall(reference, queryStatement)
                 "on" -> OnCall(reference, queryStatement)
                 "where" -> WhereCall(reference, queryStatement)
+                "whereDate" -> WhereDateCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select" -> SelectCall(reference, queryStatement)
                 else -> null

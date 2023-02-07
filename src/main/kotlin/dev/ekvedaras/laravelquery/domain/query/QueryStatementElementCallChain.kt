@@ -22,21 +22,12 @@ data class QueryStatementElementCallChain(val elements: Set<QueryStatementElemen
                 )
             }
 
-            if (startingFrom is AssignmentExpression) {
-                return QueryStatementElementCallChain(
-                    startingFrom
-                        .firstChildOfType<MethodReference>()
-                        ?.callChainOfType<MethodReference>()
-                        ?.mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
-                        ?.toSet() ?: setOf()
-                )
-            }
-
             return QueryStatementElementCallChain(
                 forStatement.statement
-                    .callChainOfType<MethodReference>()
-                    .mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
-                    .toSet()
+                    .firstChildOfType<MethodReference>()
+                    ?.callChainOfType<MethodReference>()
+                    ?.mapNotNull { QueryMethodCall.from(reference = it, queryStatement = forStatement) }
+                    ?.toSet() ?: setOf()
             )
         }
     }
