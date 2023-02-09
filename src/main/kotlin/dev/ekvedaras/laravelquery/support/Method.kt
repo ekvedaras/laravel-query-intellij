@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.support
 
+import com.intellij.database.util.containsElements
 import com.intellij.openapi.project.DumbService
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression
@@ -25,8 +26,7 @@ fun MethodReference.isMemberOfAny(vararg classes: String): Boolean =
         .completeType(project, (classReference as PhpTypedElement).type, mutableSetOf())
         .types
         .flatMap { PhpIndex.getInstance(project).getClassesByFQN(it) }
-        .flatMap { it.superClasses.map { parent -> parent.fqn } + it.fqn }
-        .containsAny(*classes)
+        .containsElements { it.isChildOfAny(*classes, orIsAny = true) }
 
 fun MethodReference.isCalledOnAVariable() = firstPsiChild is Variable
 fun MethodReference.isAssignedToAVariable() = firstPsiChild is AssignmentExpression

@@ -1,13 +1,17 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.intellij.codeInsight.lookup.LookupElement
+import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.classReference
 import dev.ekvedaras.laravelquery.support.isMemberOfAny
+import dev.ekvedaras.laravelquery.support.transform
+import dev.ekvedaras.laravelquery.support.tryTransforming
 
 /**
  * Unlike QueryStatementElement,
@@ -29,6 +33,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                     LaravelClasses.DbFacadeAlias,
                     LaravelClasses.Model,
                     LaravelClasses.JoinClause,
+                    LaravelClasses.Relation
                 )) return null
 
             return when (reference.name) {
@@ -48,7 +53,21 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "whereDate" -> WhereDateCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select" -> SelectCall(reference, queryStatement)
-                else -> null
+                else -> {
+                    if (reference.isMemberOfAny(LaravelClasses.Model)) {
+                        return PhpIndex.getInstance(reference.project)
+                            .completeType(reference.project, reference.classReference!!.type, mutableSetOf())
+                            .types
+                            .flatMap { PhpIndex.getInstance(reference.project).getClassesByFQN(it) }
+                            .firstNotNullOfOrNull { clazz ->
+                                clazz.tryTransforming { Model(it) }
+                                    ?.relation(reference.name ?: "")
+                                    .transform { ModelRelationMethodCall(it, reference, queryStatement) }
+                            }
+                    }
+
+                    null
+                }
             }
         }
     }
