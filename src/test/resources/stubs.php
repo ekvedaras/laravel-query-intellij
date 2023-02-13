@@ -1,30 +1,174 @@
 <?php
 
-namespace Illuminate\Database\Eloquent\Concerns {
-    use Illuminate\Database\Eloquent\Relations;
+namespace Illuminate\Database\Query {
+    use Closure;
+    use DateTimeInterface;
+    use Illuminate\Contracts\Support\Arrayable;
+    use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+    use Illuminate\Contracts\Pagination\Paginator;
+    use Illuminate\Support\Collection;
 
     /**
-     * @method Relations\HasOne hasOne()
-     * @method Relations\HasOneThrough hasOneThrough()
-     * @method Relations\HasMany hasMany()
-     * @method Relations\HasManyThrough hasManyThrough()
-     * @method Relations\BelongsTo belongsTo()
-     * @method Relations\BelongsToMany belongsToMany()
-     * @method Relations\MorphOne morphOne()
-     * @method Relations\MorphTo morphTo()
-     * @method Relations\MorphTo morphEagerTo()
-     * @method Relations\MorphTo morphInstanceTo()
-     * @method Relations\MorphMany morphMany()
-     * @method Relations\MorphToMany morphToMany()
-     * @method Relations\MorphToMany morphedByMany()
+     * @method static when($case, Closure $true, Closure $false)
+     * @method static select(array|mixed $columns = ['*'])
+     * @method static addSelect(array|mixed $column)
+     * @method static from(Closure|static|string $table, string|null $as = null)
+     * @method static join(string $table, Closure|string $first, string|null $operator = null, string|null $second = null, string $type = 'inner', bool $where = false)
+     * @method static joinWhere(string $table, Closure|string $first, string $operator, string $second, string $type = 'inner')
+     * @method static joinSub(Closure|static|string $query, string $as, Closure|string $first, string|null $operator = null, string|null $second = null, string $type = 'inner', bool $where = false)
+     * @method static leftJoin(string $table, Closure|string $first, string|null $operator = null, string|null $second = null)
+     * @method static leftJoinWhere(string $table, Closure|string $first, string $operator, string $second)
+     * @method static leftJoinSub(Closure|static|string $query, string $as, Closure|string $first, string|null $operator = null, string|null $second = null)
+     * @method static rightJoin(string $table, Closure|string $first, string|null $operator = null, string|null $second = null)
+     * @method static rightJoinWhere(string $table, Closure|string $first, string $operator, string $second)
+     * @method static rightJoinSub(Closure|static|string $query, string $as, Closure|string $first, string|null $operator = null, string|null $second = null)
+     * @method static crossJoin(string $table, Closure|string|null $first = null, string|null $operator = null, string|null $second = null)
+     * @method static where(Closure|string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+     * @method static orWhere(Closure|string|array $column, mixed $operator = null, mixed $value = null)
+     * @method static whereColumn(string|array $first, string|null $operator = null, string|null $second = null, string|null $boolean = 'and')
+     * @method static orWhereColumn(string|array $first, string|null $operator = null, string|null $second = null)
+     * @method static whereIn(string $column, mixed $values, string $boolean = 'and', bool $not = false)
+     * @method static orWhereIn(string $column, mixed $values)
+     * @method static whereNotIn(string $column, mixed $values, string $boolean = 'and')
+     * @method static orWhereNotIn(string $column, mixed $values)
+     * @method static whereIntegerInRaw(string $column, Arrayable|array $values, $boolean = 'and', $not = false)
+     * @method static orWhereIntegerInRaw(string $column, Arrayable|array $values)
+     * @method static whereIntegerNotInRaw(string $column, Arrayable|array $values, string $boolean = 'and')
+     * @method static orWhereIntegerNotInRaw(string $column, Arrayable|array $values)
+     * @method static whereNull(string|array $columns, string $boolean = 'and', bool $not = false)
+     * @method static orWhereNull(string $column)
+     * @method static whereNotNull(string|array $columns, string $boolean = 'and')
+     * @method static whereBetween(string $column, array $values, string $boolean = 'and', bool $not = false)
+     * @method static whereBetweenColumns(string $column, array $values, string $boolean = 'and', bool $not = false)
+     * @method static orWhereBetween(string $column, array $values)
+     * @method static orWhereBetweenColumns(string $column, array $values)
+     * @method static whereNotBetween(string $column, array $values, string $boolean = 'and')
+     * @method static whereNotBetweenColumns(string $column, array $values, string $boolean = 'and')
+     * @method static orWhereNotBetween(string $column, array $values)
+     * @method static orWhereNotBetweenColumns(string $column, array $values)
+     * @method static orWhereNotNull(string $column)
+     * @method static whereDate(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and')
+     * @method static orWhereDate(string $column, string $operator, DateTimeInterface|string|null $value = null)
+     * @method static whereTime(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and')
+     * @method static orWhereTime(string $column, string $operator, DateTimeInterface|string|null $value = null)
+     * @method static whereDay(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and')
+     * @method static orWhereDay(string $column, string $operator, DateTimeInterface|string|null $value = null)
+     * @method static whereMonth(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and')
+     * @method static orWhereMonth(string $column, string $operator, DateTimeInterface|string|null $value = null)
+     * @method static whereYear(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and')
+     * @method static orWhereYear(string $column, string $operator, DateTimeInterface|string|int|null $value = null)
+     * @method static whereRowValues(array $columns, string $operator, array $values, string $boolean = 'and')
+     * @method static orWhereRowValues(array $columns, string $operator, array $values)
+     * @method static whereJsonContains(string $column, mixed $value, string $boolean = 'and', bool $not = false)
+     * @method static orWhereJsonContains(string $column, mixed $value)
+     * @method static whereJsonDoesntContain(string $column, mixed $value, string $boolean = 'and')
+     * @method static orWhereJsonDoesntContain(string $column, mixed $value)
+     * @method static whereJsonLength(string $column, mixed $operator, mixed $value = null, string $boolean = 'and')
+     * @method static orWhereJsonLength(string $column, mixed $operator, mixed $value = null)
+     * @method static groupBy(array|string ...$groups)
+     * @method static having(string $column, string|null $operator = null, string|null $value = null, string $boolean = 'and')
+     * @method static orHaving(string $column, string|null $operator = null, string|null $value = null)
+     * @method static havingBetween(string $column, array $values, string $boolean = 'and', bool $not = false)
+     * @method static orderBy(Closure|static|Expression|string $column, string $direction = 'asc')
+     * @method static orderByDesc(string $column)
+     * @method static latest(string $column = 'created_at')
+     * @method static oldest(string $column = 'created_at')
+     * @method static forPageBeforeId(int $perPage = 15, int|null $lastId = 0, string $column = 'id')
+     * @method static forPageAfterId(int $perPage = 15, int|null $lastId = 0, string $column = 'id')
+     * @method static reorder(string|null $column = null, string $direction = 'asc')
+     * @method mixed|static find(int|string $id, array $columns = ['*'])
+     * @method mixed value(string $column)
+     * @method Collection get(array|string $columns = ['*'])
+     * @method LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
+     * @method Paginator simplePaginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
+     * @method int getCountForPagination(array $columns = ['*'])
+     * @method Collection pluck(string $column, string|nul $key = null)
+     * @method string implode(string $column, string $glue = '')
+     * @method int count(string $columns = '*')
+     * @method mixed min(string $column)
+     * @method mixed max(string $column)
+     * @method mixed sum(string $column)
+     * @method mixed avg(string $column)
+     * @method mixed average(string $column)
+     * @method mixed aggregate(string $function, array $columns = ['*'])
+     * @method float|int numericAggregate(string $function, array $columns = ['*'])
+     * @method bool insert(array $values)
+     * @method int insertOrIgnore(array $values)
+     * @method int insertGetId(array $values, string|null $sequence = null)
+     * @method int insertUsing(array $columns, Closure|static|string $query)
+     * @method int update(array $values)
+     * @method bool updateOrInsert(array $attributes, array $values = [])
+     * @method int increment(string $column, float|int $amount = 1, array $extra = [])
+     * @method int decrement(string $column, float|int $amount = 1, array $extra = [])
+     * @method static newQuery()
+     * @method Expression raw(mixed $value)
      */
-    trait HasRelationships {}
+    class Builder
+    {
+        /** @var array */
+        public $operators = [
+            '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
+            'like', 'like binary', 'not like', 'ilike',
+            '&', '|', '^', '<<', '>>',
+            'rlike', 'not rlike', 'regexp', 'not regexp',
+            '~', '~*', '!~', '!~*', 'similar to',
+            'not similar to', 'not ilike', '~~*', '!~~*',
+        ];
+    }
+
+    /**
+     * @method self on(Closure|string $first, string|null $operator = null, Expression|string|null $second = null, string $boolean = 'and')
+     * @method self orOn(Closure|string $first, string|null $operator = null, string|null $second = null, string $boolean = 'and')
+     * @method self newQuery()
+     */
+    class JoinClause extends Builder {}
 }
 
 namespace Illuminate\Database\Eloquent {
+    use Closure;
+    use Illuminate\Contracts\Support\Arrayable;
+    use Illuminate\Database\Query\Expression;
+    use Illuminate\Database\Query\Builder as QueryBuilder;
+    use Illuminate\Database\Eloquent\Collection;
+    use Illuminate\Database\Eloquent\Concerns\HasRelationships;
+    use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Eloquent\Relations\Relation;
+
+    /**
+     * @property-read HigherOrderBuilderProxy $orWhere
+     *
+     * @mixin QueryBuilder
+     *
+     * @method static make(array $attributes = [])
+     * @method static firstWhere(Closure|string|array|Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+     * @method static|Model|Collection|static[]|null find($id, $columns = ['*'])
+     * @method Collection findMany(Arrayable|array $ids, array $columns = ['*'])
+     * @method static|Model|Collection|static[] findOrFail(mixed $id, array $columns = ['*'])
+     * @method static|Model findOrNew(mixed $id, array $columns = ['*'])
+     * @method static|Model firstOrNew(array $attributes = [], array $values = [])
+     * @method static|Model firstOrCreate(array $attributes = [], array $values = [])
+     * @method static|Model updateOrCreate(array $attributes, array $values = [])
+     * @method static|Model firstOrFail(array $columns = ['*'])
+     * @method static|Model|mixed firstOr(Closure|array $columns = ['*'], Closure|null $callback = null)
+     * @method Model sole(array|string $columns = ['*'])
+     * @method static[]|Model[] getModels(array|string $columns = ['*'])
+     * @method Relation getRelation(string $name)
+     * @method Model|static create(array $attributes = [])
+     * @method Model|static forceCreate(array $attributes = [])
+     * @method int upsert(array $values, array|string $uniqueBy, array|null $update = null)
+     * @method int increment(string|Expression $column, float|int $amount = 1, array $extra = [])
+     * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = [])
+     * @method static with(string|array $relations, string|Closure|null $callback = null)
+     * @method static without(mixed $relations)
+     * @method QueryBuilder getQuery()
+     * @method QueryBuilder toBase()
+     * @method string qualifyColumn(string|Expression $column)
+     */
+    class Builder {}
+
     /** @mixin Builder */
     class Model {
-        use \Illuminate\Database\Eloquent\Concerns\HasRelationships;
+        use HasRelationships;
 
         /**
          * Begin querying the model.
@@ -110,391 +254,27 @@ namespace Illuminate\Database\Eloquent {
         {
         }
     }
+}
+
+namespace Illuminate\Database\Eloquent\Concerns {
+    use Illuminate\Database\Eloquent\Relations;
 
     /**
-     * @property-read HigherOrderBuilderProxy $orWhere
-     *
-     * @mixin \Illuminate\Database\Query\Builder
+     * @method Relations\HasOne hasOne()
+     * @method Relations\HasOneThrough hasOneThrough()
+     * @method Relations\HasMany hasMany()
+     * @method Relations\HasManyThrough hasManyThrough()
+     * @method Relations\BelongsTo belongsTo()
+     * @method Relations\BelongsToMany belongsToMany()
+     * @method Relations\MorphOne morphOne()
+     * @method Relations\MorphTo morphTo()
+     * @method Relations\MorphTo morphEagerTo()
+     * @method Relations\MorphTo morphInstanceTo()
+     * @method Relations\MorphMany morphMany()
+     * @method Relations\MorphToMany morphToMany()
+     * @method Relations\MorphToMany morphedByMany()
      */
-    class Builder
-    {
-        /**
-         * Create and return an un-saved model instance.
-         *
-         * @param  array  $attributes
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function make(array $attributes = [])
-        {
-        }
-
-        /**
-         * Add a basic where clause to the query.
-         *
-         * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
-         * @param  mixed  $operator
-         * @param  mixed  $value
-         * @param  string  $boolean
-         * @return $this
-         */
-        public function where($column, $operator = null, $value = null, $boolean = 'and')
-        {
-        }
-
-        /**
-         * Add a basic where clause to the query, and return the first result.
-         *
-         * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
-         * @param  mixed  $operator
-         * @param  mixed  $value
-         * @param  string  $boolean
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function firstWhere($column, $operator = null, $value = null, $boolean = 'and')
-        {
-        }
-
-        /**
-         * Add an "or where" clause to the query.
-         *
-         * @param  \Closure|array|string|\Illuminate\Database\Query\Expression  $column
-         * @param  mixed  $operator
-         * @param  mixed  $value
-         * @return $this
-         */
-        public function orWhere($column, $operator = null, $value = null)
-        {
-        }
-
-        /**
-         * Add an "order by" clause for a timestamp to the query.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @return $this
-         */
-        public function latest($column = null)
-        {
-        }
-
-        /**
-         * Add an "order by" clause for a timestamp to the query.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @return $this
-         */
-        public function oldest($column = null)
-        {
-        }
-
-        /**
-         * Find a model by its primary key.
-         *
-         * @param  mixed  $id
-         * @param  array  $columns
-         * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
-         */
-        public function find($id, $columns = ['*'])
-        {
-        }
-
-        /**
-         * Find multiple models by their primary keys.
-         *
-         * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-         * @param  array  $columns
-         * @return \Illuminate\Database\Eloquent\Collection
-         */
-        public function findMany($ids, $columns = ['*'])
-        {
-        }
-
-        /**
-         * Find a model by its primary key or throw an exception.
-         *
-         * @param  mixed  $id
-         * @param  array  $columns
-         * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
-         *
-         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-         */
-        public function findOrFail($id, $columns = ['*'])
-        {
-        }
-
-        /**
-         * Find a model by its primary key or return fresh model instance.
-         *
-         * @param  mixed  $id
-         * @param  array  $columns
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function findOrNew($id, $columns = ['*'])
-        {
-        }
-
-        /**
-         * Get the first record matching the attributes or instantiate it.
-         *
-         * @param  array  $attributes
-         * @param  array  $values
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function firstOrNew(array $attributes = [], array $values = [])
-        {
-        }
-
-        /**
-         * Get the first record matching the attributes or create it.
-         *
-         * @param  array  $attributes
-         * @param  array  $values
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function firstOrCreate(array $attributes = [], array $values = [])
-        {
-        }
-
-        /**
-         * Create or update a record matching the attributes, and fill it with values.
-         *
-         * @param  array  $attributes
-         * @param  array  $values
-         * @return \Illuminate\Database\Eloquent\Model|static
-         */
-        public function updateOrCreate(array $attributes, array $values = [])
-        {
-        }
-
-        /**
-         * Execute the query and get the first result or throw an exception.
-         *
-         * @param  array  $columns
-         * @return \Illuminate\Database\Eloquent\Model|static
-         *
-         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-         */
-        public function firstOrFail($columns = ['*'])
-        {
-        }
-
-        /**
-         * Execute the query and get the first result or call a callback.
-         *
-         * @param  \Closure|array  $columns
-         * @param  \Closure|null  $callback
-         * @return \Illuminate\Database\Eloquent\Model|static|mixed
-         */
-        public function firstOr($columns = ['*'], Closure $callback = null)
-        {
-        }
-
-        /**
-         * Execute the query and get the first result if it's the sole matching record.
-         *
-         * @param  array|string  $columns
-         * @return \Illuminate\Database\Eloquent\Model
-         *
-         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-         * @throws \Illuminate\Database\MultipleRecordsFoundException
-         */
-        public function sole($columns = ['*'])
-        {
-        }
-
-        /**
-         * Get a single column's value from the first result of a query.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @return mixed
-         */
-        public function value($column)
-        {
-        }
-
-        /**
-         * Execute the query as a "select" statement.
-         *
-         * @param  array|string  $columns
-         * @return \Illuminate\Database\Eloquent\Collection|static[]
-         */
-        public function get($columns = ['*'])
-        {
-        }
-
-        /**
-         * Get the hydrated models without eager loading.
-         *
-         * @param  array|string  $columns
-         * @return \Illuminate\Database\Eloquent\Model[]|static[]
-         */
-        public function getModels($columns = ['*'])
-        {
-        }
-
-        /**
-         * Get the relation instance for the given relation name.
-         *
-         * @param  string  $name
-         * @return \Illuminate\Database\Eloquent\Relations\Relation
-         */
-        public function getRelation($name)
-        {
-        }
-
-        /**
-         * Get an array with the values of a given column.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @param  string|null  $key
-         * @return \Illuminate\Support\Collection
-         */
-        public function pluck($column, $key = null)
-        {
-        }
-
-        /**
-         * Paginate the given query.
-         *
-         * @param  int|null  $perPage
-         * @param  array  $columns
-         * @param  string  $pageName
-         * @param  int|null  $page
-         * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-         *
-         * @throws \InvalidArgumentException
-         */
-        public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-        {
-        }
-
-        /**
-         * Paginate the given query into a simple paginator.
-         *
-         * @param  int|null  $perPage
-         * @param  array  $columns
-         * @param  string  $pageName
-         * @param  int|null  $page
-         * @return \Illuminate\Contracts\Pagination\Paginator
-         */
-        public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-        {
-        }
-
-        /**
-         * Save a new model and return the instance.
-         *
-         * @param  array  $attributes
-         * @return \Illuminate\Database\Eloquent\Model|$this
-         */
-        public function create(array $attributes = [])
-        {
-        }
-
-        /**
-         * Save a new model and return the instance. Allow mass-assignment.
-         *
-         * @param  array  $attributes
-         * @return \Illuminate\Database\Eloquent\Model|$this
-         */
-        public function forceCreate(array $attributes)
-        {
-        }
-
-        /**
-         * Update records in the database.
-         *
-         * @param  array  $values
-         * @return int
-         */
-        public function update(array $values)
-        {
-        }
-
-        /**
-         * Insert new records or update the existing ones.
-         *
-         * @param  array  $values
-         * @param  array|string  $uniqueBy
-         * @param  array|null  $update
-         * @return int
-         */
-        public function upsert(array $values, $uniqueBy, $update = null)
-        {
-        }
-
-        /**
-         * Increment a column's value by a given amount.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @param  float|int  $amount
-         * @param  array  $extra
-         * @return int
-         */
-        public function increment($column, $amount = 1, array $extra = [])
-        {
-        }
-
-        /**
-         * Decrement a column's value by a given amount.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @param  float|int  $amount
-         * @param  array  $extra
-         * @return int
-         */
-        public function decrement($column, $amount = 1, array $extra = [])
-        {
-        }
-
-        /**
-         * Set the relationships that should be eager loaded.
-         *
-         * @param  string|array  $relations
-         * @param  string|\Closure|null  $callback
-         * @return $this
-         */
-        public function with($relations, $callback = null)
-        {
-        }
-
-        /**
-         * Prevent the specified relations from being eager loaded.
-         *
-         * @param  mixed  $relations
-         * @return $this
-         */
-        public function without($relations)
-        {
-        }
-
-        /**
-         * Get the underlying query builder instance.
-         *
-         * @return \Illuminate\Database\Query\Builder
-         */
-        public function getQuery()
-        {
-        }
-
-        /**
-         * Get a base query builder instance.
-         *
-         * @return \Illuminate\Database\Query\Builder
-         */
-        public function toBase()
-        {
-        }
-
-        /**
-         * Qualify the given column name by the model's table.
-         *
-         * @param  string|\Illuminate\Database\Query\Expression  $column
-         * @return string
-         */
-        public function qualifyColumn($column)
-        {
-        }
-    }
+    trait HasRelationships {}
 }
 
 namespace Illuminate\Database\Eloquent\Relations {
@@ -533,1176 +313,6 @@ namespace Illuminate\Database\Eloquent\Relations {
 
     class MorphToMany extends BelongsToMany {
     }
-}
-
-
-namespace Illuminate\Database\Query {
-class Builder
-{
-    /**
-     * All of the available clause operators.
-     *
-     * @var array
-     */
-    public $operators = [
-        '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
-        'like', 'like binary', 'not like', 'ilike',
-        '&', '|', '^', '<<', '>>',
-        'rlike', 'not rlike', 'regexp', 'not regexp',
-        '~', '~*', '!~', '!~*', 'similar to',
-        'not similar to', 'not ilike', '~~*', '!~~*',
-    ];
-
-    /** @return $this */
-    public function when($case, \Closure $true, \Closure $false)
-    {
-    }
-
-    /**
-     * Set the columns to be selected.
-     *
-     * @param  array|mixed  $columns
-     * @return $this
-     */
-    public function select($columns = ['*'])
-    {
-    }
-
-    /**
-     * Add a new select column to the query.
-     *
-     * @param  array|mixed  $column
-     * @return $this
-     */
-    public function addSelect($column)
-    {
-    }
-
-    /**
-     * Set the table which the query is targeting.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $table
-     * @param  string|null  $as
-     * @return $this
-     */
-    public function from($table, $as = null)
-    {
-    }
-
-    /**
-     * Add a join clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
-     * @return $this
-     */
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
-    {
-    }
-
-    /**
-     * Add a "join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @param  string  $type
-     * @return $this
-     */
-    public function joinWhere($table, $first, $operator, $second, $type = 'inner')
-    {
-    }
-
-    /**
-     * Add a subquery join clause to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $type
-     * @param  bool  $where
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false)
-    {
-    }
-
-    /**
-     * Add a left join to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function leftJoin($table, $first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a "join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @return $this
-     */
-    public function leftJoinWhere($table, $first, $operator, $second)
-    {
-    }
-
-    /**
-     * Add a subquery left join to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function leftJoinSub($query, $as, $first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a right join to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function rightJoin($table, $first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a "right join where" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string  $first
-     * @param  string  $operator
-     * @param  string  $second
-     * @return $this
-     */
-    public function rightJoinWhere($table, $first, $operator, $second)
-    {
-    }
-
-    /**
-     * Add a subquery right join to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @param  string  $as
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function rightJoinSub($query, $as, $first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a "cross join" clause to the query.
-     *
-     * @param  string  $table
-     * @param  \Closure|string|null  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function crossJoin($table, $first = null, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a basic where clause to the query.
-     *
-     * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where" clause to the query.
-     *
-     * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function orWhere($column, $operator = null, $value = null)
-    {
-    }
-
-    /**
-     * Add a "where" clause comparing two columns to the query.
-     *
-     * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string|null  $boolean
-     * @return $this
-     */
-    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where" clause comparing two columns to the query.
-     *
-     * @param  string|array  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return $this
-     */
-    public function orWhereColumn($first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Add a "where in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereIn($column, $values, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an "or where in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @return $this
-     */
-    public function orWhereIn($column, $values)
-    {
-    }
-
-    /**
-     * Add a "where not in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereNotIn($column, $values, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where not in" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @return $this
-     */
-    public function orWhereNotIn($column, $values)
-    {
-    }
-
-    /**
-     * Add a "where in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an "or where in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @return $this
-     */
-    public function orWhereIntegerInRaw($column, $values)
-    {
-    }
-
-    /**
-     * Add a "where not in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereIntegerNotInRaw($column, $values, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where not in raw" clause for integer values to the query.
-     *
-     * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $values
-     * @return $this
-     */
-    public function orWhereIntegerNotInRaw($column, $values)
-    {
-    }
-
-    /**
-     * Add a "where null" clause to the query.
-     *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereNull($columns, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an "or where null" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
-     */
-    public function orWhereNull($column)
-    {
-    }
-
-    /**
-     * Add a "where not null" clause to the query.
-     *
-     * @param  string|array  $columns
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereNotNull($columns, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add a where between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add a where between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereBetweenColumns($column, array $values, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an or where between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
-     */
-    public function orWhereBetween($column, array $values)
-    {
-    }
-
-    /**
-     * Add an or where between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
-     */
-    public function orWhereBetweenColumns($column, array $values)
-    {
-    }
-
-    /**
-     * Add a where not between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereNotBetween($column, array $values, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add a where not between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereNotBetweenColumns($column, array $values, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an or where not between statement to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
-     */
-    public function orWhereNotBetween($column, array $values)
-    {
-    }
-
-    /**
-     * Add an or where not between statement using columns to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @return $this
-     */
-    public function orWhereNotBetweenColumns($column, array $values)
-    {
-    }
-
-    /**
-     * Add an "or where not null" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
-     */
-    public function orWhereNotNull($column)
-    {
-    }
-
-    /**
-     * Add a "where date" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereDate($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where date" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereDate($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Add a "where time" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereTime($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where time" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereTime($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Add a "where day" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereDay($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where day" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereDay($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Add a "where month" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereMonth($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where month" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|null  $value
-     * @return $this
-     */
-    public function orWhereMonth($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Add a "where year" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereYear($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where year" statement to the query.
-     *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  \DateTimeInterface|string|int|null  $value
-     * @return $this
-     */
-    public function orWhereYear($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Adds a where condition using row values.
-     *
-     * @param  array  $columns
-     * @param  string  $operator
-     * @param  array  $values
-     * @param  string  $boolean
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function whereRowValues($columns, $operator, $values, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Adds an or where condition using row values.
-     *
-     * @param  array  $columns
-     * @param  string  $operator
-     * @param  array  $values
-     * @return $this
-     */
-    public function orWhereRowValues($columns, $operator, $values)
-    {
-    }
-
-    /**
-     * Add a "where JSON contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an "or where JSON contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function orWhereJsonContains($column, $value)
-    {
-    }
-
-    /**
-     * Add a "where JSON not contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereJsonDoesntContain($column, $value, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where JSON not contains" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function orWhereJsonDoesntContain($column, $value)
-    {
-    }
-
-    /**
-     * Add a "where JSON length" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or where JSON length" clause to the query.
-     *
-     * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function orWhereJsonLength($column, $operator, $value = null)
-    {
-    }
-
-    /**
-     * Add a "group by" clause to the query.
-     *
-     * @param  array|string  ...$groups
-     * @return $this
-     */
-    public function groupBy(...$groups)
-    {
-    }
-
-    /**
-     * Add a "having" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
-     * @param  string  $boolean
-     * @return $this
-     */
-    public function having($column, $operator = null, $value = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or having" clause to the query.
-     *
-     * @param  string  $column
-     * @param  string|null  $operator
-     * @param  string|null  $value
-     * @return $this
-     */
-    public function orHaving($column, $operator = null, $value = null)
-    {
-    }
-
-    /**
-     * Add a "having between " clause to the query.
-     *
-     * @param  string  $column
-     * @param  array  $values
-     * @param  string  $boolean
-     * @param  bool  $not
-     * @return $this
-     */
-    public function havingBetween($column, array $values, $boolean = 'and', $not = false)
-    {
-    }
-
-    /**
-     * Add an "order by" clause to the query.
-     *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Query\Expression|string  $column
-     * @param  string  $direction
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function orderBy($column, $direction = 'asc')
-    {
-    }
-
-    /**
-     * Add a descending "order by" clause to the query.
-     *
-     * @param  string  $column
-     * @return $this
-     */
-    public function orderByDesc($column)
-    {
-    }
-
-    /**
-     * Add an "order by" clause for a timestamp to the query.
-     *
-     * @param  string  $column
-     * @return $this
-     */
-    public function latest($column = 'created_at')
-    {
-    }
-
-    /**
-     * Add an "order by" clause for a timestamp to the query.
-     *
-     * @param  string  $column
-     * @return $this
-     */
-    public function oldest($column = 'created_at')
-    {
-    }
-
-    /**
-     * Constrain the query to the previous "page" of results before a given ID.
-     *
-     * @param  int  $perPage
-     * @param  int|null  $lastId
-     * @param  string  $column
-     * @return $this
-     */
-    public function forPageBeforeId($perPage = 15, $lastId = 0, $column = 'id')
-    {
-    }
-
-    /**
-     * Constrain the query to the next "page" of results after a given ID.
-     *
-     * @param  int  $perPage
-     * @param  int|null  $lastId
-     * @param  string  $column
-     * @return $this
-     */
-    public function forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
-    {
-    }
-
-    /**
-     * Remove all existing orders and optionally add a new order.
-     *
-     * @param  string|null  $column
-     * @param  string  $direction
-     * @return $this
-     */
-    public function reorder($column = null, $direction = 'asc')
-    {
-    }
-
-    /**
-     * Execute a query for a single record by ID.
-     *
-     * @param  int|string  $id
-     * @param  array  $columns
-     * @return mixed|static
-     */
-    public function find($id, $columns = ['*'])
-    {
-    }
-
-    /**
-     * Get a single column's value from the first result of a query.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function value($column)
-    {
-    }
-
-    /**
-     * Execute the query as a "select" statement.
-     *
-     * @param  array|string  $columns
-     * @return \Illuminate\Support\Collection
-     */
-    public function get($columns = ['*'])
-    {
-    }
-
-    /**
-     * Paginate the given query into a simple paginator.
-     *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
-    {
-    }
-
-    /**
-     * Get a paginator only supporting simple next and previous links.
-     *
-     * This is more efficient on larger data-sets, etc.
-     *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\Paginator
-     */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null)
-    {
-    }
-
-    /**
-     * Get the count of the total records for the paginator.
-     *
-     * @param  array  $columns
-     * @return int
-     */
-    public function getCountForPagination($columns = ['*'])
-    {
-    }
-
-    /**
-     * Get an array with the values of a given column.
-     *
-     * @param  string  $column
-     * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
-     */
-    public function pluck($column, $key = null)
-    {
-    }
-
-    /**
-     * Concatenate values of a given column as a string.
-     *
-     * @param  string  $column
-     * @param  string  $glue
-     * @return string
-     */
-    public function implode($column, $glue = '')
-    {
-    }
-
-    /**
-     * Retrieve the "count" result of the query.
-     *
-     * @param  string  $columns
-     * @return int
-     */
-    public function count($columns = '*')
-    {
-    }
-
-    /**
-     * Retrieve the minimum value of a given column.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function min($column)
-    {
-    }
-
-    /**
-     * Retrieve the maximum value of a given column.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function max($column)
-    {
-    }
-
-    /**
-     * Retrieve the sum of the values of a given column.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function sum($column)
-    {
-    }
-
-    /**
-     * Retrieve the average of the values of a given column.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function avg($column)
-    {
-    }
-
-    /**
-     * Alias for the "avg" method.
-     *
-     * @param  string  $column
-     * @return mixed
-     */
-    public function average($column)
-    {
-    }
-
-    /**
-     * Execute an aggregate function on the database.
-     *
-     * @param  string  $function
-     * @param  array  $columns
-     * @return mixed
-     */
-    public function aggregate($function, $columns = ['*'])
-    {
-    }
-
-    /**
-     * Execute a numeric aggregate function on the database.
-     *
-     * @param  string  $function
-     * @param  array  $columns
-     * @return float|int
-     */
-    public function numericAggregate($function, $columns = ['*'])
-    {
-    }
-
-    /**
-     * Insert a new record into the database.
-     *
-     * @param  array  $values
-     * @return bool
-     */
-    public function insert(array $values)
-    {
-    }
-
-    /**
-     * Insert a new record into the database while ignoring errors.
-     *
-     * @param  array  $values
-     * @return int
-     */
-    public function insertOrIgnore(array $values)
-    {
-    }
-
-    /**
-     * Insert a new record and get the value of the primary key.
-     *
-     * @param  array  $values
-     * @param  string|null  $sequence
-     * @return int
-     */
-    public function insertGetId(array $values, $sequence = null)
-    {
-    }
-
-    /**
-     * Insert new records into the table using a subquery.
-     *
-     * @param  array  $columns
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string  $query
-     * @return int
-     */
-    public function insertUsing(array $columns, $query)
-    {
-    }
-
-    /**
-     * Update a record in the database.
-     *
-     * @param  array  $values
-     * @return int
-     */
-    public function update(array $values)
-    {
-    }
-
-    /**
-     * Insert or update a record matching the attributes, and fill it with values.
-     *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return bool
-     */
-    public function updateOrInsert(array $attributes, array $values = [])
-    {
-    }
-
-    /**
-     * Increment a column's value by a given amount.
-     *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
-     * @return int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function increment($column, $amount = 1, array $extra = [])
-    {
-    }
-
-    /**
-     * Decrement a column's value by a given amount.
-     *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
-     * @return int
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function decrement($column, $amount = 1, array $extra = [])
-    {
-    }
-
-    /**
-     * Get a new instance of the query builder.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function newQuery()
-    {
-    }
-
-    /**
-     * Create a raw database expression.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Query\Expression
-     */
-    public function raw($value)
-    {
-    }
-
-    /**
-     * Handle dynamic method calls into the method.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     *
-     * @throws \BadMethodCallException
-     */
-    public function __call($method, $parameters)
-    {
-    }
-}
-
-class JoinClause extends Builder {
-    /**
-     * Add an "on" clause to the join.
-     *
-     * On clauses can be chained, e.g.
-     *
-     *  $join->on('contacts.user_id', '=', 'users.id')
-     *       ->on('contacts.info_id', '=', 'info.id')
-     *
-     * will produce the following SQL:
-     *
-     * on `contacts`.`user_id` = `users`.`id` and `contacts`.`info_id` = `info`.`id`
-     *
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  \Illuminate\Database\Query\Expression|string|null  $second
-     * @param  string  $boolean
-     * @return $this
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function on($first, $operator = null, $second = null, $boolean = 'and')
-    {
-    }
-
-    /**
-     * Add an "or on" clause to the join.
-     *
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @return \Illuminate\Database\Query\JoinClause
-     */
-    public function orOn($first, $operator = null, $second = null)
-    {
-    }
-
-    /**
-     * Get a new instance of the join clause builder.
-     *
-     * @return \Illuminate\Database\Query\JoinClause
-     */
-    public function newQuery()
-    {
-    }
-}
 }
 
 namespace Illuminate\Database\Schema {
