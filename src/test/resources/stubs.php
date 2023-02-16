@@ -206,1275 +206,207 @@ namespace Illuminate\Database\Eloquent\Concerns {
 }
 
 namespace Illuminate\Database\Eloquent\Relations {
-    class Relation extends \Illuminate\Database\Eloquent\Builder {
-    }
+    use Illuminate\Database\Eloquent\Builder;
+    use Illuminate\Database\Eloquent\Model;
 
-    class BelongsTo extends Relation {
-    }
+    class Relation extends Builder {}
+    class BelongsTo extends Relation {}
+    class BelongsToMany extends Relation {}
+    class HasManyThrough extends Relation {}
+    class HasOneThrough extends HasManyThrough {}
+    abstract class HasOneOrMany extends Relation {}
+    class HasMany extends HasOneOrMany {}
+    abstract class MorphOneOrMany extends HasOneOrMany {}
+    class MorphMany extends MorphOneOrMany {}
 
-    class BelongsToMany extends Relation {
-    }
-
-    class HasManyThrough extends Relation {
-    }
-
-    class HasOneThrough extends HasManyThrough {
-    }
-
-    abstract class HasOneOrMany extends Relation {
-    }
-
-    class HasMany extends HasOneOrMany {
-    }
-
-    abstract class MorphOneOrMany extends HasOneOrMany {
-    }
-
-    class MorphMany extends MorphOneOrMany {
-    }
-
-    class Pivot extends \Illuminate\Database\Eloquent\Model {
-    }
-
-    class MorphPivot extends Pivot {
-    }
-
-    class MorphToMany extends BelongsToMany {
-    }
+    class Pivot extends Model {}
+    class MorphPivot extends Pivot {}
+    class MorphToMany extends BelongsToMany {}
 }
 
 namespace Illuminate\Database\Schema {
-class Builder {
-    /**
-     * Create a database in the schema.
-     *
-     * @param string $name
-     * @return bool
-     * @static
-     */
-    public static function createDatabase($name)
-    {
-    }
-
-    /**
-     * Drop a database from the schema if the database exists.
-     *
-     * @param string $name
-     * @return bool
-     * @static
-     */
-    public static function dropDatabaseIfExists($name)
-    {
-    }
-
-    /**
-     * Determine if the given table exists.
-     *
-     * @param string $table
-     * @return bool
-     * @static
-     */
-    public static function hasTable($table)
-    {
-    }
-
-    /**
-     * Get the column listing for a given table.
-     *
-     * @param string $table
-     * @return array
-     * @static
-     */
-    public static function getColumnListing($table)
-    {
-    }
-
-    /**
-     * Determine if the given table has a given column.
-     *
-     * @param string $table
-     * @param string $column
-     * @return bool
-     * @static
-     */
-    public static function hasColumn($table, $column)
-    {
-    }
-
-    /**
-     * Determine if the given table has given columns.
-     *
-     * @param string $table
-     * @param array $columns
-     * @return bool
-     * @static
-     */
-    public static function hasColumns($table, $columns)
-    {
-    }
-
-    /**
-     * Get the data type for the given column name.
-     *
-     * @param string $table
-     * @param string $column
-     * @return string
-     * @static
-     */
-    public static function getColumnType($table, $column)
-    {
-    }
-
-    /**
-     * Modify a table on the schema.
-     *
-     * @param string $table
-     * @param \Closure $callback
-     * @return void
-     * @static
-     */
-    public static function table($table, $callback)
-    {
-    }
-
-    /**
-     * Create a new table on the schema.
-     *
-     * @param string $table
-     * @param \Closure $callback
-     * @return void
-     * @static
-     */
-    public static function create($table, $callback)
-    {
-    }
-
-    /**
-     * Drop a table from the schema.
-     *
-     * @param string $table
-     * @return void
-     * @static
-     */
-    public static function drop($table)
-    {
-    }
-
-    /**
-     * Drop a table from the schema if it exists.
-     *
-     * @param string $table
-     * @return void
-     * @static
-     */
-    public static function dropIfExists($table)
-    {
-    }
-
-    /**
-     * Drop columns from a table schema.
-     *
-     * @param string $table
-     * @param string|array $columns
-     * @return void
-     * @static
-     */
-    public static function dropColumns($table, $columns)
-    {
-    }
-
-    /**
-     * Rename a table on the schema.
-     *
-     * @param string $from
-     * @param string $to
-     * @return void
-     * @static
-     */
-    public static function rename($from, $to)
-    {
-    }
-}
-
-class Blueprint {
-    /**
-     * Indicate that the given columns should be dropped.
-     *
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropColumn($columns)
-    {
-    }
-
-    /**
-     * Indicate that the given columns should be renamed.
-     *
-     * @param  string  $from
-     * @param  string  $to
-     * @return \Illuminate\Support\Fluent
-     */
-    public function renameColumn($from, $to)
-    {
-    }
-
-    /**
-     * Indicate that the given primary key should be dropped.
-     *
-     * @param  string|array|null  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropPrimary($index = null)
-    {
-    }
-
-    /**
-     * Indicate that the given unique key should be dropped.
-     *
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropUnique($index)
-    {
-    }
-
-    /**
-     * Indicate that the given index should be dropped.
-     *
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropIndex($index)
-    {
-    }
-
-    /**
-     * Indicate that the given spatial index should be dropped.
-     *
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropSpatialIndex($index)
-    {
-    }
-
-    /**
-     * Indicate that the given foreign key should be dropped.
-     *
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropForeign($index)
-    {
-    }
-
-    /**
-     * Indicate that the given column and foreign key should be dropped.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Support\Fluent
-     */
-    public function dropConstrainedForeignId($column)
-    {
-    }
-
-    /**
-     * Indicate that the given indexes should be renamed.
-     *
-     * @param  string  $from
-     * @param  string  $to
-     * @return \Illuminate\Support\Fluent
-     */
-    public function renameIndex($from, $to)
-    {
-    }
-
-    /**
-     * Indicate that the soft delete column should be dropped.
-     *
-     * @param  string  $column
-     * @return void
-     */
-    public function dropSoftDeletes($column = 'deleted_at')
-    {
-    }
-
-    /**
-     * Indicate that the soft delete column should be dropped.
-     *
-     * @param  string  $column
-     * @return void
-     */
-    public function dropSoftDeletesTz($column = 'deleted_at')
-    {
-    }
-
-    /**
-     * Indicate that the polymorphic columns should be dropped.
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function dropMorphs($name, $indexName = null)
-    {
-        $this->dropIndex($indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_id"]));
-        $this->dropColumn("{$name}_type", "{$name}_id");
-    }
-
-    /**
-     * Rename the table to a given name.
-     *
-     * @param  string  $to
-     * @return \Illuminate\Support\Fluent
-     */
-    public function rename($to)
-    {
-    }
-
-    /**
-     * Specify the primary key(s) for the table.
-     *
-     * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
-     */
-    public function primary($columns, $name = null, $algorithm = null)
-    {
-    }
-
-    /**
-     * Specify a unique index for the table.
-     *
-     * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
-     */
-    public function unique($columns, $name = null, $algorithm = null)
-    {
-    }
-
-    /**
-     * Specify an index for the table.
-     *
-     * @param  string|array  $columns
-     * @param  string|null  $name
-     * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
-     */
-    public function index($columns, $name = null, $algorithm = null)
-    {
-    }
-
-    /**
-     * Specify a spatial index for the table.
-     *
-     * @param  string|array  $columns
-     * @param  string|null  $name
-     * @return \Illuminate\Support\Fluent
-     */
-    public function spatialIndex($columns, $name = null)
-    {
-    }
-
-    /**
-     * Specify a raw index for the table.
-     *
-     * @param  string  $expression
-     * @param  string  $name
-     * @return \Illuminate\Support\Fluent
-     */
-    public function rawIndex($expression, $name)
-    {
-    }
-
-    /**
-     * Specify a foreign key for the table.
-     *
-     * @param  string|array  $columns
-     * @param  string|null  $name
-     * @return \Illuminate\Database\Schema\ForeignKeyDefinition
-     */
-    public function foreign($columns, $name = null)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function id($column = 'id')
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing integer (4-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function increments($column)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing integer (4-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function integerIncrements($column)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing tiny integer (1-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function tinyIncrements($column)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing small integer (2-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function smallIncrements($column)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing medium integer (3-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function mediumIncrements($column)
-    {
-    }
-
-    /**
-     * Create a new auto-incrementing big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function bigIncrements($column)
-    {
-    }
-
-    /**
-     * Create a new char column on the table.
-     *
-     * @param  string  $column
-     * @param  int|null  $length
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function char($column, $length = null)
-    {
-    }
-
-    /**
-     * Create a new string column on the table.
-     *
-     * @param  string  $column
-     * @param  int|null  $length
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function string($column, $length = null)
-    {
-    }
-
-    /**
-     * Create a new text column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function text($column)
-    {
-    }
-
-    /**
-     * Create a new medium text column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function mediumText($column)
-    {
-    }
-
-    /**
-     * Create a new long text column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function longText($column)
-    {
-    }
-
-    /**
-     * Create a new integer (4-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function integer($column, $autoIncrement = false, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new tiny integer (1-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function tinyInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new small integer (2-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function smallInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new medium integer (3-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function bigInteger($column, $autoIncrement = false, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned integer (4-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedInteger($column, $autoIncrement = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned tiny integer (1-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedTinyInteger($column, $autoIncrement = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned small integer (2-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedSmallInteger($column, $autoIncrement = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned medium integer (3-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedMediumInteger($column, $autoIncrement = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedBigInteger($column, $autoIncrement = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
-     */
-    public function foreignId($column)
-    {
-    }
-
-    /**
-     * Create a foreign ID column for the given model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
-     * @param  string|null  $column
-     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
-     */
-    public function foreignIdFor($model, $column = null)
-    {
-    }
-
-    /**
-     * Create a new float column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function float($column, $total = 8, $places = 2, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new double column on the table.
-     *
-     * @param  string  $column
-     * @param  int|null  $total
-     * @param  int|null  $places
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function double($column, $total = null, $places = null, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new decimal column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @param  bool  $unsigned
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function decimal($column, $total = 8, $places = 2, $unsigned = false)
-    {
-    }
-
-    /**
-     * Create a new unsigned float column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedFloat($column, $total = 8, $places = 2)
-    {
-    }
-
-    /**
-     * Create a new unsigned double column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDouble($column, $total = null, $places = null)
-    {
-    }
-
-    /**
-     * Create a new unsigned decimal column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function unsignedDecimal($column, $total = 8, $places = 2)
-    {
-    }
-
-    /**
-     * Create a new boolean column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function boolean($column)
-    {
-    }
-
-    /**
-     * Create a new enum column on the table.
-     *
-     * @param  string  $column
-     * @param  array  $allowed
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function enum($column, array $allowed)
-    {
-    }
-
-    /**
-     * Create a new set column on the table.
-     *
-     * @param  string  $column
-     * @param  array  $allowed
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function set($column, array $allowed)
-    {
-    }
-
-    /**
-     * Create a new json column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function json($column)
-    {
-    }
-
-    /**
-     * Create a new jsonb column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function jsonb($column)
-    {
-    }
-
-    /**
-     * Create a new date column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function date($column)
-    {
-    }
-
-    /**
-     * Create a new date-time column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function dateTime($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new date-time column (with time zone) on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function dateTimeTz($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new time column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function time($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new time column (with time zone) on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function timeTz($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new timestamp column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function timestamp($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new timestamp (with time zone) column on the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function timestampTz($column, $precision = 0)
-    {
-    }
-
-    /**
-     * Add a "deleted at" timestamp for the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function softDeletes($column = 'deleted_at', $precision = 0)
-    {
-    }
-
-    /**
-     * Add a "deleted at" timestampTz for the table.
-     *
-     * @param  string  $column
-     * @param  int  $precision
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function softDeletesTz($column = 'deleted_at', $precision = 0)
-    {
-    }
-
-    /**
-     * Create a new year column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function year($column)
-    {
-    }
-
-    /**
-     * Create a new binary column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function binary($column)
-    {
-    }
-
-    /**
-     * Create a new uuid column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function uuid($column)
-    {
-    }
-
-    /**
-     * Create a new UUID column on the table with a foreign key constraint.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ForeignIdColumnDefinition
-     */
-    public function foreignUuid($column)
-    {
-    }
-
-    /**
-     * Create a new IP address column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function ipAddress($column)
-    {
-    }
-
-    /**
-     * Create a new MAC address column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function macAddress($column)
-    {
-    }
-
-    /**
-     * Create a new geometry column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function geometry($column)
-    {
-    }
-
-    /**
-     * Create a new point column on the table.
-     *
-     * @param  string  $column
-     * @param  int|null  $srid
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function point($column, $srid = null)
-    {
-    }
-
-    /**
-     * Create a new linestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function lineString($column)
-    {
-    }
-
-    /**
-     * Create a new polygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function polygon($column)
-    {
-    }
-
-    /**
-     * Create a new geometrycollection column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function geometryCollection($column)
-    {
-    }
-
-    /**
-     * Create a new multipoint column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPoint($column)
-    {
-    }
-
-    /**
-     * Create a new multilinestring column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiLineString($column)
-    {
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygon($column)
-    {
-    }
-
-    /**
-     * Create a new multipolygon column on the table.
-     *
-     * @param  string  $column
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function multiPolygonZ($column)
-    {
-    }
-
-    /**
-     * Create a new generated, computed column on the table.
-     *
-     * @param  string  $column
-     * @param  string  $expression
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function computed($column, $expression)
-    {
-    }
-
-    /**
-     * Add the proper columns for a polymorphic table.
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function morphs($name, $indexName = null)
-    {
-    }
-
-    /**
-     * Add nullable columns for a polymorphic table.
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function nullableMorphs($name, $indexName = null)
-    {
-    }
-
-    /**
-     * Add the proper columns for a polymorphic table using numeric IDs (incremental).
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function numericMorphs($name, $indexName = null)
-    {
-        $this->string("{$name}_type");
-        $this->unsignedBigInteger("{$name}_id");
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
-    }
-
-    /**
-     * Add nullable columns for a polymorphic table using numeric IDs (incremental).
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function nullableNumericMorphs($name, $indexName = null)
-    {
-        $this->string("{$name}_type")->nullable();
-        $this->unsignedBigInteger("{$name}_id")->nullable();
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
-    }
-
-    /**
-     * Add the proper columns for a polymorphic table using UUIDs.
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function uuidMorphs($name, $indexName = null)
-    {
-        $this->string("{$name}_type");
-        $this->uuid("{$name}_id");
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
-    }
-
-    /**
-     * Add nullable columns for a polymorphic table using UUIDs.
-     *
-     * @param  string  $name
-     * @param  string|null  $indexName
-     * @return void
-     */
-    public function nullableUuidMorphs($name, $indexName = null)
-    {
-        $this->string("{$name}_type")->nullable();
-        $this->uuid("{$name}_id")->nullable();
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
-    }
-
-    /**
-     * Add a new index command to the blueprint.
-     *
-     * @param  string  $type
-     * @param  string|array  $columns
-     * @param  string  $index
-     * @param  string|null  $algorithm
-     * @return \Illuminate\Support\Fluent
-     */
-    protected function indexCommand($type, $columns, $index, $algorithm = null)
-    {
-    }
-
-    /**
-     * Create a new drop index command on the blueprint.
-     *
-     * @param  string  $command
-     * @param  string  $type
-     * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
-     */
-    protected function dropIndexCommand($command, $type, $index)
-    {
-    }
-
-    /**
-     * Create a default index name for the table.
-     *
-     * @param  string  $type
-     * @param  array  $columns
-     * @return string
-     */
-    protected function createIndexName($type, array $columns)
-    {
-    }
-
-    /**
-     * Add a new column to the blueprint.
-     *
-     * @param  string  $type
-     * @param  string  $name
-     * @param  array  $parameters
-     * @return \Illuminate\Database\Schema\ColumnDefinition
-     */
-    public function addColumn($type, $name, array $parameters = [])
-    {
-    }
-
-    /**
-     * Add the columns from the callback after the given column.
-     *
-     * @param  string  $column
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function after($column, Closure $callback)
-    {
-    }
-
-    /**
-     * Remove a column from the schema blueprint.
-     *
-     * @param  string  $name
-     * @return $this
-     */
-    public function removeColumn($name)
-    {
-    }
-}
-
-/**
- * @method $this after(string $column) Place the column "after" another column (MySQL)
- * @method $this always() Used as a modifier for generatedAs() (PostgreSQL)
- * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key)
- * @method $this change() Change the column
- * @method $this charset(string $charset) Specify a character set for the column (MySQL)
- * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server)
- * @method $this comment(string $comment) Add a comment to the column (MySQL)
- * @method $this default(mixed $value) Specify a "default" value for the column
- * @method $this first() Place the column "first" in the table (MySQL)
- * @method $this generatedAs(string|Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
- * @method $this index(string $indexName = null) Add an index
- * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
- * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
- * @method $this primary() Add a primary index
- * @method $this spatialIndex() Add a spatial index
- * @method $this storedAs(string $expression) Create a stored generated column (MySQL/SQLite)
- * @method $this type(string $type) Specify a type for the column
- * @method $this unique(string $indexName = null) Add a unique index
- * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
- * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
- * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
- * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL/SQLite)
- */
-class ColumnDefinition
-{
-    //
-}
+    use Closure;
+    use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Support\Fluent;
+    use Illuminate\Database\Schema\ForeignKeyDefinition;
+    use Illuminate\Database\Schema\ForeignIdColumnDefinition;
+    use Illuminate\Database\Schema\ColumnDefinition;
+
+    /**
+     * @method static bool createDatabase(string $name)
+     * @method static bool dropDatabaseIfExists(string $name)
+     * @method static bool hasTable(string $table)
+     * @method static array getColumnListing(string $table)
+     * @method static bool hasColumn(string $table, string $column)
+     * @method static bool hasColumns(string $table, array $columns)
+     * @method static string getColumnType(string $table, string $column)
+     * @method static void table(string $table, Closure $callback)
+     * @method static void create(string $table, Closure $callback)
+     * @method static void drop(string $table)
+     * @method static void dropIfExists(string $table)
+     * @method static void dropColumns(string $table, string|array $columns)
+     * @method static void rename(string $from, string $to)
+     */
+    class Builder {}
+
+    /**
+     * @method Fluent dropColumn(array|mixed $columns)
+     * @method Fluent renameColumn(string $from, string $to)
+     * @method Fluent dropPrimary(string|array|null $index = null)
+     * @method Fluent dropUnique(string|array $index)
+     * @method Fluent dropIndex(string|array $index)
+     * @method Fluent dropSpatialIndex(string|array $index)
+     * @method Fluent dropForeign(string|array $index)
+     * @method Fluent dropConstrainedForeignId(string $column)
+     * @method Fluent renameIndex(string $from, string $to)
+     * @method void dropSoftDeletes(string $column = 'deleted_at')
+     * @method void dropSoftDeletesTz(string $column = 'deleted_at')
+     * @method void dropMorphs(string $name, string|null $indexName = null)
+     * @method Fluent rename(string $to)
+     * @method Fluent primary(string|array $columns, string|null $name = null, string|null $algorithm = null)
+     * @method Fluent unique(string|array $columns, string|null $name = null, string|null $algorithm = null)
+     * @method Fluent index(string|array $columns, string|null $name = null, string|null $algorithm = null)
+     * @method Fluent spatialIndex(string|array $columns, string|null $name = null)
+     * @method Fluent rawIndex(string $expression, string $name)
+     * @method ForeignKeyDefinition foreign(string|array $columns, string|null $name = null)
+     * @method ColumnDefinition id(string $column = 'id')
+     * @method ColumnDefinition increments(string $column)
+     * @method ColumnDefinition integerIncrements(string $column)
+     * @method ColumnDefinition tinyIncrements(string $column)
+     * @method ColumnDefinition smallIncrements(string $column)
+     * @method ColumnDefinition mediumIncrements(string $column)
+     * @method ColumnDefinition bigIncrements(string $column)
+     * @method ColumnDefinition char(string $column, int|null $length = null)
+     * @method ColumnDefinition string(string $column, int|null $length = null)
+     * @method ColumnDefinition text(string $column)
+     * @method ColumnDefinition mediumText(string $column)
+     * @method ColumnDefinition longText(string $column)
+     * @method ColumnDefinition integer(string $column, bool $autoIncrement = false, bool $unsigned = false)
+     * @method ColumnDefinition tinyInteger(string $column, bool $autoIncrement = false, bool $unsigned = false)
+     * @method ColumnDefinition smallInteger(string $column, bool $autoIncrement = false, bool $unsigned = false)
+     * @method ColumnDefinition mediumInteger(string $column, bool $autoIncrement = false, bool $unsigned = false)
+     * @method ColumnDefinition bigInteger(string $column, bool $autoIncrement = false, bool $unsigned = false)
+     * @method ColumnDefinition unsignedInteger(string $column, bool $autoIncrement = false)
+     * @method ColumnDefinition unsignedTinyInteger(string $column, bool $autoIncrement = false)
+     * @method ColumnDefinition unsignedSmallInteger(string $column, bool $autoIncrement = false)
+     * @method ColumnDefinition unsignedMediumInteger(string $column, bool $autoIncrement = false)
+     * @method ColumnDefinition unsignedBigInteger(string $column, bool $autoIncrement = false)
+     * @method ForeignIdColumnDefinition foreignId(string $column)
+     * @method ForeignIdColumnDefinition foreignIdFor(Model|string $model, string|null $column = null)
+     * @method ColumnDefinition float(string $column, int $total = 8, int $places = 2, bool $unsigned = false)
+     * @method ColumnDefinition double(string $column, int|null $total = null, int|null $places = null, bool $unsigned = false)
+     * @method ColumnDefinition decimal(string $column, int $total = 8, int $places = 2, bool $unsigned = false)
+     * @method ColumnDefinition unsignedFloat(string $column, int $total = 8, int $places = 2)
+     * @method ColumnDefinition unsignedDouble(string $column, int $total = null, int $places = null)
+     * @method ColumnDefinition unsignedDecimal(string $column, int $total = 8, int $places = 2)
+     * @method ColumnDefinition boolean(string $column)
+     * @method ColumnDefinition enum(string $column, array $allowed)
+     * @method ColumnDefinition set(string $column, array $allowed)
+     * @method ColumnDefinition json(string $column)
+     * @method ColumnDefinition jsonb(string $column)
+     * @method ColumnDefinition date(string $column)
+     * @method ColumnDefinition dateTime(string $column, int $precision = 0)
+     * @method ColumnDefinition dateTimeTz(string $column, int $precision = 0)
+     * @method ColumnDefinition time(string $column, int $precision = 0)
+     * @method ColumnDefinition timeTz(string $column, int $precision = 0)
+     * @method ColumnDefinition timestamp(string $column, int $precision = 0)
+     * @method ColumnDefinition timestampTz(string $column, int $precision = 0)
+     * @method ColumnDefinition softDeletes(string $column = 'deleted_at', int $precision = 0)
+     * @method ColumnDefinition softDeletesTz(string $column = 'deleted_at', int $precision = 0)
+     * @method ColumnDefinition year(string $column)
+     * @method ColumnDefinition binary(string $column)
+     * @method ColumnDefinition uuid(string $column)
+     * @method ColumnDefinition foreignUuid(string $column)
+     * @method ColumnDefinition ipAddress(string $column)
+     * @method ColumnDefinition macAddress(string $column)
+     * @method ColumnDefinition geometry(string $column)
+     * @method ColumnDefinition point(string $column, int|null $srid = null)
+     * @method ColumnDefinition lineString(string $column)
+     * @method ColumnDefinition polygon(string $column)
+     * @method ColumnDefinition geometryCollection(string $column)
+     * @method ColumnDefinition multiPoint(string $column)
+     * @method ColumnDefinition multiLineString(string $column)
+     * @method ColumnDefinition multiPolygon(string $column)
+     * @method ColumnDefinition multiPolygonZ(string $column)
+     * @method ColumnDefinition computed(string $column, string $expression)
+     * @method void morphs(string $name, string|null $indexName = null)
+     * @method void nullableMorphs(string $name, string|null $indexName = null)
+     * @method void numericMorphs(string $name, string|null $indexName = null)
+     * @method void nullableNumericMorphs(string $name, string|null $indexName = null)
+     * @method void uuidMorphs(string $name, string|null $indexName = null)
+     * @method void nullableUuidMorphs(string $name, string|null $indexName = null)
+     * @method ColumnDefinition addColumn(string $type, string $name, array $parameters = [])
+     * @method void after(string $column, Closure $callback)
+     * @method $this removeColumn(string $name)
+     */
+    class Blueprint {}
+
+    /**
+     * @method $this after(string $column) Place the column "after" another column (MySQL)
+     * @method $this always() Used as a modifier for generatedAs() (PostgreSQL)
+     * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key)
+     * @method $this change() Change the column
+     * @method $this charset(string $charset) Specify a character set for the column (MySQL)
+     * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server)
+     * @method $this comment(string $comment) Add a comment to the column (MySQL)
+     * @method $this default(mixed $value) Specify a "default" value for the column
+     * @method $this first() Place the column "first" in the table (MySQL)
+     * @method $this generatedAs(string|Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
+     * @method $this index(string $indexName = null) Add an index
+     * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
+     * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
+     * @method $this primary() Add a primary index
+     * @method $this spatialIndex() Add a spatial index
+     * @method $this storedAs(string $expression) Create a stored generated column (MySQL/SQLite)
+     * @method $this type(string $type) Specify a type for the column
+     * @method $this unique(string $indexName = null) Add a unique index
+     * @method $this unsigned() Set the INTEGER column as UNSIGNED (MySQL)
+     * @method $this useCurrent() Set the TIMESTAMP column to use CURRENT_TIMESTAMP as default value
+     * @method $this useCurrentOnUpdate() Set the TIMESTAMP column to use CURRENT_TIMESTAMP when updating (MySQL)
+     * @method $this virtualAs(string $expression) Create a virtual generated column (MySQL/SQLite)
+     */
+    class ColumnDefinition {}
 }
 
 namespace Illuminate\Support\Facades {
-class Schema extends \Illuminate\Database\Schema\Builder {}
+    use Illuminate\Database\Schema\Builder;
 
-/**
- * @method $this \PDO getPdo()
- * @method $this \Illuminate\Database\ConnectionInterface connection(string $name = null)
- * @method $this \Illuminate\Database\Query\Builder table(string $table, string $as = null)
- * @method $this \Illuminate\Database\Query\Builder query()
- * @method $this \Illuminate\Database\Query\Expression raw($value)
- * @method $this array getQueryLog()
- * @method $this array prepareBindings(array $bindings)
- * @method $this array pretend(\Closure $callback)
- * @method $this array select(string $query, array $bindings = [], bool $useReadPdo = true)
- * @method $this bool insert(string $query, array $bindings = [])
- * @method $this bool logging()
- * @method $this bool statement(string $query, array $bindings = [])
- * @method $this bool unprepared(string $query)
- * @method $this int affectingStatement(string $query, array $bindings = [])
- * @method $this int delete(string $query, array $bindings = [])
- * @method $this int transactionLevel()
- * @method $this int update(string $query, array $bindings = [])
- * @method $this mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)
- * @method $this mixed transaction(\Closure $callback, int $attempts = 1)
- * @method $this string getDefaultConnection()
- * @method $this void afterCommit(\Closure $callback)
- * @method $this void beginTransaction()
- * @method $this void commit()
- * @method $this void enableQueryLog()
- * @method $this void disableQueryLog()
- * @method $this void flushQueryLog()
- * @method $this void registerDoctrineType(string $class, string $name, string $type)
- * @method $this \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
- * @method $this void listen(\Closure $callback)
- * @method $this void rollBack(int $toLevel = null)
- * @method $this void setDefaultConnection(string $name)
- */
-class DB {
-    /**
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public static function query()
-    {
-    }
+    class Schema extends Builder {}
 
     /**
-     * @return \Illuminate\Database\Query\Builder
+     * @method static \PDO getPdo()
+     * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null)
+     * @method static \Illuminate\Database\Query\Builder table(string $table, string $as = null)
+     * @method static \Illuminate\Database\Query\Builder query()
+     * @method static \Illuminate\Database\Query\Expression raw($value)
+     * @method static array getQueryLog()
+     * @method static array prepareBindings(array $bindings)
+     * @method static array pretend(\Closure $callback)
+     * @method static array select(string $query, array $bindings = [], bool $useReadPdo = true)
+     * @method static bool insert(string $query, array $bindings = [])
+     * @method static bool logging()
+     * @method static bool statement(string $query, array $bindings = [])
+     * @method static bool unprepared(string $query)
+     * @method static int affectingStatement(string $query, array $bindings = [])
+     * @method static int delete(string $query, array $bindings = [])
+     * @method static int transactionLevel()
+     * @method static int update(string $query, array $bindings = [])
+     * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)
+     * @method static mixed transaction(\Closure $callback, int $attempts = 1)
+     * @method static string getDefaultConnection()
+     * @method static void afterCommit(\Closure $callback)
+     * @method static void beginTransaction()
+     * @method static void commit()
+     * @method static void enableQueryLog()
+     * @method static void disableQueryLog()
+     * @method static void flushQueryLog()
+     * @method static void registerDoctrineType(string $class, string $name, string $type)
+     * @method static \Illuminate\Database\Connection beforeExecuting(\Closure $callback)
+     * @method static void listen(\Closure $callback)
+     * @method static void rollBack(int $toLevel = null)
+     * @method static void setDefaultConnection(string $name)
      */
-    public static function table(string $table)
-    {
-    }
-}
+    class DB {}
 }
 
 namespace {
