@@ -133,6 +133,7 @@ namespace Illuminate\Database\Eloquent {
     use Illuminate\Database\Eloquent\Concerns\HasRelationships;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\Relations\Relation;
+    use Illuminate\Database\Eloquent\Scope;
 
     /**
      * @property-read HigherOrderBuilderProxy $orWhere
@@ -166,93 +167,20 @@ namespace Illuminate\Database\Eloquent {
      */
     class Builder {}
 
-    /** @mixin Builder */
+    /**
+     * @mixin Builder
+     * @method static Builder query()
+     * @method Builder newQuery()
+     * @method Builder|$this newModelQuery()
+     * @method Builder newQueryWithoutRelationships()
+     * @method Builder|$this newQueryWithoutScopes()
+     * @method Builder newQueryWithoutScope(Scope|string $scope)
+     * @method Builder newQueryForRestoration(array|int $ids)
+     * @method Builder|$this newEloquentBuilder(QueryBuilder $query)
+     * @method QueryBuilder newBaseQueryBuilder()
+     */
     class Model {
         use HasRelationships;
-
-        /**
-         * Begin querying the model.
-         *
-         * @return \Illuminate\Database\Eloquent\Builder
-         */
-        public static function query()
-        {
-        }
-
-        /**
-         * Get a new query builder for the model's table.
-         *
-         * @return \Illuminate\Database\Eloquent\Builder
-         */
-        public function newQuery()
-        {
-        }
-
-        /**
-         * Get a new query builder that doesn't have any global scopes or eager loading.
-         *
-         * @return \Illuminate\Database\Eloquent\Builder|static
-         */
-        public function newModelQuery()
-        {
-        }
-
-        /**
-         * Get a new query builder with no relationships loaded.
-         *
-         * @return \Illuminate\Database\Eloquent\Builder
-         */
-        public function newQueryWithoutRelationships()
-        {
-        }
-
-        /**
-         * Get a new query builder that doesn't have any global scopes.
-         *
-         * @return \Illuminate\Database\Eloquent\Builder|static
-         */
-        public function newQueryWithoutScopes()
-        {
-        }
-
-        /**
-         * Get a new query instance without a given scope.
-         *
-         * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
-         * @return \Illuminate\Database\Eloquent\Builder
-         */
-        public function newQueryWithoutScope($scope)
-        {
-        }
-
-        /**
-         * Get a new query to restore one or more models by their queueable IDs.
-         *
-         * @param  array|int  $ids
-         * @return \Illuminate\Database\Eloquent\Builder
-         */
-        public function newQueryForRestoration($ids)
-        {
-        }
-
-        /**
-         * Create a new Eloquent query builder for the model.
-         *
-         * @param  \Illuminate\Database\Query\Builder  $query
-         * @return \Illuminate\Database\Eloquent\Builder|static
-         */
-        public function newEloquentBuilder($query)
-        {
-        }
-
-        /**
-         * Get a new query builder instance for the connection.
-         *
-         * @return \Illuminate\Database\Query\Builder
-         */
-        protected function newBaseQueryBuilder()
-        {
-        }
     }
 }
 
