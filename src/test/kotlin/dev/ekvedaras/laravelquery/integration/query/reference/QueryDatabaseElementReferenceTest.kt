@@ -115,6 +115,12 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .once().at(50).inString("email")
     }
 
+    fun testItDoesNotResolveNamespaceInFromCall() {
+        myFixture.configureByFile("integration/query/reference/inFromCallWithOnlyNamespace.php")
+
+        Namespaces.testProject1.expect(myFixture).toBeReferenced().never()
+    }
+
     fun testItDoesNotResolveColumnInGetCallUsingNestedArrayLikeWhere() {
         myFixture.configureByFile("integration/query/reference/inGetCallUsingNestedArrayLikeWhere.php")
 
