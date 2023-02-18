@@ -7,6 +7,7 @@ import com.intellij.database.psi.DbTable
 import com.jetbrains.rd.util.firstOrNull
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.Query
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableAlias
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import kotlin.streams.toList
 
@@ -36,7 +37,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
                 .flatMap { table -> table.columns().map { it.asLookupElement() }.toList() }
                 .toList()
             completion += query.aliases.keys.map { it.asLookupElement() }.toList()
-            completion += query.aliases.keys.flatMap { alias -> alias.table.columns().map { it.asLookupElement(alias = alias.name) }.toList() }
+            completion += query.aliases.keys.filterIsInstance<TableAlias>().flatMap { alias -> alias.table.columns().map { it.asLookupElement(alias = alias.name) }.toList() }
 
             return completion
         }
@@ -67,7 +68,7 @@ class ColumnParameter(val stringParameter: StringParameter) {
             }
 
             return query.tables.find { it.name == tableOrNamespaceName }?.columns()?.map { it.asLookupElement(withTablePrefix = true) }?.toList()
-                ?: query.aliases.filterKeys { it.name == tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = tableOrNamespaceName) }?.toList()
+                ?: query.aliases.filterKeys { it is TableAlias && it.name == tableOrNamespaceName }.firstOrNull()?.value?.columns()?.map { it.asLookupElement(alias = tableOrNamespaceName) }?.toList()
                 ?: listOf()
         }
 

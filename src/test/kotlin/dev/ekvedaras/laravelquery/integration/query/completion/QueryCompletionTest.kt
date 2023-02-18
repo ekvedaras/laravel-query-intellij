@@ -236,6 +236,22 @@ internal class QueryCompletionTest : BaseTestCase() {
         Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
     }
 
+    fun testItCompletesInJoinSubCallFirstColumn() {
+        myFixture.configureByFile("integration/query/completion/inJoinSubCallFirstColumn.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users.expect(myFixture).toBeCompleted().withColumns()
+
+        Tables.customers.expect(myFixture)
+            .not().toBeCompleted().withColumns()
+            .but().toHaveAliasCompleted("c2")
+
+        Tables.migrations.expect(myFixture).not().toBeCompleted().withColumns()
+        Tables.failed_jobs.expect(myFixture).not().toBeCompleted().withColumns()
+    }
+
     fun testItCompletesInJoinWhereCallFirstColumn() {
         myFixture.configureByFile("integration/query/completion/inJoinWhereCallFirstColumn.php")
         myFixture.completeBasic()

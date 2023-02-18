@@ -7,7 +7,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableP
 
 sealed interface TableSelectionCall : QueryMethodCall, ReferencesTable {
     val tableParameter: TableParameter?
-    val alias: Alias?
+    val tableAlias: TableAlias?
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? =
         queryStatement

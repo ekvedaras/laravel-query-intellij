@@ -10,6 +10,7 @@ import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.AcceptsClosures
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.SubQuerySelectionCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
 import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInSurroundingScope
 import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInUpperScope
@@ -26,7 +27,7 @@ class Query {
     var dataSource: DataSource? = null
     var namespaces: Set<Namespace> = setOf()
     var tables: Set<Table> = setOf()
-    var aliases: MutableMap<Alias, Table> = mutableMapOf()
+    var aliases: MutableMap<Alias, Table?> = mutableMapOf()
 
     fun scanStatements(startingFrom: QueryStatement) {
         addStatement(statement = startingFrom)
@@ -47,7 +48,7 @@ class Query {
             when (methodCall) {
                 is TableSelectionCall -> {
                     val tableParameter = methodCall.tableParameter ?: return@forEach
-                    val alias = methodCall.alias
+                    val alias = methodCall.tableAlias
 
                     if (alias != null) {
                         aliases[alias] = alias.table
@@ -56,6 +57,14 @@ class Query {
                     }
 
                     tableParameter.namespace.tap { namespaces += it }
+                }
+
+                is SubQuerySelectionCall -> {
+                    val alias = methodCall.subQueryAlias
+
+                    if (alias != null) {
+                        aliases[alias] = null
+                    }
                 }
 
                 else -> {}

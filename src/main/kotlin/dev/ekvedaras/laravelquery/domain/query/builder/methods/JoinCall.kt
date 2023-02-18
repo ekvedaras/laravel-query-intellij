@@ -23,8 +23,8 @@ class JoinCall(override val reference: MethodReference, override val queryStatem
         TableParameter(it.asStringParameter())
     }
 
-    override val alias: Alias? =
-        if (tableParameter?.table != null && tableParameter.alias != null) Alias(
+    override val tableAlias: TableAlias? =
+        if (tableParameter?.table != null && tableParameter.alias != null) TableAlias(
             name = tableParameter.alias,
             definitionParameter = tableParameter.stringParameter,
             table = tableParameter.table

@@ -22,10 +22,10 @@ class FromCall(override val reference: MethodReference, override val queryStatem
         AliasParameter(it.asStringParameter())
     }
 
-    override val alias: Alias? = if (aliasParameter != null && tableParameter?.table != null) {
-        Alias(name = aliasParameter.name, definitionParameter = aliasParameter.stringParameter, table = tableParameter.table)
+    override val tableAlias: TableAlias? = if (aliasParameter != null && tableParameter?.table != null) {
+        TableAlias(name = aliasParameter.name, definitionParameter = aliasParameter.stringParameter, table = tableParameter.table)
     } else if (tableParameter?.table != null && tableParameter.alias != null) {
-        Alias(name = tableParameter.alias, definitionParameter = tableParameter.stringParameter, table = tableParameter.table)
+        TableAlias(name = tableParameter.alias, definitionParameter = tableParameter.stringParameter, table = tableParameter.table)
     } else {
         null
     }
