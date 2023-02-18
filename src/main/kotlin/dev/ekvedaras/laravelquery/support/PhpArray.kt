@@ -18,10 +18,14 @@ inline fun <reified T : PsiElement> ArrayCreationExpression.hashValuesOfType(): 
     .filterIsInstance<T>()
     .toSet()
 
-inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType(): Set<T> = this
+fun ArrayCreationExpression.nonHashEntries(): Set<PhpPsiElement> = this
     .childrenOfType<PhpPsiElement>()
     .asSequence()
     .filterNot { it is ArrayHashElement }
+    .toSet()
+
+inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType(): Set<T> = this
+    .nonHashEntries()
     .map { it.firstPsiChild }
     .filterIsInstance<T>()
     .toSet()

@@ -572,6 +572,48 @@ internal class QueryCompletionTest : BaseTestCase() {
             .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInWhereBetweenColumnsCallFirstParameter() {
+        myFixture.configureByFile("integration/query/completion/inWhereBetweenColumnCallFirstParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInWhereBetweenColumnsCallSecondParameterFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inWhereBetweenColumnCallSecondParameterFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInWhereBetweenColumnsCallSecondParameterSecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inWhereBetweenColumnCallSecondParameterSecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItDoesNotCompleteInWhereBetweenColumnsCallSecondParameterThirdEntry() {
+        myFixture.configureByFile("integration/query/completion/inWhereBetweenColumnCallSecondParameterThirdEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInWhereCallOnAQueryWithARelationClosure() {
         myFixture.configureByFile("integration/query/completion/inWhereCallOnAQueryWithARelationClosure.php")
         myFixture.completeBasic()

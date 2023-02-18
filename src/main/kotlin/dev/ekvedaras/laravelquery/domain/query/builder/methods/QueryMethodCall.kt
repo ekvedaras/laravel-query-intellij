@@ -47,6 +47,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "on" -> OnCall(reference, queryStatement)
                 "where", "orWhere" -> WhereCall(reference, queryStatement)
                 "whereColumn", "orWhereColumn" -> WhereColumnCall(reference, queryStatement)
+                "whereBetweenColumns", "orWhereBetweenColumns", "whereNotBetweenColumns", "orWhereNotBetweenColumns" -> WhereBetweenColumnsCall(reference, queryStatement)
                 "whereIn", "orWhereIn", "orWhereNotIn",
                 "whereBetween", "orWhereBetween", "whereNotBetween", "orWhereNotBetween",
                 "whereIntegerInRaw", "orWhereIntegerInRaw", "whereIntegerNotInRaw", "orWhereIntegerNotInRaw",
