@@ -12,6 +12,12 @@ inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOfType(): Se
     .filterIsInstance<T>()
     .toSet()
 
+inline fun <reified T : PsiElement> ArrayCreationExpression.hashValuesOfType(): Set<T> = this
+    .hashElements
+    .map { it.value }
+    .filterIsInstance<T>()
+    .toSet()
+
 inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType(): Set<T> = this
     .childrenOfType<PhpPsiElement>()
     .asSequence()
@@ -21,6 +27,3 @@ inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType
     .toSet()
 
 inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOrEntriesOfType(): Set<T> = hashKeysOfType<T>() + nonHashEntriesOfType()
-
-inline fun <reified T : PsiElement> ArrayCreationExpression.elementsOfType(): Set<T> =
-    childrenOfType<PhpPsiElement>().filter { it.firstPsiChild is T }.map { it.firstPsiChild as T }.toSet()

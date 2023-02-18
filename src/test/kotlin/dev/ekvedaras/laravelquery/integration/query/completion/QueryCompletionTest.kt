@@ -457,6 +457,17 @@ internal class QueryCompletionTest : BaseTestCase() {
         assertEmpty(myFixture.lookupElements ?: arrayOf())
     }
 
+    fun testItCompleteColumnsInWhereColumnCallArrayHashValue() {
+        myFixture.configureByFile("integration/query/completion/inWhereColumnCallArrayHashValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItDoesNotCompleteColumnsInNonModelClasses() {
         myFixture.configureByFile("integration/query/completion/inCreateCallOfNonModelClass.php")
         myFixture.completeBasic()
@@ -574,6 +585,17 @@ internal class QueryCompletionTest : BaseTestCase() {
 
     fun testItCompletesInWhereCallStaticallyOnModel() {
         myFixture.configureByFile("integration/query/completion/inWhereCallStaticallyOnModel.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInWhereColumnCallSecondParameter() {
+        myFixture.configureByFile("integration/query/completion/inWhereColumnCallSecondParameter.php")
         myFixture.completeBasic()
 
         Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()

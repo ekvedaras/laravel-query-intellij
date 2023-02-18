@@ -25,9 +25,7 @@ class WhereCall(override val reference: MethodReference, override val queryState
                     .toSet()
         }
 
-        is StringLiteralExpression -> {
-            reference.parameters.filterIsInstance<StringLiteralExpression>().map { ColumnParameter(it.asStringParameter()) }.toSet()
-        }
+        is StringLiteralExpression -> setOf(ColumnParameter(columnsMethodParameter.asStringParameter()))
 
         else -> {
             setOf()
