@@ -8,7 +8,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 
-class SelectCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+open class SelectCall(final override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnsMethodParameter = reference.getParameter(0)
 
     override val columns: Set<ColumnParameter> = when (columnsMethodParameter) {

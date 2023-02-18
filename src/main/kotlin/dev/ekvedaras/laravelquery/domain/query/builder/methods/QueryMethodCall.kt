@@ -53,6 +53,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "whereDate" -> WhereDateCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select" -> SelectCall(reference, queryStatement)
+                "addSelect" -> AddSelectCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return PhpIndex.getInstance(reference.project)
