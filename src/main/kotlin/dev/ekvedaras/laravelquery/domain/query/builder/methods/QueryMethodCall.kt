@@ -48,9 +48,16 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "where", "orWhere" -> WhereCall(reference, queryStatement)
                 "whereColumn", "orWhereColumn" -> WhereColumnCall(reference, queryStatement)
                 "whereIn", "orWhereIn", "orWhereNotIn",
+                "whereBetween", "orWhereBetween", "whereNotBetween", "orWhereNotBetween",
                 "whereIntegerInRaw", "orWhereIntegerInRaw", "whereIntegerNotInRaw", "orWhereIntegerNotInRaw",
                 "whereDate", "orWhereDate", "whereTime", "orWhereTime",
-                "whereDay", "orWhereDay", "whereMonth", "orWhereMonth", "whereYear", "orWhereYear" -> WhereOneColumnIsSomeValueCall(reference, queryStatement)
+                "whereDay", "orWhereDay", "whereMonth", "orWhereMonth", "whereYear", "orWhereYear",
+                "whereJsonContains", "orWhereJsonContains", "whereJsonDoesntContain", "orWhereJsonDoesntContain",
+                "whereJsonLength", "orWhereJsonLength", "having", "orHaving", "havingBetween",
+                "orderByDesc", "latest", "oldest", "reorder",
+                "value", "implode", "min", "max", "sum", "avg", "average",
+                "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
+
                 "get" -> GetCall(reference, queryStatement)
                 "select", "addSelect" -> SelectCall(reference, queryStatement)
                 else -> {
