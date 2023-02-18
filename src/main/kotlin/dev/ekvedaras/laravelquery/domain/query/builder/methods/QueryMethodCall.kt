@@ -57,9 +57,8 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "orderByDesc", "latest", "oldest", "reorder",
                 "value", "implode", "min", "max", "sum", "avg", "average",
                 "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
-
                 "get" -> GetCall(reference, queryStatement)
-                "select", "addSelect" -> SelectCall(reference, queryStatement)
+                "select", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return PhpIndex.getInstance(reference.project)
