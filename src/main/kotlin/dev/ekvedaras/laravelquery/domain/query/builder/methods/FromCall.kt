@@ -10,11 +10,11 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasP
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-open class FromCall(final override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall {
+class FromCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall {
     private val tableMethodParameter = reference.getParameter(0) as? StringLiteralExpression
     private val aliasMethodParameter = reference.getParameter(1) as? StringLiteralExpression
 
-    final override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
+    override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
         TableParameter(it.asStringParameter())
     }
 

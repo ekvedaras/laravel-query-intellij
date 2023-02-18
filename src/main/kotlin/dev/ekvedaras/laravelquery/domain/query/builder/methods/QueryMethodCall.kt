@@ -37,24 +37,17 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 )) return null
 
             return when (reference.name) {
-                "newQuery" -> NewQueryCall(reference, queryStatement)
-                "query" -> QueryCall(reference, queryStatement)
+                "query", "newQuery" -> QueryCall(reference, queryStatement)
                 "create" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
-                "from" -> FromCall(reference, queryStatement)
-                "table" -> TableCall(reference, queryStatement)
-                "join" -> JoinCall(reference, queryStatement)
-                "joinWhere" -> JoinWhereCall(reference, queryStatement)
-                "leftJoin" -> LeftJoinCall(reference, queryStatement)
-                "rightJoin" -> RightJoinCall(reference, queryStatement)
-                "crossJoin" -> CrossJoinCall(reference, queryStatement)
+                "from", "table" -> FromCall(reference, queryStatement)
+                "join", "joinWhere", "leftJoin", "rightJoin", "crossJoin" -> JoinCall(reference, queryStatement)
                 "on" -> OnCall(reference, queryStatement)
                 "where" -> WhereCall(reference, queryStatement)
                 "whereDate" -> WhereDateCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
-                "select" -> SelectCall(reference, queryStatement)
-                "addSelect" -> AddSelectCall(reference, queryStatement)
+                "select", "addSelect" -> SelectCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return PhpIndex.getInstance(reference.project)

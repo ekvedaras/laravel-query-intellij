@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-open class JoinCall(final override val reference: MethodReference, final override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall, ColumnSelectionCall {
+class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall, ColumnSelectionCall {
     private val tableMethodParameter = reference.getParameter(0)
     private val firstColumnMethodParameter = reference.getParameter(1)
     private val secondColumnMethodParameter = reference.getParameter(
