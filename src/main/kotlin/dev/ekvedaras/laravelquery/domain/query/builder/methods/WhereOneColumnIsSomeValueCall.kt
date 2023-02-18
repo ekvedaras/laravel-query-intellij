@@ -7,7 +7,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class WhereDateCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class WhereOneColumnIsSomeValueCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
     private val columnMethodParameter = reference.getParameter(0)
 
     override val columns: Set<ColumnParameter> = setOf(

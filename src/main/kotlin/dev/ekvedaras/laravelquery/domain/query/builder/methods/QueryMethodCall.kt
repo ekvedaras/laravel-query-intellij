@@ -47,7 +47,10 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "on" -> OnCall(reference, queryStatement)
                 "where", "orWhere" -> WhereCall(reference, queryStatement)
                 "whereColumn", "orWhereColumn" -> WhereColumnCall(reference, queryStatement)
-                "whereDate" -> WhereDateCall(reference, queryStatement)
+                "whereIn", "orWhereIn", "orWhereNotIn",
+                "whereIntegerInRaw", "orWhereIntegerInRaw", "whereIntegerNotInRaw", "orWhereIntegerNotInRaw",
+                "whereDate", "orWhereDate", "whereTime", "orWhereTime",
+                "whereDay", "orWhereDay", "whereMonth", "orWhereMonth", "whereYear", "orWhereYear" -> WhereOneColumnIsSomeValueCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select", "addSelect" -> SelectCall(reference, queryStatement)
                 else -> {
