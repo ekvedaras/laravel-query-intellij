@@ -73,8 +73,8 @@ namespace Illuminate\Database\Query {
      * @method $this orderByDesc(string $column) ✅
      * @method $this latest(string $column = 'created_at') ✅
      * @method $this oldest(string $column = 'created_at') ✅
-     * @method $this forPageBeforeId(int $perPage = 15, int|null $lastId = 0, string $column = 'id') ❌
-     * @method $this forPageAfterId(int $perPage = 15, int|null $lastId = 0, string $column = 'id') ❌
+     * @method $this forPageBeforeId(int $perPage = 15, int|null $lastId = 0, string $column = 'id') ✅
+     * @method $this forPageAfterId(int $perPage = 15, int|null $lastId = 0, string $column = 'id') ✅
      * @method $this reorder(string|null $column = null, string $direction = 'asc') ✅
      * @method mixed|static find(int|string $id, array $columns = ['*']) ❌
      * @method mixed value(string $column) ✅
