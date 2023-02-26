@@ -63,7 +63,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "forPageBeforeId", "forPageAfterId" -> ForPageAroundIdCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
-                "whereRowValues", "orWhereRowValues" -> WhereRowValuesCall(reference, queryStatement)
+                "whereRowValues", "orWhereRowValues", "getCountForPagination" -> WhereRowValuesCall(reference, queryStatement)
                 "find" -> FindCall(reference, queryStatement)
                 "paginate", "simplePaginate" -> PaginateCall(reference, queryStatement)
                 else -> {
