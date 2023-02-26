@@ -1,8 +1,6 @@
 package dev.ekvedaras.laravelquery.support
 
 import com.intellij.database.util.containsElements
-import com.intellij.openapi.project.DumbService
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -19,14 +17,12 @@ fun MethodReference.classReference(depth: Int = 0): ClassReference? =
     else if (depth < 30 && classReference is MethodReference && classReference == this && firstPsiChild is MethodReference) (firstPsiChild as MethodReference).classReference(depth + 1)
     else null
 
-fun MethodReference.isMemberOfAny(vararg classes: String): Boolean =
-    if (DumbService.isDumb(project)) false
-    else if (classReference !is PhpTypedElement) false
-    else PhpIndex.getInstance(project)
-        .completeType(project, (classReference as PhpTypedElement).type, mutableSetOf())
-        .types
-        .flatMap { PhpIndex.getInstance(project).getClassesByFQN(it) }
-        .containsElements { it.isChildOfAny(*classes, orIsAny = true) }
+fun MethodReference.isMemberOfAny(vararg classes: String): Boolean = whenSmart {
+    if (classReference !is PhpTypedElement) false
+    else (classReference as PhpTypedElement).resolveClassesFromType().containsElements {
+        it.isChildOfAny(*classes, orIsAny = true)
+    }
+} ?: false
 
 fun MethodReference.isCalledOnAVariable() = firstPsiChild is Variable
 fun MethodReference.isAssignedToAVariable() = firstPsiChild is AssignmentExpression

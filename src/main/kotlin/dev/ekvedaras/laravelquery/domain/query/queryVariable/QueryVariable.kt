@@ -1,17 +1,17 @@
 package dev.ekvedaras.laravelquery.domain.query.queryVariable
 
-import com.intellij.openapi.project.DumbService
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
 import com.jetbrains.php.lang.psi.elements.Variable
 import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.support.referenceVariable
+import dev.ekvedaras.laravelquery.support.resolveClassesFromType
 import dev.ekvedaras.laravelquery.support.tryTransformingInstanceOfOrContinue
 import dev.ekvedaras.laravelquery.support.tryTransformingInstanceOfUnless
+import dev.ekvedaras.laravelquery.support.whenSmart
 
 /**
  * A wrapper data class for a variable that is used to build and store the query.
@@ -31,21 +31,17 @@ import dev.ekvedaras.laravelquery.support.tryTransformingInstanceOfUnless
 interface QueryVariable {
     val variable: Variable
     val clazz: PhpClass
-        get() = if (DumbService.isDumb(variable.project)) throw Exception("Cannot instantiate query variables while php index is building")
-        else PhpIndex.getInstance(variable.project)
-            .completeType(variable.project, variable.type, mutableSetOf())
-            .types
-            .flatMap { PhpIndex.getInstance(variable.project).getClassesByFQN(it) }
-            .firstOrNull() ?: throw Exception("Cannot find a class of query variable")
+        get() = variable.whenSmart { variable.resolveClassesFromType().firstOrNull() }
+            ?: throw Exception("Cannot find a class of query variable")
+
     val model: Model? get() = null
 
-    fun usageStatements(): List<Statement> =
-        if (DumbService.isDumb(variable.project))
-            listOf()
-        else ReferencesSearch.search(variable.originalElement, variable.resolveScope, false)
+    fun usageStatements(): List<Statement> = variable.whenSmart {
+        ReferencesSearch.search(variable.originalElement, variable.resolveScope, false)
             .toList()
             .filterNot { it.element.originalElement == variable.originalElement }
             .mapNotNull { it.element.parentOfType() }
+    } ?: listOf()
 
     companion object {
         fun from(statement: QueryStatement): QueryVariable? = statement

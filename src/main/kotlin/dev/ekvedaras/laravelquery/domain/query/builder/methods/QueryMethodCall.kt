@@ -1,7 +1,6 @@
 package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.intellij.codeInsight.lookup.LookupElement
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.domain.StringParameter
@@ -10,6 +9,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.classReference
 import dev.ekvedaras.laravelquery.support.isMemberOfAny
+import dev.ekvedaras.laravelquery.support.resolveClassesFromType
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.tryTransforming
 
@@ -62,11 +62,9 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "select", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
-                        return PhpIndex.getInstance(reference.project)
-                            .completeType(reference.project, reference.classReference!!.type, mutableSetOf())
-                            .types
-                            .flatMap { PhpIndex.getInstance(reference.project).getClassesByFQN(it) }
-                            .firstNotNullOfOrNull { clazz ->
+                        return reference.classReference
+                            ?.resolveClassesFromType()
+                            ?.firstNotNullOfOrNull { clazz ->
                                 clazz.tryTransforming { Model(it) }
                                     ?.relation(reference.name ?: "")
                                     .transform { ModelRelationMethodCall(it, reference, queryStatement) }

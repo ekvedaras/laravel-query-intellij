@@ -1,15 +1,14 @@
 package dev.ekvedaras.laravelquery.domain.model
 
 import com.cesarferreira.pluralize.pluralize
-import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
+import dev.ekvedaras.laravelquery.domain.FQN
 import dev.ekvedaras.laravelquery.domain.database.DataSource
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.query.queryVariable.QueryVariable
@@ -65,23 +64,8 @@ data class Model(private val clazz: PhpClass) {
             ?.model
 
     companion object {
-        fun from(classReference: ClassReference): Model? {
-            if (DumbService.isDumb(classReference.project)) return null
-
-            return PhpIndex.getInstance(classReference.project)
-                .getClassesByFQN(classReference.fqn ?: return null)
-                .firstOrNull()
-                .tryTransforming { Model(it) }
-        }
-
-        fun from(fqn: StringLiteralExpression): Model? {
-            if (DumbService.isDumb(fqn.project)) return null
-
-            return PhpIndex.getInstance(fqn.project)
-                .getClassesByFQN(fqn.text.cleanup())
-                .firstOrNull()
-                .tryTransforming { Model(it) }
-        }
+        fun from(classReference: ClassReference): Model? = FQN.from(classReference)?.clazz?.tryTransforming { Model(it) }
+        fun from(fqn: StringLiteralExpression): Model? = FQN.from(fqn).clazz?.tryTransforming { Model(it) }
 
         private fun PsiElement.isWithinModel(): Boolean = parentOfType<PhpClass>()?.isChildOfAny(LaravelClasses.Model) == true
         fun PsiElement.isWithinModelScopeMethod(): Boolean = isWithinModel() && parentOfType<Function>()?.name?.startsWith("scope") == true

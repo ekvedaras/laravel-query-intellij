@@ -1,11 +1,19 @@
 package dev.ekvedaras.laravelquery.support
 
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
+
 inline fun <T : Any, R> T?.transform(using: (T) -> R) = let {
     if (it != null) using(it) else null
 }
 
 inline fun <T : Any, R> T?.tryTransforming(using: (T) -> R) = let {
-    try { it.transform(using) } catch (e: Exception) { null}
+    try {
+        it.transform(using)
+    } catch (e: Exception) {
+        null
+    }
 }
 
 inline fun <reified TFrom, TTo> Any?.transformInstanceOf(using: (TFrom) -> TTo): TTo? = let {
@@ -36,3 +44,9 @@ inline fun <reified TPassThrough, reified TFrom, TTo : TPassThrough> Any?.tryTra
         null
     }
 }
+
+fun <R> Project.whenSmart(action: () -> R): R? =
+    if (DumbService.isDumb(this)) null
+    else action()
+
+fun <R> PsiElement.whenSmart(action: () -> R): R? = project.whenSmart(action)
