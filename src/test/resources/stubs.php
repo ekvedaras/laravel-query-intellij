@@ -90,8 +90,8 @@ namespace Illuminate\Database\Query {
      * @method mixed sum(string $column) ✅
      * @method mixed avg(string $column) ✅
      * @method mixed average(string $column) ✅
-     * @method mixed aggregate(string $function, array $columns = ['*']) ❌
-     * @method float|int numericAggregate(string $function, array $columns = ['*']) ❌
+     * @method mixed aggregate(string $function, array $columns = ['*']) ✅
+     * @method float|int numericAggregate(string $function, array $columns = ['*']) ✅
      * @method bool insert(array $values) ❌
      * @method int insertOrIgnore(array $values) ❌
      * @method int insertGetId(array $values, string|null $sequence = null) ❌
