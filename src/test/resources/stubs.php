@@ -79,8 +79,8 @@ namespace Illuminate\Database\Query {
      * @method mixed|static find(int|string $id, array $columns = ['*']) ✅
      * @method mixed value(string $column) ✅
      * @method Collection get(array|string $columns = ['*']) ✅
-     * @method LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ❌
-     * @method Paginator simplePaginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ❌
+     * @method LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ✅
+     * @method Paginator simplePaginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ✅
      * @method int getCountForPagination(array $columns = ['*']) ❌
      * @method Collection pluck(string $column, string|nul $key = null) ❌
      * @method string implode(string $column, string $glue = '') ✅
