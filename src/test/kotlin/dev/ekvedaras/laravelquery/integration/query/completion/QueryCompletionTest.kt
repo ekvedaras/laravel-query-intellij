@@ -279,6 +279,51 @@ internal class QueryCompletionTest : BaseTestCase() {
         Columns.expect(myFixture).not().toBeCompleted()
     }
 
+    fun testItCompletesInInsertGetIdCallArrayEntry() {
+        myFixture.configureByFile("integration/query/completion/inInsertGetIdCallArrayEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInInsertGetIdCallArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inInsertGetIdCallArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInInsertGetIdCallSequence() {
+        myFixture.configureByFile("integration/query/completion/inInsertGetIdCallSequence.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItCompletesInGetCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inGetCallUsingArray.php")
         myFixture.completeBasic()
