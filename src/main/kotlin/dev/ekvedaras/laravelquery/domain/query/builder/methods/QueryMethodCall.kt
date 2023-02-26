@@ -65,6 +65,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 "whereRowValues", "orWhereRowValues", "getCountForPagination" -> WhereRowValuesCall(reference, queryStatement)
                 "find" -> FindCall(reference, queryStatement)
+                "pluck" -> PluckCall(reference, queryStatement)
                 "paginate", "simplePaginate" -> PaginateCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {

@@ -82,7 +82,7 @@ namespace Illuminate\Database\Query {
      * @method LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ✅
      * @method Paginator simplePaginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null) ✅
      * @method int getCountForPagination(array $columns = ['*']) ✅
-     * @method Collection pluck(string $column, string|nul $key = null) ❌
+     * @method Collection pluck(string $column, string|nul $key = null) ✅
      * @method string implode(string $column, string $glue = '') ✅
      * @method int count(string $columns = '*') ❌
      * @method mixed min(string $column) ✅

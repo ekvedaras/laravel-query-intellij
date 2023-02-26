@@ -170,6 +170,36 @@ internal class QueryCompletionTest : BaseTestCase() {
             .and().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInPluckCallColumn() {
+        myFixture.configureByFile("integration/query/completion/inPluckCallColumn.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInPluckCallKey() {
+        myFixture.configureByFile("integration/query/completion/inPluckCallKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItCompletesInGetCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inGetCallUsingArray.php")
         myFixture.completeBasic()
