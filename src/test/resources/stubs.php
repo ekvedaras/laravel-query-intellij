@@ -57,8 +57,8 @@ namespace Illuminate\Database\Query {
      * @method $this orWhereMonth(string $column, string $operator, DateTimeInterface|string|null $value = null) ✅
      * @method $this whereYear(string $column, string $operator, DateTimeInterface|string|null $value = null, string $boolean = 'and') ✅
      * @method $this orWhereYear(string $column, string $operator, DateTimeInterface|string|int|null $value = null) ✅
-     * @method $this whereRowValues(array $columns, string $operator, array $values, string $boolean = 'and') ❌
-     * @method $this orWhereRowValues(array $columns, string $operator, array $values) ❌
+     * @method $this whereRowValues(array $columns, string $operator, array $values, string $boolean = 'and') ✅
+     * @method $this orWhereRowValues(array $columns, string $operator, array $values) ✅
      * @method $this whereJsonContains(string $column, mixed $value, string $boolean = 'and', bool $not = false) ✅
      * @method $this orWhereJsonContains(string $column, mixed $value) ✅
      * @method $this whereJsonDoesntContain(string $column, mixed $value, string $boolean = 'and') ✅

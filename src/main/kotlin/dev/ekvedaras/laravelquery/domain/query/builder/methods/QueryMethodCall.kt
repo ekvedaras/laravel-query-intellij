@@ -62,6 +62,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
+                "whereRowValues", "orWhereRowValues" -> WhereRowValuesCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return reference.classReference
