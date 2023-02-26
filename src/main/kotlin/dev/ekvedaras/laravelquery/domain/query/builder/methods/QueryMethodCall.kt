@@ -61,7 +61,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "value", "implode", "min", "max", "sum", "avg", "average",
                 "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
                 "forPageBeforeId", "forPageAfterId" -> ForPageAroundIdCall(reference, queryStatement)
-                "get" -> GetCall(reference, queryStatement)
+                "get", "count" -> GetCall(reference, queryStatement)
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 "whereRowValues", "orWhereRowValues", "getCountForPagination" -> WhereRowValuesCall(reference, queryStatement)
                 "find" -> FindCall(reference, queryStatement)

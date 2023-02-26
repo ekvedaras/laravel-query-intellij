@@ -84,7 +84,7 @@ namespace Illuminate\Database\Query {
      * @method int getCountForPagination(array $columns = ['*']) ✅
      * @method Collection pluck(string $column, string|nul $key = null) ✅
      * @method string implode(string $column, string $glue = '') ✅
-     * @method int count(string $columns = '*') ❌
+     * @method int count(string|array $columns = '*') ✅
      * @method mixed min(string $column) ✅
      * @method mixed max(string $column) ✅
      * @method mixed sum(string $column) ✅
