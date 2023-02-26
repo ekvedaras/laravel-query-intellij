@@ -60,11 +60,11 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "orderBy", "orderByDesc", "latest", "oldest", "reorder",
                 "value", "implode", "min", "max", "sum", "avg", "average",
                 "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
-
                 "forPageBeforeId", "forPageAfterId" -> ForPageAroundIdCall(reference, queryStatement)
                 "get" -> GetCall(reference, queryStatement)
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 "whereRowValues", "orWhereRowValues" -> WhereRowValuesCall(reference, queryStatement)
+                "find" -> FindCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return reference.classReference
