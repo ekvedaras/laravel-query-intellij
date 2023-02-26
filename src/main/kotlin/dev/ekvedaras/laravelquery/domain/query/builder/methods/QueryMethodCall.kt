@@ -37,14 +37,16 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 )) return null
 
             return when (reference.name) {
-                "query", "newQuery" -> QueryCall(reference, queryStatement)
-                "create" -> CreateCall(reference, queryStatement)
+                "query", "newQuery", "newModelQuery", "newQueryWithoutRelationships",
+                "newQueryWithoutScopes", "newQueryForRestoration", "newEloquentBuilder", "newBaseQueryBuilder" -> QueryCall(reference, queryStatement)
+
+                "create", "forceCreate" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
                 "from", "table" -> FromCall(reference, queryStatement)
                 "join", "joinWhere", "leftJoin", "leftJoinWhere", "rightJoin", "rightJoinWhere", "crossJoin" -> JoinCall(reference, queryStatement)
                 "joinSub", "leftJoinSub", "rightJoinSub" -> JoinSubCall(reference, queryStatement)
-                "on" -> OnCall(reference, queryStatement)
+                "on", "orOn" -> OnCall(reference, queryStatement)
                 "where", "orWhere" -> WhereCall(reference, queryStatement)
                 "whereColumn", "orWhereColumn" -> WhereColumnCall(reference, queryStatement)
                 "whereBetweenColumns", "orWhereBetweenColumns", "whereNotBetweenColumns", "orWhereNotBetweenColumns" -> WhereBetweenColumnsCall(reference, queryStatement)

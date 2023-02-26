@@ -21,7 +21,7 @@ sealed interface TestMethodCall {
             if (! reference.isMemberOfAny(LaravelClasses.TestCase)) return null
 
             return when (reference.name) {
-                "assertDatabaseHas" -> AssertDatabaseHasCall(reference)
+                "assertDatabaseHas", "assertDatabaseMissing", "assertDeleted" -> AssertDatabaseHasCall(reference)
                 else -> null
             }
         }
