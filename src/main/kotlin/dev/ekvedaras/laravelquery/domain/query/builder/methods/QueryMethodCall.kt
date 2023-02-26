@@ -57,11 +57,12 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "whereDay", "orWhereDay", "whereMonth", "orWhereMonth", "whereYear", "orWhereYear",
                 "whereJsonContains", "orWhereJsonContains", "whereJsonDoesntContain", "orWhereJsonDoesntContain",
                 "whereJsonLength", "orWhereJsonLength", "having", "orHaving", "havingBetween",
-                "orderByDesc", "latest", "oldest", "reorder",
+                "orderBy", "orderByDesc", "latest", "oldest", "reorder",
                 "value", "implode", "min", "max", "sum", "avg", "average",
                 "increment", "decrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
+
                 "get" -> GetCall(reference, queryStatement)
-                "select", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
+                "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 "whereRowValues", "orWhereRowValues" -> WhereRowValuesCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {

@@ -65,11 +65,11 @@ namespace Illuminate\Database\Query {
      * @method $this orWhereJsonDoesntContain(string $column, mixed $value) ✅
      * @method $this whereJsonLength(string $column, mixed $operator, mixed $value = null, string $boolean = 'and') ✅
      * @method $this orWhereJsonLength(string $column, mixed $operator, mixed $value = null) ✅
-     * @method $this groupBy(array|string ...$groups) ❌
+     * @method $this groupBy(array|string ...$groups) ✅
      * @method $this having(string $column, string|null $operator = null, string|null $value = null, string $boolean = 'and') ✅
      * @method $this orHaving(string $column, string|null $operator = null, string|null $value = null) ✅
      * @method $this havingBetween(string $column, array $values, string $boolean = 'and', bool $not = false) ✅
-     * @method $this orderBy(Closure|static|Expression|string $column, string $direction = 'asc') ❌
+     * @method $this orderBy(Closure|static|Expression|string $column, string $direction = 'asc') ✅
      * @method $this orderByDesc(string $column) ✅
      * @method $this latest(string $column = 'created_at') ✅
      * @method $this oldest(string $column = 'created_at') ✅

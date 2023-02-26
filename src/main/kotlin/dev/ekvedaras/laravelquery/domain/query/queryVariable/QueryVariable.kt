@@ -48,6 +48,7 @@ interface QueryVariable {
             .statement
             .referenceVariable()
             .tryTransformingInstanceOfOrContinue<Variable, WhereQueryVariable> { WhereQueryVariable(it) }
+            .tryTransformingInstanceOfOrContinue<Variable, OrderByQueryVariable> { OrderByQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, WhenQueryVariable> { WhenQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, JoinQueryVariable> { JoinQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, RelationQueryVariable> { RelationQueryVariable(it) }
