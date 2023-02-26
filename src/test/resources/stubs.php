@@ -97,7 +97,7 @@ namespace Illuminate\Database\Query {
      * @method int insertGetId(array $values, string|null $sequence = null) ✅
      * @method int insertUsing(array $columns, Closure|static|string $query) ✅
      * @method int update(array $values) ✅
-     * @method bool updateOrInsert(array $attributes, array $values = []) ❌
+     * @method bool updateOrInsert(array $attributes, array $values = []) ✅
      * @method int increment(string $column, float|int $amount = 1, array $extra = [])  ✅
      * @method int decrement(string $column, float|int $amount = 1, array $extra = []) ✅
      * @method $this newQuery() ✅
