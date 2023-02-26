@@ -34,13 +34,16 @@ data class StringParameter(val element: StringLiteralExpression) {
     val hasThreeParts = parts.size == 3
     val hasUncompletedPart = parts.size > 1 && text.endsWith('.')
     val lastPartRange: TextRange = element.text.findTextRange(parts.last().substringBefore(' ')) ?: TextRange(0, 0)
-    val oneBeforeLastPartRange: TextRange = (if (parts.size > 1) element.text.findTextRange(parts[parts.size - 2]) else null) ?: TextRange(0, 0)
-    val twoBeforeLastPartRange: TextRange = (if (parts.size > 2) element.text.findTextRange(parts[parts.size - 3]) else null) ?: TextRange(0, 0)
+    val oneBeforeLastPartRange: TextRange = (if (parts.size > 1) element.text.findTextRange(parts[parts.size - 2]) else null)
+        ?: TextRange(0, 0)
+    val twoBeforeLastPartRange: TextRange = (if (parts.size > 2) element.text.findTextRange(parts[parts.size - 3]) else null)
+        ?: TextRange(0, 0)
 
     private val isMethodReferenceParameter = element.parent.parent is MethodReference
     private val isEntryOfArrayWhichIsMethodReferenceParameter = element.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent is MethodReference
     private val isArrayHashKeyOfArrayWhichIsMethodReferenceParameter = element.parent.parent is ArrayHashElement && (element.parent.parent as ArrayHashElement).key == element && element.parent.parent.parent.parent.parent is MethodReference
-    private val isNestedArrayFirstEntry = element.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent.parent.parent is MethodReference
+    private val isInnerArrayEntry = element.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent.parent.parent is MethodReference
+    private val isInnerArrayHashKey = element.parent.parent is ArrayHashElement && element.parent.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent.parent is ArrayCreationExpression && element.parent.parent.parent.parent.parent.parent.parent is MethodReference
 
     val parentMethodParameter = when (element.parent.parent) {
         is ArrayHashElement -> {
@@ -60,7 +63,8 @@ data class StringParameter(val element: StringLiteralExpression) {
         return isMethodReferenceParameter // ->get('parameter');
             || isEntryOfArrayWhichIsMethodReferenceParameter // ->get(['parameter'])
             || isArrayHashKeyOfArrayWhichIsMethodReferenceParameter // ->get(['parameter' => 'foo'])
-            || isNestedArrayFirstEntry // ->where([ ['parameter', '=', 'foo'] ])
+            || isInnerArrayEntry // ->where([ ['parameter', '=', 'foo'] ])
+            || isInnerArrayHashKey // ->insert([ ['parameter' => '1' ] ])
     }
 
     private val methodReference: MethodReference? get() = element.parentOfType()

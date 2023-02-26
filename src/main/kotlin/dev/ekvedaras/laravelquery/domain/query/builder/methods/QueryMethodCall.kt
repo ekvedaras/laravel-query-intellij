@@ -66,6 +66,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "find" -> FindCall(reference, queryStatement)
                 "pluck" -> PluckCall(reference, queryStatement)
                 "paginate", "simplePaginate", "aggregate", "numericAggregate" -> PaginateCall(reference, queryStatement)
+                "insert", "insertOrIgnore" -> InsertCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return reference.classReference

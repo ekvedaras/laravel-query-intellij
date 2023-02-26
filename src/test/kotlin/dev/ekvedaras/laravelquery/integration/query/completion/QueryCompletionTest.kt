@@ -200,6 +200,85 @@ internal class QueryCompletionTest : BaseTestCase() {
             .and().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInInsertCallTopArrayEntry() {
+        myFixture.configureByFile("integration/query/completion/inInsertTopArrayEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInInsertCallTopArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inInsertTopArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItDoesNotCompleteInInsertCallTopArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inInsertTopArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+
+    fun testItCompletesInInsertCallInnerArrayEntry() {
+        myFixture.configureByFile("integration/query/completion/inInsertInnerArrayEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInInsertCallInnerArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inInsertInnerArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItDoesNotCompleteInInsertCallInnerArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inInsertInnerArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInGetCallUsingArray() {
         myFixture.configureByFile("integration/query/completion/inGetCallUsingArray.php")
         myFixture.completeBasic()
