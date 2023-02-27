@@ -145,4 +145,13 @@ internal class QueryDatabaseElementReferenceTest : BaseTestCase() {
             .toBeReferenced()
             .never()
     }
+
+    fun testItResolvesTableInFromCallWithAlias() {
+        myFixture.configureByFile("integration/query/reference/inFromCallWithAlias.php")
+
+        Tables.users
+            .expect(myFixture)
+            .toBeReferenced()
+            .once().at(40).inString("testProject1.users as u1")
+    }
 }

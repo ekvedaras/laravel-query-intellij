@@ -52,6 +52,7 @@ class Query {
 
                     if (alias != null) {
                         aliases[alias] = alias.table
+                        tables += alias.table
                     } else if (tableParameter.table != null) {
                         tables += tableParameter.table
                     }
