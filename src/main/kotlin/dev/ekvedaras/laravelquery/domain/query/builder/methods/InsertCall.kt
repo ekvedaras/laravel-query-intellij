@@ -7,6 +7,7 @@ import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParam
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
+import dev.ekvedaras.laravelquery.support.hashKeysOrFirstEntryOfType
 import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 import dev.ekvedaras.laravelquery.support.transform
 
@@ -22,7 +23,7 @@ class InsertCall(override val reference: MethodReference, override val queryStat
                 .nonHashEntriesOfType<ArrayCreationExpression>()
                 .flatMap { innerArray ->
                     innerArray
-                        .hashKeysOrEntriesOfType<StringLiteralExpression>()
+                        .hashKeysOrFirstEntryOfType<StringLiteralExpression>()
                         .map { ColumnParameter(it.asStringParameter()) }
                 }.toSet()
     } ?: setOf()

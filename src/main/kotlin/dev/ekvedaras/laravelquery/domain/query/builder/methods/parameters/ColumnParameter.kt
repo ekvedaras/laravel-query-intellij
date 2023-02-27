@@ -87,11 +87,17 @@ class ColumnParameter(val stringParameter: StringParameter) {
         }
 
         if (stringParameter.hasTwoParts) {
-            return query.tables
+            return query.aliases
+                .filterKeys { it.name == tableOrNamespaceName }
+                .firstNotNullOfOrNull { it.value }
+                ?.columns()
+                ?.firstWhereOrNull { it.name == columnOrTableOrNamespaceName }
+                ?.asDbColumn() ?: query.tables
                 .firstOrNull { it.name == tableOrNamespaceName }
                 ?.columns()
                 ?.firstWhereOrNull { it.name == columnOrTableOrNamespaceName }
                 ?.asDbColumn()
+
         }
 
         if (stringParameter.hasOnePart) {

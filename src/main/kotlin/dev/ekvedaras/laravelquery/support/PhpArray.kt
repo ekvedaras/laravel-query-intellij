@@ -31,3 +31,8 @@ inline fun <reified T : PsiElement> ArrayCreationExpression.nonHashEntriesOfType
     .toSet()
 
 inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOrEntriesOfType(): Set<T> = hashKeysOfType<T>() + nonHashEntriesOfType()
+inline fun <reified T : PsiElement> ArrayCreationExpression.hashKeysOrFirstEntryOfType(): Set<T> = hashKeysOfType<T>() + nonHashEntries()
+    .take(1)
+    .map { it.firstPsiChild }
+    .filterIsInstance<T>()
+    .toSet()

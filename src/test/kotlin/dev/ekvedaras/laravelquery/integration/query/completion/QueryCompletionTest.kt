@@ -255,6 +255,15 @@ internal class QueryCompletionTest : BaseTestCase() {
             .and().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInInsertCallInnerArraySecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inInsertInnerArraySecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInInsertCallInnerArrayKey() {
         myFixture.configureByFile("integration/query/completion/inInsertInnerArrayKey.php")
         myFixture.completeBasic()

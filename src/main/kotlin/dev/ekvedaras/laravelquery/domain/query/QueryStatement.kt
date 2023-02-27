@@ -16,9 +16,8 @@ class QueryStatement(val statement: Statement, val query: Query) {
     val model = callChain.model ?: queryVariable?.model
 
     companion object {
-        fun Statement.query(): Query = getUserData(queryKey) ?: Query().also { putUserData(queryKey, it) }
-        fun from(statement: Statement) = QueryStatement(statement, statement.query()).also {
-            statement.query().scanStatements(it)
+        fun from(statement: Statement) = QueryStatement(statement, Query()).also {
+            it.query.scanStatements(it)
         }
     }
 }
