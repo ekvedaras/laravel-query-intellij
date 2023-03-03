@@ -727,6 +727,16 @@ internal class QueryCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted()
     }
 
+    fun testItCompletesColumnsInMakeCallArrayEntry() {
+        myFixture.configureByFile("integration/query/completion/inMakeCallArrayEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted().asWellAsOthers().andTheirColumns()
+            .but().toHaveItsColumnsCompleted()
+    }
+
     fun testItCompletesColumnsInCreateCallArrayEntry() {
         myFixture.configureByFile("integration/query/completion/inCreateCallArrayEntry.php")
         myFixture.completeBasic()
