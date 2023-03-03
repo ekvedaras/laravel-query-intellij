@@ -12,8 +12,6 @@ plugins {
     id("org.jetbrains.intellij") version "1.10.1"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
-    // Gradle Kover Plugin
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 }
 
 group = properties("pluginGroup")
@@ -45,11 +43,6 @@ changelog {
     version.set(properties("pluginVersion"))
     groups.set(emptyList())
     repositoryUrl.set(properties("pluginRepositoryUrl"))
-}
-
-// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
-kover.xmlReport {
-    onCheck.set(true)
 }
 
 tasks {
