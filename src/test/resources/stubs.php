@@ -142,10 +142,10 @@ namespace Illuminate\Database\Eloquent {
      *
      * @method $this make(array $attributes = []) ✅
      * @method $this firstWhere(Closure|string|array|Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and') ✅
-     * @method $this|Model|Collection|static[]|null find($id, $columns = ['*']) ❌
-     * @method Collection findMany(Arrayable|array $ids, array $columns = ['*']) ❌
-     * @method $this|Model|Collection|static[] findOrFail(mixed $id, array $columns = ['*']) ❌
-     * @method $this|Model findOrNew(mixed $id, array $columns = ['*']) ❌
+     * @method $this|Model|Collection|static[]|null find($id, $columns = ['*']) ✅
+     * @method Collection findMany(Arrayable|array $ids, array $columns = ['*']) ✅
+     * @method $this|Model|Collection|static[] findOrFail(mixed $id, array $columns = ['*']) ✅
+     * @method $this|Model findOrNew(mixed $id, array $columns = ['*']) ✅
      * @method $this|Model firstOrNew(array $attributes = [], array $values = []) ❌
      * @method $this|Model firstOrCreate(array $attributes = [], array $values = []) ❌
      * @method $this|Model updateOrCreate(array $attributes, array $values = []) ❌
