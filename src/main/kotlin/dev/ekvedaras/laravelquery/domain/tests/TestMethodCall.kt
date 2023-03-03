@@ -23,6 +23,7 @@ sealed interface TestMethodCall {
             return when (reference.name) {
                 "assertDatabaseHas", "assertDatabaseMissing", "assertDeleted" -> AssertDatabaseHasCall(reference)
                 "assertDatabaseCount", "assertDatabaseEmpty" -> AssertDatabaseCountCall(reference)
+                "assertSoftDeleted", "assertNotSoftDeleted" -> AssertSoftDeletedCall(reference)
                 else -> null
             }
         }

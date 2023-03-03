@@ -408,8 +408,8 @@ namespace Illuminate\Foundation\Testing\Concerns {
      * @method $this assertDatabaseCount(Model|string $table, int $count, string|null $connection = null) ✅
      * @method $this assertDatabaseEmpty(Model|string $table, string|null $connection = null) ✅
      * @method $this assertDeleted(Model|string $table, array $data = [], string|null $connection = null) ✅
-     * @method $this assertSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ❌
-     * @method $this assertNotSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ❌
+     * @method $this assertSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ✅
+     * @method $this assertNotSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ✅
      */
     trait InteractsWithDatabase {}
 }
