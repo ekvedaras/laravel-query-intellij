@@ -47,7 +47,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "join", "joinWhere", "leftJoin", "leftJoinWhere", "rightJoin", "rightJoinWhere", "crossJoin" -> JoinCall(reference, queryStatement)
                 "joinSub", "leftJoinSub", "rightJoinSub" -> JoinSubCall(reference, queryStatement)
                 "on", "orOn" -> OnCall(reference, queryStatement)
-                "where", "orWhere" -> WhereCall(reference, queryStatement)
+                "where", "orWhere", "firstWhere" -> WhereCall(reference, queryStatement)
                 "whereColumn", "orWhereColumn" -> WhereColumnCall(reference, queryStatement)
                 "whereBetweenColumns", "orWhereBetweenColumns", "whereNotBetweenColumns", "orWhereNotBetweenColumns" -> WhereBetweenColumnsCall(reference, queryStatement)
                 "whereIn", "orWhereIn", "orWhereNotIn",

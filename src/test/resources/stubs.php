@@ -141,7 +141,7 @@ namespace Illuminate\Database\Eloquent {
      * @mixin QueryBuilder
      *
      * @method $this make(array $attributes = []) ✅
-     * @method $this firstWhere(Closure|string|array|Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and') ❌
+     * @method $this firstWhere(Closure|string|array|Expression $column, mixed $operator = null, mixed $value = null, string $boolean = 'and') ✅
      * @method $this|Model|Collection|static[]|null find($id, $columns = ['*']) ❌
      * @method Collection findMany(Arrayable|array $ids, array $columns = ['*']) ❌
      * @method $this|Model|Collection|static[] findOrFail(mixed $id, array $columns = ['*']) ❌

@@ -812,6 +812,17 @@ internal class QueryCompletionTest : BaseTestCase() {
             .but().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInFirstWhereCallUsingClosure() {
+        myFixture.configureByFile("integration/query/completion/inFirstWhereCallUsingClosure.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted().exceptOthers()
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItCompletesInWhereCallInsideWhenCall() {
         myFixture.configureByFile("integration/query/completion/inWhereCallInsideWhenCall.php")
         myFixture.completeBasic()
