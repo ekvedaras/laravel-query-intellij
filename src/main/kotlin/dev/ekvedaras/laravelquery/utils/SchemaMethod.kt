@@ -1,6 +1,5 @@
 package dev.ekvedaras.laravelquery.utils
 
-import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.GroupStatement
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -21,7 +20,7 @@ class SchemaMethod private constructor() {
         fun Method.statementsForTable(table : String) = this
             .children.first { it is GroupStatement }
             .children.filterIsInstance<Statement>()
-            .map { it.firstPsiChild as MethodReference }
+            .mapNotNull { it.firstPsiChild as? MethodReference }
             .filter { it.isCreateOrTable() }
             .filter { (it.tableName() ?: "") == table }
     }
