@@ -38,4 +38,13 @@ internal class TestsCompletionTest : BaseTestCase() {
             .not().toBeCompleted().asWellAsOthers().andTheirColumns()
             .but().toHaveItsColumnsCompleted()
     }
+
+    fun testItCompletesInAssertDatabaseCountCall() {
+        myFixture.configureByFile("integration/tests/completion/inAssertDatabaseCountCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }

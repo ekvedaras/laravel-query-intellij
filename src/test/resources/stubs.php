@@ -405,7 +405,7 @@ namespace Illuminate\Foundation\Testing\Concerns {
     /**
      * @method $this assertDatabaseHas(Model|string $table, array $data, string|null $connection = null) ✅
      * @method $this assertDatabaseMissing(Model|string $table, array $data, string|null $connection = null) ✅
-     * @method $this assertDatabaseCount(Model|string $table, int $count, string|null $connection = null) ❌
+     * @method $this assertDatabaseCount(Model|string $table, int $count, string|null $connection = null) ✅
      * @method $this assertDatabaseEmpty(Model|string $table, string|null $connection = null) ❌
      * @method $this assertDeleted(Model|string $table, array $data = [], string|null $connection = null) ✅
      * @method $this assertSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ❌
