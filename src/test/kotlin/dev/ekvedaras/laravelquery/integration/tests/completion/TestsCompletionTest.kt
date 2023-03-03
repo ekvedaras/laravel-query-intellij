@@ -47,4 +47,13 @@ internal class TestsCompletionTest : BaseTestCase() {
         Tables.expect(myFixture).toBeCompleted()
         Columns.expect(myFixture).not().toBeCompleted()
     }
+
+    fun testItCompletesInAssertDatabaseEmptyCall() {
+        myFixture.configureByFile("integration/tests/completion/inAssertDatabaseEmptyCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }
