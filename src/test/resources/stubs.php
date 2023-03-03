@@ -163,7 +163,7 @@ namespace Illuminate\Database\Eloquent {
      * @method $this without(mixed $relations) ❌
      * @method QueryBuilder getQuery() ✅
      * @method QueryBuilder toBase() ✅
-     * @method string qualifyColumn(string|Expression $column) ❌
+     * @method string qualifyColumn(string|Expression $column) ✅
      */
     class Builder {}
 
