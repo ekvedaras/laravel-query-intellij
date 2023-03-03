@@ -400,13 +400,20 @@ namespace {
 
 namespace Illuminate\Foundation\Testing\Concerns {
     use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Connection;
 
     /**
      * @method $this assertDatabaseHas(Model|string $table, array $data, string|null $connection = null) ✅
      * @method $this assertDatabaseMissing(Model|string $table, array $data, string|null $connection = null) ✅
      * @method $this assertDatabaseCount(Model|string $table, int $count, string|null $connection = null) ❌
+     * @method $this assertDatabaseEmpty(Model|string $table, string|null $connection = null) ❌
      * @method $this assertDeleted(Model|string $table, array $data = [], string|null $connection = null) ✅
      * @method $this assertSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ❌
+     * @method $this assertNotSoftDeleted(Model|string $table, array $data = [], string|null $connection = null, string|null $deletedAtColumn = 'deleted_at') ❌
+     * @method Connection getConnection(string|null $connection = null, string|null $table = null) ❌
+     * @method string getTable(Model|string $table) ❌
+     * @method string|null getTableConnection(Model|string $table) ❌
+     * @method Model|null newModelFor(Model|string $table) ❌
      */
     trait InteractsWithDatabase {}
 }
