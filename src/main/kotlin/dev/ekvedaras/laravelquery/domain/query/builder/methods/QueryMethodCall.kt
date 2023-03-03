@@ -37,7 +37,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 )) return null
 
             return when (reference.name) {
-                "query", "newQuery", "newModelQuery", "newQueryWithoutRelationships",
+                "query", "getQuery", "newQuery", "newModelQuery", "newQueryWithoutRelationships", "toBase",
                 "newQueryWithoutScopes", "newQueryForRestoration", "newEloquentBuilder", "newBaseQueryBuilder" -> QueryCall(reference, queryStatement)
 
                 "create", "forceCreate", "update", "make" -> CreateCall(reference, queryStatement)

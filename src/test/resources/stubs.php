@@ -161,8 +161,8 @@ namespace Illuminate\Database\Eloquent {
      * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
      * @method $this with(string|array $relations, string|Closure|null $callback = null)  ✅
      * @method $this without(mixed $relations) ❌
-     * @method QueryBuilder getQuery() ❌
-     * @method QueryBuilder toBase() ❌
+     * @method QueryBuilder getQuery() ✅
+     * @method QueryBuilder toBase() ✅
      * @method string qualifyColumn(string|Expression $column) ❌
      */
     class Builder {}
