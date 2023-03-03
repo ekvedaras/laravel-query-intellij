@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [4.0.2]
+
 ### Fixed
 
 - Invalid casting. #110
