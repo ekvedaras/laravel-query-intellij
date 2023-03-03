@@ -146,9 +146,9 @@ namespace Illuminate\Database\Eloquent {
      * @method Collection findMany(Arrayable|array $ids, array $columns = ['*']) ✅
      * @method $this|Model|Collection|static[] findOrFail(mixed $id, array $columns = ['*']) ✅
      * @method $this|Model findOrNew(mixed $id, array $columns = ['*']) ✅
-     * @method $this|Model firstOrNew(array $attributes = [], array $values = []) ❌
-     * @method $this|Model firstOrCreate(array $attributes = [], array $values = []) ❌
-     * @method $this|Model updateOrCreate(array $attributes, array $values = []) ❌
+     * @method $this|Model firstOrNew(array $attributes = [], array $values = []) ✅
+     * @method $this|Model firstOrCreate(array $attributes = [], array $values = []) ✅
+     * @method $this|Model updateOrCreate(array $attributes, array $values = []) ✅
      * @method $this|Model firstOrFail(array $columns = ['*']) ❌
      * @method $this|Model|mixed firstOr(Closure|array $columns = ['*'], Closure|null $callback = null) ❌
      * @method Model sole(array|string $columns = ['*']) ❌
@@ -178,6 +178,9 @@ namespace Illuminate\Database\Eloquent {
      * @method Builder newQueryForRestoration(array|int $ids) ✅
      * @method Builder|$this newEloquentBuilder(QueryBuilder $query) ✅
      * @method QueryBuilder newBaseQueryBuilder() ✅
+     * @method int increment(string $column, float|int $amount = 1, array $extra = []) ❌
+     * @method int decrement(string $column, float|int $amount = 1, array $extra = []) ❌
+     * @method int incrementOrDecrement(string $column, float|int $amount, array $extra, string $method) ❌
      */
     class Model {
         use HasRelationships;

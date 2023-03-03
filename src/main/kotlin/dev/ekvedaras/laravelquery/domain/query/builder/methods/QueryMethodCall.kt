@@ -66,6 +66,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull" -> SelectCall(reference, queryStatement)
                 "whereRowValues", "orWhereRowValues", "getCountForPagination" -> WhereRowValuesCall(reference, queryStatement)
                 "find", "findMany", "findOrFail", "findOrNew" -> FindCall(reference, queryStatement)
+                "firstOrNew", "firstOrCreate", "updateOrCreate" -> FirstOrNewCall(reference, queryStatement)
                 "pluck" -> PluckCall(reference, queryStatement)
                 "paginate", "simplePaginate", "aggregate", "numericAggregate" -> PaginateCall(reference, queryStatement)
                 "insert", "insertOrIgnore" -> InsertCall(reference, queryStatement)

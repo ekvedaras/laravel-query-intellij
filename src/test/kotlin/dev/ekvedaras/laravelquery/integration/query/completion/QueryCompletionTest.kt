@@ -155,6 +155,36 @@ internal class QueryCompletionTest : BaseTestCase() {
             .and().withoutOtherTables().andTheirColumns()
     }
 
+    fun testItCompletesInFirstOrNewCallAttributesFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inFirstOrNewCallAttributesFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInFirstOrNewCallValuesFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inFirstOrNewCallValuesFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1
+            .expect(myFixture)
+            .toBeCompleted()
+            .exceptOthers()
+
+        Tables.users
+            .expect(myFixture)
+            .toBeCompleted().withColumns()
+            .and().withoutOtherTables().andTheirColumns()
+    }
+
     fun testItCompletesInPaginateCall() {
         myFixture.configureByFile("integration/query/completion/inPaginateCall.php")
         myFixture.completeBasic()
