@@ -1145,4 +1145,59 @@ internal class QueryCompletionTest : BaseTestCase() {
         Tables.expect(myFixture).not().toBeCompleted()
         Columns.expect(myFixture).not().toBeCompleted()
     }
+
+    fun testItCompletesInWithCallRelationString() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationString.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertCompletion("freeCustomers", "payingCustomers")
+    }
+
+    fun testItCompletesInWithCallRelationArrayFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationArrayFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertCompletion("freeCustomers", "payingCustomers")
+    }
+
+    fun testItCompletesInWithCallRelationArraySecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationArraySecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertNoCompletion("freeCustomers", "payingCustomers")
+    }
+
+    fun testItCompletesInWithCallRelationArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertCompletion("freeCustomers", "payingCustomers")
+    }
+
+    fun testItCompletesInWithCallRelationArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertNoCompletion("freeCustomers", "payingCustomers")
+    }
 }

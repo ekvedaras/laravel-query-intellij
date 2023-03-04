@@ -15,6 +15,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasedParam
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
@@ -27,6 +28,7 @@ data class StringParameter(val element: StringLiteralExpression) {
     val text = element.text
         .cleanup() // remove quotes and trim
         .substringBefore("->") // ignore json selectors
+        .substringBefore(":") // ignore relation columns
     val isEmpty = text.isEmpty()
     val parts = text.split('.')
     val hasOnePart = parts.size == 1
@@ -82,6 +84,7 @@ data class StringParameter(val element: StringLiteralExpression) {
         is TableParameter -> other.stringParameter == this
         is ColumnParameter -> other.stringParameter == this
         is AliasParameter -> other.stringParameter == this
+        is RelationParameter -> other.stringParameter == this
         is TestsTableParameter -> other.stringParameter == this
         is TestsColumnParameter -> other.stringParameter == this
         is StringParameter -> other.element.originalElement == element.originalElement

@@ -1,5 +1,7 @@
 package dev.ekvedaras.laravelquery.domain.model
 
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.sql.symbols.DasPsiWrappingSymbol
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference
 import com.jetbrains.php.lang.psi.elements.ClassReference
 import com.jetbrains.php.lang.psi.elements.GroupStatement
@@ -42,4 +44,12 @@ data class Relation(val method: Method) {
         is StringLiteralExpression -> Model.from(firstParameter) ?: throw Exception()
         else -> null
     } ?: throw Exception("Cannot find related model for method ${method.name}")
+
+    fun asLookupElement() =
+        LookupElementBuilder
+            .create(method, method.name)
+            .withLookupString(method.name)
+            .withTailText(model.name, true)
+            .withTypeText(model.table?.nameWithoutPrefix, true)
+            .withIcon(model.clazz.icon)
 }

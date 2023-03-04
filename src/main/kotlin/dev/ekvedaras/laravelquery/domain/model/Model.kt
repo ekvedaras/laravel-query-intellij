@@ -23,12 +23,14 @@ import dev.ekvedaras.laravelquery.support.tryTransforming
  *
  * All the logic for fetching relations, table names and whatever else is directly related to model, should live here.
  */
-data class Model(private val clazz: PhpClass) {
+data class Model(val clazz: PhpClass) {
     init {
         if (!clazz.isChildOfAny(LaravelClasses.Model)) {
             throw Exception("Given class does not extend Eloquent base model thus is not a model")
         }
     }
+
+    val name = clazz.name.substringAfterLast('\\')
 
     private val tableField = clazz.findFieldByName("table", false)
     private val definedTableName =
@@ -56,12 +58,13 @@ data class Model(private val clazz: PhpClass) {
         .firstWhereOrNull { it.findFirstTable(tableName) != null }
         ?.findFirstTable(tableName)
 
+    val relations =
+        clazz.methods
+            .filter { it.access.isPublic }
+            .mapNotNull { method -> method.tryTransforming { Relation(it) } }
+
     fun relation(name: String): Model? =
-        clazz
-            .methods
-            .firstOrNull { it.name == name }
-            ?.tryTransforming { Relation(it) }
-            ?.model
+        relations.firstOrNull { it.method.name == name }?.model
 
     companion object {
         fun from(classReference: ClassReference): Model? = FQN.from(classReference)?.clazz?.tryTransforming { Model(it) }
