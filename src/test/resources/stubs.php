@@ -150,7 +150,7 @@ namespace Illuminate\Database\Eloquent {
      * @method $this|Model firstOrCreate(array $attributes = [], array $values = []) ✅
      * @method $this|Model updateOrCreate(array $attributes, array $values = []) ✅
      * @method $this|Model firstOrFail(array $columns = ['*']) ✅
-     * @method $this|Model|mixed firstOr(Closure|array $columns = ['*'], Closure|null $callback = null) ❌
+     * @method $this|Model|mixed firstOr(Closure|array $columns = ['*'], Closure|null $callback = null) ✅
      * @method Model sole(array|string $columns = ['*']) ✅
      * @method $this[]|Model[] getModels(array|string $columns = ['*']) ✅
      * @method Relation getRelation(string $name) ❌
