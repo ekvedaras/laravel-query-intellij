@@ -1201,6 +1201,17 @@ internal class QueryCompletionTest : BaseTestCase() {
         assertNoCompletion("freeCustomers", "payingCustomers")
     }
 
+    fun testItCompletesInWithCallRelationSecondString() {
+        myFixture.configureByFile("integration/query/completion/inWithCallRelationSecondString.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertCompletion("freeCustomers", "payingCustomers")
+    }
+
     fun testItCompletesInGetRelationCall() {
         myFixture.configureByFile("integration/query/completion/inGetRelationCall.php")
         myFixture.completeBasic()

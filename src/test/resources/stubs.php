@@ -159,7 +159,7 @@ namespace Illuminate\Database\Eloquent {
      * @method int upsert(array $values, array|string $uniqueBy, array|null $update = null) ✅
      * @method int increment(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
      * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
-     * @method $this with(string|array $relations, string|Closure|null $callback = null)  ✅ - not if using func_get_args() ❌
+     * @method $this with(string|array $relations, string|Closure|null $callback = null)  ✅
      * @method $this without(mixed $relations) ❌
      * @method $this withOnly(mixed $relations) ❌
      * @method QueryBuilder getQuery() ✅
