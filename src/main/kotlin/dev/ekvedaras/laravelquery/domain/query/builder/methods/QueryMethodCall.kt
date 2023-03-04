@@ -42,6 +42,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
 
                 "create", "forceCreate", "update", "make" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
+                "without", "withOnly" -> WithoutCall(reference, queryStatement)
                 "getRelation" -> GetRelationCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
                 "from", "table" -> FromCall(reference, queryStatement)
