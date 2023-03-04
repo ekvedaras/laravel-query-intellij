@@ -44,6 +44,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "with" -> WithCall(reference, queryStatement)
                 "without", "withOnly" -> WithoutCall(reference, queryStatement)
                 "getRelation" -> GetRelationCall(reference, queryStatement)
+                "newQueryWithoutScope" -> NewQueryWithoutScopeCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
                 "from", "table" -> FromCall(reference, queryStatement)
                 "join", "joinWhere", "leftJoin", "leftJoinWhere", "rightJoin", "rightJoinWhere", "crossJoin" -> JoinCall(reference, queryStatement)

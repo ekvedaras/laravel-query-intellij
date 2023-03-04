@@ -66,6 +66,12 @@ data class Model(val clazz: PhpClass) {
     fun relation(name: String): Model? =
         relations.firstOrNull { it.method.name == name }?.model
 
+    val scopes =
+        clazz.methods
+            .filter { it.access.isPublic }
+            .filter { it.name.startsWith("scope", ignoreCase = true) }
+            .mapNotNull { method -> method.tryTransforming { Scope(it, this) } }
+
     companion object {
         fun from(classReference: ClassReference): Model? = FQN.from(classReference)?.clazz?.tryTransforming { Model(it) }
         fun from(fqn: StringLiteralExpression): Model? = FQN.from(fqn).clazz?.tryTransforming { Model(it) }

@@ -175,7 +175,7 @@ namespace Illuminate\Database\Eloquent {
      * @method Builder|$this newModelQuery() ✅
      * @method Builder newQueryWithoutRelationships() ✅
      * @method Builder|$this newQueryWithoutScopes() ✅
-     * @method Builder newQueryWithoutScope(Scope|string $scope) ❌
+     * @method Builder newQueryWithoutScope(Scope|string $scope) ✅
      * @method Builder newQueryForRestoration(array|int $ids) ✅
      * @method Builder|$this newEloquentBuilder(QueryBuilder $query) ✅
      * @method QueryBuilder newBaseQueryBuilder() ✅

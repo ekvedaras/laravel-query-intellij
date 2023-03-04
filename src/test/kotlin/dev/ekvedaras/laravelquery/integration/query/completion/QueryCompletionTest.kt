@@ -1288,4 +1288,15 @@ internal class QueryCompletionTest : BaseTestCase() {
 
         assertCompletion("freeCustomers", "payingCustomers")
     }
+
+    fun testItCompletesInNewQueryWithoutScopeCall() {
+        myFixture.configureByFile("integration/query/completion/inNewQueryWithoutScopeCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+
+        assertCompletion("active", "inActive")
+    }
 }
