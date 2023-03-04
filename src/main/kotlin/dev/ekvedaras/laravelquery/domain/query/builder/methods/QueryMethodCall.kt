@@ -42,6 +42,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
 
                 "create", "forceCreate", "update", "make" -> CreateCall(reference, queryStatement)
                 "with" -> WithCall(reference, queryStatement)
+                "getRelation" -> GetRelationCall(reference, queryStatement)
                 "when" -> WhenCall(reference, queryStatement)
                 "from", "table" -> FromCall(reference, queryStatement)
                 "join", "joinWhere", "leftJoin", "leftJoinWhere", "rightJoin", "rightJoinWhere", "crossJoin" -> JoinCall(reference, queryStatement)
@@ -60,7 +61,6 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "orderBy", "orderByDesc", "latest", "oldest", "reorder",
                 "value", "implode", "min", "max", "sum", "avg", "average",
                 "increment", "decrement", "qualifyColumn" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
-
                 "forPageBeforeId", "forPageAfterId" -> ForPageAroundIdCall(reference, queryStatement)
                 "get", "count" -> GetCall(reference, queryStatement)
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull", "sole", "getModels" -> SelectCall(reference, queryStatement)
