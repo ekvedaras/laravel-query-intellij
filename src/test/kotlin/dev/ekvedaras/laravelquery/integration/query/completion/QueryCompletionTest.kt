@@ -994,4 +994,155 @@ internal class QueryCompletionTest : BaseTestCase() {
             .not().toBeCompleted()
             .but().toHaveItsColumnsCompleted()
     }
+
+    fun testItCompletesInUpsertCallValuesArrayFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesArrayFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallValuesArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallValuesInnerArrayFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesInnerArrayFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallValuesInnerArraySecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesInnerArraySecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallValuesInnerArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesInnerArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallValuesInnerArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallValuesInnerArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallUniqueByString() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUniqueByString.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallUniqueByArrayFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUniqueByArrayFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallUniqueByArraySecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUniqueByArraySecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallUniqueByArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUniqueByArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallUniqueByArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUniqueByArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallUpdateString() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUpdateString.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallUpdateArrayFirstEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUpdateArrayFirstEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallUpdateArraySecondEntry() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUpdateArraySecondEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.users
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInUpsertCallUpdateArrayKey() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUpdateArrayKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInUpsertCallUpdateArrayValue() {
+        myFixture.configureByFile("integration/query/completion/inUpsertCallUpdateArrayValue.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }

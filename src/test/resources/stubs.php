@@ -156,7 +156,7 @@ namespace Illuminate\Database\Eloquent {
      * @method Relation getRelation(string $name) ❌
      * @method Model|static create(array $attributes = []) ✅
      * @method Model|static forceCreate(array $attributes = []) ✅
-     * @method int upsert(array $values, array|string $uniqueBy, array|null $update = null) ❌
+     * @method int upsert(array $values, array|string $uniqueBy, array|null $update = null) ✅
      * @method int increment(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
      * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
      * @method $this with(string|array $relations, string|Closure|null $callback = null)  ✅
