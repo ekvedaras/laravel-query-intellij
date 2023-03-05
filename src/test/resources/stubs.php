@@ -192,11 +192,11 @@ namespace Illuminate\Database\Eloquent\Concerns {
     use Illuminate\Database\Eloquent\Relations;
 
     /**
-     * @method Relations\HasOne hasOne() ❌ ✅
+     * @method Relations\HasOne hasOne() ✅
      * @method Relations\HasOneThrough hasOneThrough() ❌ ✅
      * @method Relations\HasMany hasMany() ✅
      * @method Relations\HasManyThrough hasManyThrough() ❌ ✅
-     * @method Relations\BelongsTo belongsTo() ❌ ✅
+     * @method Relations\BelongsTo belongsTo() ✅
      * @method Relations\BelongsToMany belongsToMany() ❌ ✅
      * @method Relations\MorphOne morphOne() ❌
      * @method Relations\MorphTo morphTo() ❌
