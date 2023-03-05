@@ -15,6 +15,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.QueryMethodCall
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasedParam
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationKeyParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ScopeParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
@@ -86,6 +87,7 @@ data class StringParameter(val element: StringLiteralExpression) {
         is ColumnParameter -> other.stringParameter == this
         is AliasParameter -> other.stringParameter == this
         is RelationParameter -> other.stringParameter == this
+        is RelationKeyParameter -> other.stringParameter == this
         is ScopeParameter -> other.stringParameter == this
         is TestsTableParameter -> other.stringParameter == this
         is TestsColumnParameter -> other.stringParameter == this

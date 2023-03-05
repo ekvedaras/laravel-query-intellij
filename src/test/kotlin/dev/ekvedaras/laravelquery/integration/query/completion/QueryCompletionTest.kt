@@ -1319,4 +1319,14 @@ internal class QueryCompletionTest : BaseTestCase() {
             .expect(myFixture).not().toBeCompleted()
             .but().toHaveItsColumnsCompleted().withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesInHasManyCallLocalKey() {
+        myFixture.configureByFile("integration/query/completion/inHasManyCallLocalKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users
+            .expect(myFixture).not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withoutOtherTables().andTheirColumns()
+    }
 }

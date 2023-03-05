@@ -7,9 +7,9 @@ import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 
-data class RelationKeyParameter(val stringParameter: StringParameter, private val model: Model?) {
+data class RelationKeyParameter(val stringParameter: StringParameter, private val modelResolver: () -> Model?) {
     fun getCompletionOptions(): List<LookupElement> =
-        model
+        modelResolver()
             ?.table
             ?.columns()
             ?.map { it.asLookupElement() }
@@ -18,6 +18,6 @@ data class RelationKeyParameter(val stringParameter: StringParameter, private va
     fun findColumnReference(): DbColumn? {
         if (stringParameter.isEmpty) return null
 
-        return model?.table?.columns()?.firstWhereOrNull { it.name == stringParameter.text }?.asDbColumn()
+        return modelResolver()?.table?.columns()?.firstWhereOrNull { it.name == stringParameter.text }?.asDbColumn()
     }
 }
