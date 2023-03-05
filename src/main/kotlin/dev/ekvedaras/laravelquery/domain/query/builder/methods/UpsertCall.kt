@@ -6,13 +6,12 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.support.hashKeysOfType
 import dev.ekvedaras.laravelquery.support.hashKeysOrFirstEntryOfType
 import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class UpsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class UpsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val valuesMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
     private val uniqueByMethodParameter = reference.getParameter(1)
     private val updateMethodParameter = reference.getParameter(2) as? ArrayCreationExpression

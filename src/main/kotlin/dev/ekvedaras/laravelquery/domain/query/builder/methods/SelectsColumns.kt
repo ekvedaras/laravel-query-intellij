@@ -7,7 +7,7 @@ import com.intellij.database.psi.DbTable
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 
-sealed interface ColumnSelectionCall : QueryMethodCall, ReferencesColumn {
+sealed interface SelectsColumns : QueryMethodCall, ReferencesColumn, ReferencesTable {
     val columns: Set<ColumnParameter>
 
     private fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =

@@ -7,7 +7,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ScopeParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class NewQueryWithoutScopeCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ScopeSelectionCall {
+class NewQueryWithoutScopeCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsModelScopes {
     override val scopes: Set<ScopeParameter> = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, Set<ScopeParameter>> {
         setOf(ScopeParameter(it.asStringParameter()))
     } ?: setOf()

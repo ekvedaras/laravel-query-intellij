@@ -11,7 +11,7 @@ import dev.ekvedaras.laravelquery.domain.model.Model
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.AcceptsClosures
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.Alias
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.SubQuerySelectionCall
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.SelectsTable
 import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInSurroundingScope
 import dev.ekvedaras.laravelquery.domain.query.queryVariable.InterestedInUpperScope
 import dev.ekvedaras.laravelquery.support.tap
@@ -46,7 +46,7 @@ class Query {
 
         statement.callChain.forEach { methodCall ->
             when (methodCall) {
-                is TableSelectionCall -> {
+                is SelectsTable -> {
                     val tableParameter = methodCall.tableParameter ?: return@forEach
                     val alias = methodCall.tableAlias
 

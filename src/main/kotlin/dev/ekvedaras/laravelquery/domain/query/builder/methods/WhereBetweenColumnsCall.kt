@@ -9,7 +9,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.support.nonHashEntries
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class WhereBetweenColumnsCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class WhereBetweenColumnsCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val columnMethodParameter = reference.getParameter(0)
     private val otherColumnsMethodParameter = reference.getParameter(1)
 

@@ -7,8 +7,8 @@ import com.intellij.util.ProcessingContext
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.ColumnSelectionCall
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.TableSelectionCall
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.SelectsColumns
+import dev.ekvedaras.laravelquery.domain.query.builder.methods.SelectsTable
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class QueryDatabaseElementsReferenceProvider : PsiReferenceProvider() {
@@ -21,12 +21,12 @@ class QueryDatabaseElementsReferenceProvider : PsiReferenceProvider() {
 
         val methodCall = string.queryMethodCall ?: return PsiReference.EMPTY_ARRAY
 
-        if (methodCall is TableSelectionCall && methodCall.tableParameter?.stringParameter == string) return arrayOf(
+        if (methodCall is SelectsTable && methodCall.tableParameter?.stringParameter == string) return arrayOf(
             TableReference(string, string.lastPartRange),
             NamespaceReference(string, string.oneBeforeLastPartRange)
         )
 
-        if (methodCall is ColumnSelectionCall) return arrayOf(
+        if (methodCall is SelectsColumns) return arrayOf(
             ColumnReference(string, string.lastPartRange),
             TableReference(string, string.oneBeforeLastPartRange),
             NamespaceReference(string, string.twoBeforeLastPartRange)

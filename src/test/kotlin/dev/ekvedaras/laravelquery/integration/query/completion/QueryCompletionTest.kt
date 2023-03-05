@@ -1299,4 +1299,24 @@ internal class QueryCompletionTest : BaseTestCase() {
 
         assertCompletion("active", "inActive")
     }
+
+    fun testItCompletesInWhereCallOnRelationInsideModel() {
+        myFixture.configureByFile("integration/query/completion/inWhereCallOnRelationInsideModel.php")
+        myFixture.completeBasic()
+
+        Namespaces.testProject1.expect(myFixture).toBeCompleted()
+        Tables.customers
+            .expect(myFixture).toBeCompleted().withColumns()
+            .but().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInHasManyCallForeignKey() {
+        myFixture.configureByFile("integration/query/completion/inHasManyCallForeignKey.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.customers
+            .expect(myFixture).not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withoutOtherTables().andTheirColumns()
+    }
 }

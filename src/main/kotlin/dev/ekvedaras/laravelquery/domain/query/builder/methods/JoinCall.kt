@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, TableSelectionCall, ColumnSelectionCall {
+class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsTable, SelectsColumns {
     private val tableMethodParameter = reference.getParameter(0)
     private val firstColumnMethodParameter = reference.getParameter(1)
     private val secondColumnMethodParameter = reference.getParameter(
@@ -50,16 +50,16 @@ class JoinCall(override val reference: MethodReference, override val queryStatem
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? {
         return when (parameter.element) {
-            tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findTableReferencedIn(parameter)
-            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findTableReferencedIn(parameter)
+            tableParameter?.stringParameter?.element -> super<SelectsTable>.findTableReferencedIn(parameter)
+            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<SelectsColumns>.findTableReferencedIn(parameter)
             else -> null
         }
     }
 
     override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? {
         return when (parameter.element) {
-            tableParameter?.stringParameter?.element -> super<TableSelectionCall>.findNamespaceReferencedIn(parameter)
-            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<ColumnSelectionCall>.findNamespaceReferencedIn(parameter)
+            tableParameter?.stringParameter?.element -> super<SelectsTable>.findNamespaceReferencedIn(parameter)
+            firstColumnParameter?.stringParameter?.element, secondColumnParameter?.stringParameter?.element -> super<SelectsColumns>.findNamespaceReferencedIn(parameter)
             else -> null
         }
     }

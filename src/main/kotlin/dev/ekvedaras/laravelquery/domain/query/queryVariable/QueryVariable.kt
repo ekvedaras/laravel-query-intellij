@@ -53,6 +53,7 @@ interface QueryVariable {
             .tryTransformingInstanceOfOrContinue<Variable, WhenQueryVariable> { WhenQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, JoinQueryVariable> { JoinQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, RelationQueryVariable> { RelationQueryVariable(it) }
+            .tryTransformingInstanceOfOrContinue<Variable, RelationDefinitionQueryVariable> { RelationDefinitionQueryVariable(it) }
             .tryTransformingInstanceOfOrContinue<Variable, ModelScopeQueryVariable> { ModelScopeQueryVariable(it) }
             .tryTransformingInstanceOfUnless<QueryVariable, Variable, DynamicQueryVariable> { DynamicQueryVariable(it) }
     }

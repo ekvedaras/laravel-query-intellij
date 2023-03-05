@@ -6,7 +6,7 @@ import com.jetbrains.rd.util.firstOrNull
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 
-sealed interface TableSelectionCall : QueryMethodCall, ReferencesTable {
+sealed interface SelectsTable : QueryMethodCall, ReferencesTable {
     val tableParameter: TableParameter?
     val tableAlias: TableAlias?
 

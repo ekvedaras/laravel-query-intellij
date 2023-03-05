@@ -9,9 +9,8 @@ import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParam
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
-import kotlin.streams.toList
 
-class CreateCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class CreateCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val columnsMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
 
     override val columns: Set<ColumnParameter> = columnsMethodParameter

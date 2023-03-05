@@ -7,7 +7,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.transform
 
-class OnCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class OnCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val firstColumnMethodParameter = reference.getParameter(0) as? StringLiteralExpression
     private val secondColumnMethodParameter = reference.getParameter(
         if (reference.parameters.size > 2) 2 else 1

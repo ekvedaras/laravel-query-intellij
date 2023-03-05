@@ -6,7 +6,7 @@ import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
 import kotlin.streams.toList
 
-class TableParameter(val stringParameter: StringParameter) {
+data class TableParameter(val stringParameter: StringParameter) {
     private val tableName: String
     private val namespaceName: String?
 

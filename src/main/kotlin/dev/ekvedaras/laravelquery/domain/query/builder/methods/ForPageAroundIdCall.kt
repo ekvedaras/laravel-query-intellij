@@ -7,7 +7,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class ForPageAroundIdCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class ForPageAroundIdCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val columnMethodParameter = reference.getParameter(2)
 
     override val columns: Set<ColumnParameter> = setOf(

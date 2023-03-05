@@ -8,7 +8,7 @@ import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrFirstEntryOfType
 
-class FirstOrNewCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class FirstOrNewCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val attributesMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
     private val valuesMethodParameter = reference.getParameter(1) as? ArrayCreationExpression
 

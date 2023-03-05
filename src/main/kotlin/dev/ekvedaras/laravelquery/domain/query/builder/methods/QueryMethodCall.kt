@@ -76,6 +76,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "insertUsing" -> InsertUsingCall(reference, queryStatement)
                 "updateOrInsert" -> UpdateOrInsertCall(reference, queryStatement)
                 "upsert" -> UpsertCall(reference, queryStatement)
+                "hasMany" -> HasManyCall(reference, queryStatement)
                 else -> {
                     if (reference.isMemberOfAny(LaravelClasses.Model)) {
                         return reference.classReference

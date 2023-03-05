@@ -9,7 +9,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
 import dev.ekvedaras.laravelquery.support.transform
 
-class UpdateOrInsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class UpdateOrInsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val attributesMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
     private val columnsMethodParameter = reference.getParameter(1) as? ArrayCreationExpression
 

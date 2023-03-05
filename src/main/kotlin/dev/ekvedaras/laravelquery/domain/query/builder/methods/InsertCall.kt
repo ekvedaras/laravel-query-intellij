@@ -11,7 +11,7 @@ import dev.ekvedaras.laravelquery.support.hashKeysOrFirstEntryOfType
 import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 import dev.ekvedaras.laravelquery.support.transform
 
-class InsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class InsertCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val columnsMethodParameter = reference.getParameter(0) as? ArrayCreationExpression
 
     override val columns: Set<ColumnParameter> = columnsMethodParameter.transform { array ->

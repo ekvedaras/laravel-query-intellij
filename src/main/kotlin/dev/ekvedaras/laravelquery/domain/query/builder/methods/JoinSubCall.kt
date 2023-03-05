@@ -10,7 +10,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasP
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class JoinSubCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SubQuerySelectionCall, ColumnSelectionCall {
+class JoinSubCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SubQuerySelectionCall, SelectsColumns {
     private val aliasParameter = reference.getParameter(1).transformInstanceOf<StringLiteralExpression, AliasParameter> { AliasParameter(it.asStringParameter()) }
     private val firstColumnMethodParameter = reference.getParameter(2)
     private val secondColumnMethodParameter = reference.getParameter(

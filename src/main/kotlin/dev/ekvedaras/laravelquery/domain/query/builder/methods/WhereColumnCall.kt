@@ -12,7 +12,7 @@ import dev.ekvedaras.laravelquery.support.nonHashEntriesOfType
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class WhereColumnCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, ColumnSelectionCall {
+class WhereColumnCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsColumns {
     private val firstColumnMethodParameter = reference.getParameter(0)
     private val secondColumnParameter =
         if (reference.parameters.size > 2) reference.getParameter(2)
