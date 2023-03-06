@@ -1,12 +1,10 @@
-package dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters
+package dev.ekvedaras.laravelquery.domain
 
 import com.intellij.codeInsight.lookup.LookupElement
-import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
-import kotlin.streams.toList
 
-class TableParameter(val stringParameter: StringParameter) {
+class TableWithAliasParameter(val stringParameter: StringParameter) {
     val tableName: String
     val namespaceName: String?
     val alias: String?

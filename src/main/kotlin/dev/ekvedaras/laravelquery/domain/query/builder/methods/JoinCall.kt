@@ -9,7 +9,7 @@ import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.TableWithAliasParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class JoinCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsTable, SelectsColumns {
@@ -19,8 +19,8 @@ class JoinCall(override val reference: MethodReference, override val queryStatem
         if (reference.parameters.size > 3) 3 else 2
     )
 
-    final override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
-        TableParameter(it.asStringParameter())
+    final override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableWithAliasParameter> {
+        TableWithAliasParameter(it.asStringParameter())
     }
 
     override val tableAlias: TableAlias? =

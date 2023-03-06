@@ -2,12 +2,9 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.database.psi.DbColumn
-import com.intellij.database.psi.DbNamespace
-import com.intellij.database.psi.DbTable
+import dev.ekvedaras.laravelquery.domain.ReferencesColumn
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationKeyParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationParameter
 
 sealed interface DefinesModelRelation : QueryMethodCall, ReferencesColumn {
     val columns: Set<RelationKeyParameter>

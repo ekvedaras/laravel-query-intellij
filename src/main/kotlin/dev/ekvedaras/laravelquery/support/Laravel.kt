@@ -13,5 +13,6 @@ object LaravelClasses {
     const val SchemaFacade = "\\Illuminate\\Support\\Facades\\Schema"
     const val SchemaFacadeAlias = "\\Schema"
     const val ColumnDefinition = "\\Illuminate\\Database\\Schema\\ColumnDefinition"
+    const val Migration = "\\Illuminate\\Database\\Migrations\\Migration"
     const val TestCase = "\\Illuminate\\Foundation\\Testing\\TestCase"
 }

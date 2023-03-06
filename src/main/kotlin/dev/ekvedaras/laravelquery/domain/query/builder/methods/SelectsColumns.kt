@@ -4,10 +4,13 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.database.psi.DbColumn
 import com.intellij.database.psi.DbNamespace
 import com.intellij.database.psi.DbTable
+import dev.ekvedaras.laravelquery.domain.ReferencesColumn
+import dev.ekvedaras.laravelquery.domain.ReferencesNamespace
+import dev.ekvedaras.laravelquery.domain.ReferencesTable
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ColumnParameter
 
-sealed interface SelectsColumns : QueryMethodCall, ReferencesColumn, ReferencesTable {
+sealed interface SelectsColumns : QueryMethodCall, ReferencesColumn, ReferencesTable, ReferencesNamespace {
     val columns: Set<ColumnParameter>
 
     private fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =

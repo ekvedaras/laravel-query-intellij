@@ -18,12 +18,10 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationKeyParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ScopeParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
 import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
-import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter as TestsColumnParameter
-import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter as TestsTableParameter
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
 
 data class StringParameter(val element: StringLiteralExpression) {
     val project = element.project
@@ -74,23 +72,25 @@ data class StringParameter(val element: StringLiteralExpression) {
     private val methodReference: MethodReference? get() = element.parentOfType()
     private val statement: Statement? get() = methodReference?.parentOfType()
     private val queryStatement: QueryStatement? get() = statement.transform { QueryStatement.from(it) }
-    val queryMethodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
 
+    val queryMethodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
     val testMethodCall: TestMethodCall? get() = methodReference.transform { TestMethodCall.from(it) }
+    val schemaBuilderMethodCall: SchemaBuilderMethodCall? get() = methodReference.transform { SchemaBuilderMethodCall.from(it) }
 
     companion object {
         fun StringLiteralExpression.asStringParameter() = StringParameter(this)
     }
 
     override fun equals(other: Any?): Boolean = when (other) {
+        is TableWithAliasParameter -> other.stringParameter == this
         is TableParameter -> other.stringParameter == this
+        is StandaloneTableParameter -> other.stringParameter == this
         is ColumnParameter -> other.stringParameter == this
+        is StandaloneColumnParameter -> other.stringParameter == this
         is AliasParameter -> other.stringParameter == this
         is RelationParameter -> other.stringParameter == this
         is RelationKeyParameter -> other.stringParameter == this
         is ScopeParameter -> other.stringParameter == this
-        is TestsTableParameter -> other.stringParameter == this
-        is TestsColumnParameter -> other.stringParameter == this
         is StringParameter -> other.element.originalElement == element.originalElement
         is PsiElement -> other == element.originalElement
         else -> false

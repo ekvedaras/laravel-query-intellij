@@ -45,8 +45,12 @@ inline fun <reified TPassThrough, reified TFrom, TTo : TPassThrough> Any?.tryTra
     }
 }
 
-fun <R> Project.whenSmart(action: () -> R): R? =
-    if (DumbService.isDumb(this)) null
-    else action()
+fun <R> returnWhen(condition: Boolean, action: () -> R): R? = if (condition) action() else null
+fun <R> returnWhen(condition: Boolean, result: R): R? = if (condition) result else null
+
+fun <R> returnUnless(condition: Boolean, action: () -> R): R? = returnWhen(!condition, action)
+fun <R> returnUnless(condition: Boolean, result: R): R? = returnWhen(!condition, result)
+
+fun <R> Project.whenSmart(action: () -> R): R? = returnUnless(DumbService.isDumb(this), action)
 
 fun <R> PsiElement.whenSmart(action: () -> R): R? = project.whenSmart(action)

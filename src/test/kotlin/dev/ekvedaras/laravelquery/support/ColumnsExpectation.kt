@@ -3,7 +3,7 @@ package dev.ekvedaras.laravelquery.support
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.BaseTestCase
 
-internal data class ColumnsExpectation(val fixture: CodeInsightTestFixture, val not: Boolean = false) : Expectation<ColumnsExpectation> {
+internal data class ColumnsExpectation(val fixture: CodeInsightTestFixture, private val not: Boolean = false) : Expectation<ColumnsExpectation> {
     private val contains = !not
 
     override fun not() = ColumnsExpectation(fixture, not = true)

@@ -5,7 +5,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiReferenceBase
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.ReferencesNamespace
+import dev.ekvedaras.laravelquery.domain.ReferencesNamespace
 
 class NamespaceReference(private val stringParameter: StringParameter, rangeInElement: TextRange) : PsiReferenceBase<StringLiteralExpression>(stringParameter.element, rangeInElement) {
     override fun resolve(): DbNamespace? {

@@ -3,17 +3,17 @@ package dev.ekvedaras.laravelquery.domain.tests
 import com.intellij.codeInsight.lookup.LookupElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
+import dev.ekvedaras.laravelquery.domain.TableParameter
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.isMemberOfAny
 
 sealed interface TestMethodCall {
     val tableParameter: TableParameter?
-    val columns: Set<ColumnParameter>
+    val columns: Set<StandaloneColumnParameter>
         get() = setOf()
 
-    fun columnParameterFor(stringParameter: StringParameter): ColumnParameter? =
+    fun columnParameterFor(stringParameter: StringParameter): StandaloneColumnParameter? =
         columns.find { stringParameter.equals(it) }
 
     companion object {

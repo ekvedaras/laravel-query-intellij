@@ -3,11 +3,13 @@ package dev.ekvedaras.laravelquery.domain.query.builder.methods
 import com.intellij.database.psi.DbNamespace
 import com.intellij.database.psi.DbTable
 import com.jetbrains.rd.util.firstOrNull
+import dev.ekvedaras.laravelquery.domain.ReferencesNamespace
+import dev.ekvedaras.laravelquery.domain.ReferencesTable
 import dev.ekvedaras.laravelquery.domain.StringParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.TableWithAliasParameter
 
-sealed interface SelectsTable : QueryMethodCall, ReferencesTable {
-    val tableParameter: TableParameter?
+sealed interface SelectsTable : QueryMethodCall, ReferencesTable, ReferencesNamespace {
+    val tableParameter: TableWithAliasParameter?
     val tableAlias: TableAlias?
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? =

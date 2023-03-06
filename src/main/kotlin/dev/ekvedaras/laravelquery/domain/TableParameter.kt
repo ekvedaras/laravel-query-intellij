@@ -1,10 +1,8 @@
-package dev.ekvedaras.laravelquery.domain.tests.parameters
+package dev.ekvedaras.laravelquery.domain
 
 import com.intellij.codeInsight.lookup.LookupElement
-import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.database.Namespace
 import dev.ekvedaras.laravelquery.domain.database.Table
-import kotlin.streams.toList
 
 data class TableParameter(val stringParameter: StringParameter) {
     private val tableName: String

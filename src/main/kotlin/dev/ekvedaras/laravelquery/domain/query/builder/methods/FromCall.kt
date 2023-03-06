@@ -7,15 +7,15 @@ import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
 import dev.ekvedaras.laravelquery.domain.query.QueryStatement
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.AliasParameter
-import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.TableWithAliasParameter
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 class FromCall(override val reference: MethodReference, override val queryStatement: QueryStatement) : QueryMethodCall, SelectsTable {
     private val tableMethodParameter = reference.getParameter(0) as? StringLiteralExpression
     private val aliasMethodParameter = reference.getParameter(1) as? StringLiteralExpression
 
-    override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableParameter> {
-        TableParameter(it.asStringParameter())
+    override val tableParameter = tableMethodParameter.transformInstanceOf<StringLiteralExpression, TableWithAliasParameter> {
+        TableWithAliasParameter(it.asStringParameter())
     }
 
     private val aliasParameter = aliasMethodParameter.transformInstanceOf<StringLiteralExpression, AliasParameter> {

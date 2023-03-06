@@ -6,8 +6,8 @@ import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
-import dev.ekvedaras.laravelquery.domain.tests.parameters.ColumnParameter
-import dev.ekvedaras.laravelquery.domain.tests.parameters.TableParameter
+import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
+import dev.ekvedaras.laravelquery.domain.TableParameter
 import dev.ekvedaras.laravelquery.support.hashKeysOrEntriesOfType
 import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transform
@@ -21,11 +21,11 @@ class AssertSoftDeletedCall(reference: MethodReference) : TestMethodCall {
 
     private val columnsMethodParameter = reference.getParameter(1) as? ArrayCreationExpression
     private val deletedAtColumnMethodParameter = reference.getParameter(3) as? StringLiteralExpression
-    override val columns: Set<ColumnParameter> = columnsMethodParameter
+    override val columns: Set<StandaloneColumnParameter> = columnsMethodParameter
         ?.hashKeysOrEntriesOfType<StringLiteralExpression>()
-        ?.map { ColumnParameter(it.asStringParameter()) }
+        ?.map { StandaloneColumnParameter(it.asStringParameter()) }
         ?.tap { list ->
-            deletedAtColumnMethodParameter.transform { list + ColumnParameter(it.asStringParameter()) }
+            deletedAtColumnMethodParameter.transform { list + StandaloneColumnParameter(it.asStringParameter()) }
         }
         ?.toSet() ?: setOf()
 
