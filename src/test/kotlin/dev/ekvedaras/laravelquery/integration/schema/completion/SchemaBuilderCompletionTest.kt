@@ -6,6 +6,15 @@ import dev.ekvedaras.laravelquery.support.Namespaces
 import dev.ekvedaras.laravelquery.support.Tables
 
 internal class SchemaBuilderCompletionTest : BaseTestCase() {
+    fun testItCompletesInCreateDatabaseMethodCall() {
+        myFixture.configureByFile("integration/schema/completion/inCreateDatabaseCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInCreateMethodCall() {
         myFixture.configureByFile("integration/schema/completion/inCreateCallOfAnonymousMigration.php")
         myFixture.completeBasic()

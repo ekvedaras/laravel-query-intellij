@@ -18,6 +18,7 @@ import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.Column
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationKeyParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.RelationParameter
 import dev.ekvedaras.laravelquery.domain.query.builder.methods.parameters.ScopeParameter
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.NamespaceParameter
 import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
@@ -84,6 +85,7 @@ data class StringParameter(val element: StringLiteralExpression) {
     }
 
     override fun equals(other: Any?): Boolean = when (other) {
+        is NamespaceParameter -> other.stringParameter == this
         is TableWithAliasParameter -> other.stringParameter == this
         is TableParameter -> other.stringParameter == this
         is StandaloneTableParameter -> other.stringParameter == this

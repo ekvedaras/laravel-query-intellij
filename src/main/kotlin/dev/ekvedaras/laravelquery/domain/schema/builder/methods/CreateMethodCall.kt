@@ -19,6 +19,6 @@ class CreateMethodCall(override val reference: MethodReference, override val mig
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? = returnWhen(parameter.equals(tableParameter), tableParameter?.table?.asDbTable())
     override fun completeFor(parameter: StringParameter): List<LookupElement> = returnWhen(parameter.equals(tableParameter)) {
-        Table.list(reference.project).map { it.asLookupElement() }.toList()
+        tableParameter?.getCompletionOptions()
     } ?: listOf()
 }

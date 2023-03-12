@@ -20,6 +20,6 @@ class DropMethodCall(override val reference: MethodReference, override val migra
 
     override fun findTableReferencedIn(parameter: StringParameter): DbTable? = returnWhen(parameter.equals(tableParameter), tableParameter?.table?.asDbTable())
     override fun completeFor(parameter: StringParameter): List<LookupElement> = returnWhen(parameter.equals(tableParameter)) {
-        migration.tables.map { it.asLookupElement() } + Table.list(reference.project).map { it.asLookupElement() }.toList()
+        migration.tables.map { it.asLookupElement() } + (tableParameter?.getCompletionOptions() ?: listOf())
     } ?: listOf()
 }

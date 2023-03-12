@@ -237,7 +237,7 @@ namespace Illuminate\Database\Schema {
     use Illuminate\Database\Schema\ColumnDefinition;
 
     /**
-     * @method static bool createDatabase(string $name) ❌
+     * @method static bool createDatabase(string $name) ✅
      * @method static bool dropDatabaseIfExists(string $name) ❌
      * @method static bool hasTable(string $table) ❌
      * @method static array getColumnListing(string $table) ❌
