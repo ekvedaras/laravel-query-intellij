@@ -22,6 +22,7 @@ import dev.ekvedaras.laravelquery.domain.tests.TestMethodCall
 import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.BlueprintMethodCall
 
 data class StringParameter(val element: StringLiteralExpression) {
     val project = element.project
@@ -76,6 +77,7 @@ data class StringParameter(val element: StringLiteralExpression) {
     val queryMethodCall: QueryMethodCall? get() = methodReference.transform { queryStatement?.callChain?.methodCallFor(it) }
     val testMethodCall: TestMethodCall? get() = methodReference.transform { TestMethodCall.from(it) }
     val schemaBuilderMethodCall: SchemaBuilderMethodCall? get() = methodReference.transform { SchemaBuilderMethodCall.from(it) }
+    val blueprintMethodCall: BlueprintMethodCall? get() = methodReference.transform { BlueprintMethodCall.from(it) }
 
     companion object {
         fun StringLiteralExpression.asStringParameter() = StringParameter(this)

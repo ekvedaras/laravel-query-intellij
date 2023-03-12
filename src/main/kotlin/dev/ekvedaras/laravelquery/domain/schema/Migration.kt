@@ -12,7 +12,7 @@ data class Migration(private val clazz: PhpClass) {
     private val upMethod = clazz.methods.first { it.name == "up" }
     private val downMethod = clazz.methods.firstOrNull { it.name == "down" }
 
-    private val newTables = setOf<NewTable>()
+    private val tables = setOf<MigrationTable>()
 
 
 }

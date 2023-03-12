@@ -37,6 +37,10 @@
                                 implementationClass="dev.ekvedaras.laravelquery.integration.schema.completion.SchemaBuilderCompletionContributor"
         />
 
+        <completion.contributor language="PHP"
+                                implementationClass="dev.ekvedaras.laravelquery.integration.schema.blueprint.completion.BlueprintCompletionContributor"
+        />
+
 <!--        <completion.contributor language="PHP"-->
 <!--                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"-->
 <!--                                order="first"/>-->

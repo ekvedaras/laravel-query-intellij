@@ -13,8 +13,8 @@ import dev.ekvedaras.laravelquery.domain.schema.Migration
 import dev.ekvedaras.laravelquery.support.returnWhen
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class CreateMethodCall(override val reference: MethodReference, override val migration: Migration) : SchemaBuilderMethodCall, ReferencesTable {
-    private val tableParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneTableParameter> {
+class CreateMethodCall(override val reference: MethodReference, override val migration: Migration) : SchemaBuilderMethodCall, HasBlueprintClosure {
+    override val tableParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneTableParameter> {
         StandaloneTableParameter(it.asStringParameter())
     }
 

@@ -245,7 +245,7 @@ namespace Illuminate\Database\Schema {
      * @method static bool hasColumns(string $table, array $columns) ❌
      * @method static string getColumnType(string $table, string $column) ❌
      * @method static void table(string $table, Closure $callback) ❌
-     * @method static void create(string $table, Closure $callback) ❌
+     * @method static void create(string $table, Closure $callback) ✅
      * @method static void drop(string $table) ❌
      * @method static void dropIfExists(string $table) ❌
      * @method static void dropColumns(string $table, string|array $columns) ❌
@@ -281,7 +281,7 @@ namespace Illuminate\Database\Schema {
      * @method ColumnDefinition mediumIncrements(string $column) ❌
      * @method ColumnDefinition bigIncrements(string $column) ❌
      * @method ColumnDefinition char(string $column, int|null $length = null) ❌
-     * @method ColumnDefinition string(string $column, int|null $length = null) ❌
+     * @method ColumnDefinition string(string $column, int|null $length = null) ✅
      * @method ColumnDefinition text(string $column) ❌
      * @method ColumnDefinition mediumText(string $column) ❌
      * @method ColumnDefinition longText(string $column) ❌
