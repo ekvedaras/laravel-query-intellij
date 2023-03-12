@@ -14,4 +14,13 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
         Tables.expect(myFixture).toBeCompleted()
         Columns.expect(myFixture).not().toBeCompleted()
     }
+
+    fun testItCompletesInDropMethodCallOfNewTable() {
+        myFixture.configureByFile("integration/schema/completion/inDropCallOfNewTable.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted().withNewTable("new_table")
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }

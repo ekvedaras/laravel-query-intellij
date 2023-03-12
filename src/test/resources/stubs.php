@@ -244,10 +244,10 @@ namespace Illuminate\Database\Schema {
      * @method static bool hasColumn(string $table, string $column) ❌
      * @method static bool hasColumns(string $table, array $columns) ❌
      * @method static string getColumnType(string $table, string $column) ❌
-     * @method static void table(string $table, Closure $callback) ❌
+     * @method static void table(string $table, Closure $callback) ✅
      * @method static void create(string $table, Closure $callback) ✅
-     * @method static void drop(string $table) ❌
-     * @method static void dropIfExists(string $table) ❌
+     * @method static void drop(string $table) ✅
+     * @method static void dropIfExists(string $table) ✅
      * @method static void dropColumns(string $table, string|array $columns) ❌
      * @method static void rename(string $from, string $to) ❌
      */

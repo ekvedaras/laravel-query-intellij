@@ -17,4 +17,12 @@ internal data class TablesExpectation(val fixture: CodeInsightTestFixture, val n
             inFixture = fixture,
         )
     }
+
+    fun withNewTable(name: String) = apply {
+        BaseTestCase.assertLookup(
+            contains,
+            name,
+            inFixture = fixture,
+        )
+    }
 }
