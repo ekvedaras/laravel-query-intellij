@@ -9,10 +9,18 @@ internal data class NamespacesExpectation(val fixture: CodeInsightTestFixture, v
     override fun but() = NamespacesExpectation(fixture, not = false)
     override fun and() = this
 
-    fun toBeCompleted() = this.apply {
+    fun toBeCompleted() = apply {
         BaseTestCase.assertLookup(
             contains,
             *Namespaces.values().map { it.name }.toTypedArray(),
+            inFixture = fixture,
+        )
+    }
+
+    fun withNewNamespace(name: String) = apply {
+        BaseTestCase.assertLookup(
+            contains,
+            name,
             inFixture = fixture,
         )
     }

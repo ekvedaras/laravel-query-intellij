@@ -29,6 +29,7 @@ sealed interface SchemaBuilderMethodCall {
 
             return when(reference.name) {
                 "createDatabase" -> CreateDatabaseMethodCall(reference, migration)
+                "dropDatabase", "dropDatabaseIfExists" -> DropDatabaseMethodCall(reference, migration)
                 "create", "table" -> CreateMethodCall(reference, migration)
                 "drop", "dropIfExists" -> DropMethodCall(reference, migration)
                 else -> null

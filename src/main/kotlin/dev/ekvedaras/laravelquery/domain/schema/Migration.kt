@@ -5,14 +5,13 @@ import com.jetbrains.php.lang.psi.elements.GroupStatement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
-import dev.ekvedaras.laravelquery.domain.ReferencesTable
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesNamespace
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.firstChildOfType
 import dev.ekvedaras.laravelquery.support.isChildOfAny
 import dev.ekvedaras.laravelquery.support.tap
-import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 data class Migration(private val clazz: PhpClass) {
@@ -23,6 +22,7 @@ data class Migration(private val clazz: PhpClass) {
     private val upMethod = clazz.methods.firstOrNull { it.name == "up" }
     private val downMethod = clazz.methods.firstOrNull { it.name == "down" }
 
+    var namespaces = setOf<MigrationNamespace>()
     var tables = setOf<MigrationTable>()
 
     init {
@@ -32,6 +32,9 @@ data class Migration(private val clazz: PhpClass) {
                     is MigratesTable -> migrationStatement.tableParameter?.tableName.tap {
                         tables += MigrationTable(it, clazz.project)
                     }
+                    is MigratesNamespace -> migrationStatement.namespaceParameter?.namespaceName.tap {
+                        namespaces += MigrationNamespace(it, clazz.project)
+                    }
                     else -> {}
                 }
             }
@@ -40,6 +43,4 @@ data class Migration(private val clazz: PhpClass) {
         upMethod?.firstChildOfType<GroupStatement>()?.childrenOfType<Statement>()?.forEach(scanStatements)
         downMethod?.firstChildOfType<GroupStatement>()?.childrenOfType<Statement>()?.forEach(scanStatements)
     }
-
-
 }

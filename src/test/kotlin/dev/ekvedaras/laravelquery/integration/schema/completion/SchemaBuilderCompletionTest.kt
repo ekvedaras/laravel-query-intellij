@@ -15,6 +15,15 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
         Columns.expect(myFixture).not().toBeCompleted()
     }
 
+    fun testItCompletesInDropDatabaseMethodCallOfNewDatabase() {
+        myFixture.configureByFile("integration/schema/completion/inDropCallOfNewNamespace.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).toBeCompleted().withNewNamespace("new_database")
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
     fun testItCompletesInCreateMethodCall() {
         myFixture.configureByFile("integration/schema/completion/inCreateCallOfAnonymousMigration.php")
         myFixture.completeBasic()
