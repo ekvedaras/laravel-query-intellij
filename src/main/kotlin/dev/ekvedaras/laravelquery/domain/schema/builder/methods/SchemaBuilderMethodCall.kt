@@ -32,7 +32,7 @@ sealed interface SchemaBuilderMethodCall {
                 "dropDatabase", "dropDatabaseIfExists" -> DropDatabaseCall(reference, migration)
                 "create", "table" -> CreateCall(reference, migration)
                 "drop", "dropIfExists", "hasTable", "getColumnListing" -> DropCall(reference, migration)
-                "hasColumn" -> HasColumnCall(reference, migration)
+                "hasColumn", "getColumnType" -> HasColumnCall(reference, migration)
                 "hasColumns" -> HasColumnsCall(reference, migration)
                 else -> null
             }

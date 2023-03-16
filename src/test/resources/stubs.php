@@ -243,7 +243,7 @@ namespace Illuminate\Database\Schema {
      * @method static array getColumnListing(string $table) ✅
      * @method static bool hasColumn(string $table, string $column) ✅
      * @method static bool hasColumns(string $table, array $columns) ✅
-     * @method static string getColumnType(string $table, string $column) ❌
+     * @method static string getColumnType(string $table, string $column) ✅
      * @method static void table(string $table, Closure $callback) ✅
      * @method static void create(string $table, Closure $callback) ✅
      * @method static void drop(string $table) ✅
