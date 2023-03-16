@@ -50,4 +50,24 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
         Tables.expect(myFixture).toBeCompleted()
         Columns.expect(myFixture).not().toBeCompleted()
     }
+
+    fun testItCompletesInHasColumnMethodCallTableParameter() {
+        myFixture.configureByFile("integration/schema/completion/inHasColumnCallTableParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInHasColumnMethodCallColumnParameter() {
+        myFixture.configureByFile("integration/schema/completion/inHasColumnCallColumnParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted()
+            .withoutOtherTables().andTheirColumns()
+    }
 }
