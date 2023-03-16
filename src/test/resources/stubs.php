@@ -239,8 +239,8 @@ namespace Illuminate\Database\Schema {
     /**
      * @method static bool createDatabase(string $name) ✅
      * @method static bool dropDatabaseIfExists(string $name) ✅
-     * @method static bool hasTable(string $table) ❌
-     * @method static array getColumnListing(string $table) ❌
+     * @method static bool hasTable(string $table) ✅
+     * @method static array getColumnListing(string $table) ✅
      * @method static bool hasColumn(string $table, string $column) ❌
      * @method static bool hasColumns(string $table, array $columns) ❌
      * @method static string getColumnType(string $table, string $column) ❌

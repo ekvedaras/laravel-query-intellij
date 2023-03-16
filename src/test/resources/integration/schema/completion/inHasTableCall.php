@@ -8,6 +8,6 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::drop('users');
+        Schema::hasTable('<caret>');
     }
 };

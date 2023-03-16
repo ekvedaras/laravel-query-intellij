@@ -10,13 +10,13 @@ import dev.ekvedaras.laravelquery.domain.schema.Migration
 import dev.ekvedaras.laravelquery.support.returnWhen
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class CreateDatabaseMethodCall(override val reference: MethodReference, override val migration: Migration) : SchemaBuilderMethodCall, MigratesNamespace {
+class DropDatabaseCall(override val reference: MethodReference, override val migration: Migration) : SchemaBuilderMethodCall, MigratesNamespace {
     override val namespaceParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, NamespaceParameter> {
         NamespaceParameter(it.asStringParameter())
     }
 
     override fun findNamespaceReferencedIn(parameter: StringParameter): DbNamespace? = returnWhen(parameter.equals(namespaceParameter), namespaceParameter?.namespace?.asDbNamespace())
     override fun completeFor(parameter: StringParameter): List<LookupElement> = returnWhen(parameter.equals(namespaceParameter)) {
-        namespaceParameter?.getCompletionOptions()
+        migration.namespaces.map { it.asLookupElement() } + (namespaceParameter?.getCompletionOptions() ?: listOf())
     } ?: listOf()
 }

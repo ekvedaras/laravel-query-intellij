@@ -41,4 +41,13 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
         Tables.expect(myFixture).toBeCompleted().withNewTable("new_table")
         Columns.expect(myFixture).not().toBeCompleted()
     }
+
+    fun testItCompletesInHasTableMethodCall() {
+        myFixture.configureByFile("integration/schema/completion/inHasTableCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }
