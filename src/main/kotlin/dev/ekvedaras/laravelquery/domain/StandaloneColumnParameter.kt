@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.psi.DbColumn
 import dev.ekvedaras.laravelquery.domain.database.Table
+import dev.ekvedaras.laravelquery.domain.schema.MigrationTable
 import dev.ekvedaras.laravelquery.support.firstWhereOrNull
 import dev.ekvedaras.laravelquery.support.transform
 
@@ -21,4 +22,9 @@ data class StandaloneColumnParameter(val stringParameter: StringParameter) {
             ?: LookupElementBuilder
                 .create(stringParameter.text)
                 .withTypeText(table.nameWithoutPrefix, true)
+
+    fun asLookupElement(table: MigrationTable): LookupElement =
+        LookupElementBuilder
+            .create(stringParameter.text)
+            .withTypeText(table.name, true)
 }

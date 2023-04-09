@@ -32,6 +32,7 @@ sealed interface BlueprintMethodCall {
 
             return when (reference.name) {
                 "string" -> StringCall(reference, table)
+                "dropColumn" -> DropColumnCall(reference, table)
                 else -> null
             }
         }
