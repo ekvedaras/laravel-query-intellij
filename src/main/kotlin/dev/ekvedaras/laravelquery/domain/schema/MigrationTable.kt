@@ -23,5 +23,6 @@ data class MigrationTable(val methodCall: MigratesTable) {
     val columns: List<StandaloneColumnParameter>
         get() = when (methodCall) {
             is HasBlueprintClosure -> methodCall.closure?.columns
+            else -> null
         } ?: listOf()
 }

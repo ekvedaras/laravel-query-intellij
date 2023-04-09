@@ -249,7 +249,7 @@ namespace Illuminate\Database\Schema {
      * @method static void drop(string $table) ✅
      * @method static void dropIfExists(string $table) ✅
      * @method static void dropColumns(string $table, string|array $columns) ✅
-     * @method static void rename(string $from, string $to) ❌
+     * @method static void rename(string $from, string $to) ✅
      */
     class Builder {}
 

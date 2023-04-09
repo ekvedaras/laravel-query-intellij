@@ -141,4 +141,31 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted().withNewColumn("new_column")
             .withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesTablesInRenameMethodCallFromParameterInUpMethod() {
+        myFixture.configureByFile("integration/schema/completion/inRenameCallFromParameterInUpMethod.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesTablesInRenameMethodCallToParameterInUpMethod() {
+        myFixture.configureByFile("integration/schema/completion/inRenameCallToParameterInUpMethod.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesTablesInRenameMethodCallFromParameterInDownMethod() {
+        myFixture.configureByFile("integration/schema/completion/inRenameCallFromParameterInDown.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted().withNewTable("users1")
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
 }

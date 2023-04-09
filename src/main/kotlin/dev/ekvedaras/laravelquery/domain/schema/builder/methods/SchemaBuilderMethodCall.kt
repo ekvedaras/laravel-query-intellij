@@ -35,6 +35,7 @@ sealed interface SchemaBuilderMethodCall {
                 "hasColumn", "getColumnType" -> HasColumnCall(reference, migration)
                 "hasColumns" -> HasColumnsCall(reference, migration)
                 "dropColumns" -> DropColumnsCall(reference, migration)
+                "rename" -> RenameCall(reference, migration)
                 else -> null
             }
         }
