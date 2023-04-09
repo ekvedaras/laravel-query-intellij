@@ -29,12 +29,8 @@ data class Migration(private val clazz: PhpClass) {
         val scanStatements: (statement: Statement) -> Unit = { statement: Statement ->
             statement.firstPsiChild.transformInstanceOf<MethodReference, Unit> { reference ->
                 when(val migrationStatement = SchemaBuilderMethodCall.from(reference, this)) {
-                    is MigratesTable -> migrationStatement.tableParameter?.tableName.tap {
-                        tables += MigrationTable(it, clazz.project)
-                    }
-                    is MigratesNamespace -> migrationStatement.namespaceParameter?.namespaceName.tap {
-                        namespaces += MigrationNamespace(it, clazz.project)
-                    }
+                    is MigratesTable -> tables += MigrationTable(migrationStatement)
+                    is MigratesNamespace -> namespaces += MigrationNamespace(migrationStatement)
                     else -> {}
                 }
             }

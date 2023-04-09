@@ -46,6 +46,14 @@ internal data class TableExpectation(val table: Tables, val fixture: CodeInsight
 
     fun toHaveItsColumnsCompleted() = withColumns()
 
+    fun withNewColumn(name: String) = apply {
+        BaseTestCase.assertLookup(
+            contains,
+            name,
+            inFixture = fixture,
+        )
+    }
+
     fun toHaveAliasCompleted(alias: String) = apply {
         BaseTestCase.assertLookup(
             contains,

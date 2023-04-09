@@ -90,4 +90,55 @@ internal class SchemaBuilderCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted()
             .withoutOtherTables().andTheirColumns()
     }
+
+    fun testItDoesNotCompleteInHasColumnsMethodCallColumnParameterString() {
+        myFixture.configureByFile("integration/schema/completion/inHasColumnsCallColumnParameterString.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).not().toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInDropColumnsMethodCallTableParameter() {
+        myFixture.configureByFile("integration/schema/completion/inDropColumnsCallTableParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.expect(myFixture).toBeCompleted()
+        Columns.expect(myFixture).not().toBeCompleted()
+    }
+
+    fun testItCompletesInDropColumnsMethodCallColumnParameterArrayEntry() {
+        myFixture.configureByFile("integration/schema/completion/inDropColumnsCallColumnParameterArrayEntry.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted()
+            .withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInDropColumnsMethodCallColumnParameterString() {
+        myFixture.configureByFile("integration/schema/completion/inDropColumnsCallColumnParameterString.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted()
+            .withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesNewlyAddedColumnsInDropColumnsMethodCallColumnParameterString() {
+        myFixture.configureByFile("integration/schema/completion/inDropColumnsCallColumnParameterStringInDownMethod.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withNewColumn("new_column")
+            .withoutOtherTables().andTheirColumns()
+    }
 }

@@ -13,8 +13,8 @@ import dev.ekvedaras.laravelquery.support.returnWhen
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class StringCall(override val reference: MethodReference, override val table: MigrationTable) : BlueprintMethodCall, ReferencesColumn {
-    private val columnParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneColumnParameter> {
+class StringCall(override val reference: MethodReference, override val table: MigrationTable) : BlueprintMethodCall, MigratesColumn {
+    override val columnParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneColumnParameter> {
         StandaloneColumnParameter(it.asStringParameter())
     }
 

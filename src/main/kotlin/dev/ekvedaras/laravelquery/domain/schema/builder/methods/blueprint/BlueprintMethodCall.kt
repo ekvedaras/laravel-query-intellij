@@ -24,9 +24,7 @@ sealed interface BlueprintMethodCall {
                 ?.parentOfType<MethodReference>()
                 .transform { SchemaBuilderMethodCall.from(it) }
                 .transformInstanceOf<HasBlueprintClosure, BlueprintMethodCall?> {
-                    it.tableParameter?.tableName.transform { tableName ->
-                        from(reference, MigrationTable(tableName, reference.project))
-                    }
+                    from(reference, MigrationTable(it))
                 }
 
         fun from(reference: MethodReference, table: MigrationTable): BlueprintMethodCall? {

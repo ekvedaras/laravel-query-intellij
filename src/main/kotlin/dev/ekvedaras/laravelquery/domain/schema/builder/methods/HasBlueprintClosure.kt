@@ -1,3 +1,5 @@
 package dev.ekvedaras.laravelquery.domain.schema.builder.methods
 
-sealed interface HasBlueprintClosure : MigratesTable
+sealed interface HasBlueprintClosure : MigratesTable {
+    val closure: BlueprintClosure?
+}
