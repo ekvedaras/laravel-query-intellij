@@ -263,8 +263,8 @@ namespace Illuminate\Database\Schema {
      * @method Fluent dropForeign(string|array $index) ❌
      * @method Fluent dropConstrainedForeignId(string $column) ❌
      * @method Fluent renameIndex(string $from, string $to) ❌
-     * @method void dropSoftDeletes(string $column = 'deleted_at') ❌
-     * @method void dropSoftDeletesTz(string $column = 'deleted_at') ❌
+     * @method void dropSoftDeletes(string $column = 'deleted_at') ✅
+     * @method void dropSoftDeletesTz(string $column = 'deleted_at') ✅
      * @method void dropMorphs(string $name, string|null $indexName = null) ❌
      * @method Fluent rename(string $to) ❌
      * @method Fluent primary(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
@@ -273,66 +273,66 @@ namespace Illuminate\Database\Schema {
      * @method Fluent spatialIndex(string|array $columns, string|null $name = null) ❌
      * @method Fluent rawIndex(string $expression, string $name) ❌
      * @method ForeignKeyDefinition foreign(string|array $columns, string|null $name = null) ❌
-     * @method ColumnDefinition id(string $column = 'id') ❌
-     * @method ColumnDefinition increments(string $column) ❌
-     * @method ColumnDefinition integerIncrements(string $column) ❌
-     * @method ColumnDefinition tinyIncrements(string $column) ❌
-     * @method ColumnDefinition smallIncrements(string $column) ❌
-     * @method ColumnDefinition mediumIncrements(string $column) ❌
-     * @method ColumnDefinition bigIncrements(string $column) ❌
-     * @method ColumnDefinition char(string $column, int|null $length = null) ❌
+     * @method ColumnDefinition id(string $column = 'id') ✅
+     * @method ColumnDefinition increments(string $column) ✅
+     * @method ColumnDefinition integerIncrements(string $column) ✅
+     * @method ColumnDefinition tinyIncrements(string $column) ✅
+     * @method ColumnDefinition smallIncrements(string $column) ✅
+     * @method ColumnDefinition mediumIncrements(string $column) ✅
+     * @method ColumnDefinition bigIncrements(string $column) ✅
+     * @method ColumnDefinition char(string $column, int|null $length = null) ✅
      * @method ColumnDefinition string(string $column, int|null $length = null) ✅
-     * @method ColumnDefinition text(string $column) ❌
-     * @method ColumnDefinition mediumText(string $column) ❌
-     * @method ColumnDefinition longText(string $column) ❌
-     * @method ColumnDefinition integer(string $column, bool $autoIncrement = false, bool $unsigned = false) ❌
-     * @method ColumnDefinition tinyInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ❌
-     * @method ColumnDefinition smallInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ❌
-     * @method ColumnDefinition mediumInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ❌
-     * @method ColumnDefinition bigInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ❌
-     * @method ColumnDefinition unsignedInteger(string $column, bool $autoIncrement = false) ❌
-     * @method ColumnDefinition unsignedTinyInteger(string $column, bool $autoIncrement = false) ❌
-     * @method ColumnDefinition unsignedSmallInteger(string $column, bool $autoIncrement = false) ❌
-     * @method ColumnDefinition unsignedMediumInteger(string $column, bool $autoIncrement = false) ❌
-     * @method ColumnDefinition unsignedBigInteger(string $column, bool $autoIncrement = false) ❌
-     * @method ForeignIdColumnDefinition foreignId(string $column) ❌
+     * @method ColumnDefinition text(string $column) ✅
+     * @method ColumnDefinition mediumText(string $column) ✅
+     * @method ColumnDefinition longText(string $column) ✅
+     * @method ColumnDefinition integer(string $column, bool $autoIncrement = false, bool $unsigned = false) ✅
+     * @method ColumnDefinition tinyInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ✅
+     * @method ColumnDefinition smallInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ✅
+     * @method ColumnDefinition mediumInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ✅
+     * @method ColumnDefinition bigInteger(string $column, bool $autoIncrement = false, bool $unsigned = false) ✅
+     * @method ColumnDefinition unsignedInteger(string $column, bool $autoIncrement = false) ✅
+     * @method ColumnDefinition unsignedTinyInteger(string $column, bool $autoIncrement = false) ✅
+     * @method ColumnDefinition unsignedSmallInteger(string $column, bool $autoIncrement = false) ✅
+     * @method ColumnDefinition unsignedMediumInteger(string $column, bool $autoIncrement = false) ✅
+     * @method ColumnDefinition unsignedBigInteger(string $column, bool $autoIncrement = false) ✅
+     * @method ForeignIdColumnDefinition foreignId(string $column) ✅
      * @method ForeignIdColumnDefinition foreignIdFor(Model|string $model, string|null $column = null) ❌
-     * @method ColumnDefinition float(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ❌
-     * @method ColumnDefinition double(string $column, int|null $total = null, int|null $places = null, bool $unsigned = false) ❌
-     * @method ColumnDefinition decimal(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ❌
-     * @method ColumnDefinition unsignedFloat(string $column, int $total = 8, int $places = 2) ❌
-     * @method ColumnDefinition unsignedDouble(string $column, int $total = null, int $places = null) ❌
-     * @method ColumnDefinition unsignedDecimal(string $column, int $total = 8, int $places = 2) ❌
-     * @method ColumnDefinition boolean(string $column) ❌
-     * @method ColumnDefinition enum(string $column, array $allowed) ❌
-     * @method ColumnDefinition set(string $column, array $allowed) ❌
-     * @method ColumnDefinition json(string $column) ❌
-     * @method ColumnDefinition jsonb(string $column) ❌
-     * @method ColumnDefinition date(string $column) ❌
-     * @method ColumnDefinition dateTime(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition dateTimeTz(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition time(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition timeTz(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition timestamp(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition timestampTz(string $column, int $precision = 0) ❌
-     * @method ColumnDefinition softDeletes(string $column = 'deleted_at', int $precision = 0) ❌
-     * @method ColumnDefinition softDeletesTz(string $column = 'deleted_at', int $precision = 0) ❌
-     * @method ColumnDefinition year(string $column) ❌
-     * @method ColumnDefinition binary(string $column) ❌
-     * @method ColumnDefinition uuid(string $column) ❌
-     * @method ColumnDefinition foreignUuid(string $column) ❌
-     * @method ColumnDefinition ipAddress(string $column) ❌
-     * @method ColumnDefinition macAddress(string $column) ❌
-     * @method ColumnDefinition geometry(string $column) ❌
-     * @method ColumnDefinition point(string $column, int|null $srid = null) ❌
-     * @method ColumnDefinition lineString(string $column) ❌
-     * @method ColumnDefinition polygon(string $column) ❌
-     * @method ColumnDefinition geometryCollection(string $column) ❌
-     * @method ColumnDefinition multiPoint(string $column) ❌
-     * @method ColumnDefinition multiLineString(string $column) ❌
-     * @method ColumnDefinition multiPolygon(string $column) ❌
-     * @method ColumnDefinition multiPolygonZ(string $column) ❌
-     * @method ColumnDefinition computed(string $column, string $expression) ❌
+     * @method ColumnDefinition float(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ✅
+     * @method ColumnDefinition double(string $column, int|null $total = null, int|null $places = null, bool $unsigned = false) ✅
+     * @method ColumnDefinition decimal(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ✅
+     * @method ColumnDefinition unsignedFloat(string $column, int $total = 8, int $places = 2) ✅
+     * @method ColumnDefinition unsignedDouble(string $column, int $total = null, int $places = null) ✅
+     * @method ColumnDefinition unsignedDecimal(string $column, int $total = 8, int $places = 2) ✅
+     * @method ColumnDefinition boolean(string $column) ✅
+     * @method ColumnDefinition enum(string $column, array $allowed) ✅
+     * @method ColumnDefinition set(string $column, array $allowed) ✅
+     * @method ColumnDefinition json(string $column) ✅
+     * @method ColumnDefinition jsonb(string $column) ✅
+     * @method ColumnDefinition date(string $column) ✅
+     * @method ColumnDefinition dateTime(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition dateTimeTz(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition time(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition timeTz(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition timestamp(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition timestampTz(string $column, int $precision = 0) ✅
+     * @method ColumnDefinition softDeletes(string $column = 'deleted_at', int $precision = 0) ✅
+     * @method ColumnDefinition softDeletesTz(string $column = 'deleted_at', int $precision = 0) ✅
+     * @method ColumnDefinition year(string $column) ✅
+     * @method ColumnDefinition binary(string $column) ✅
+     * @method ColumnDefinition uuid(string $column) ✅
+     * @method ColumnDefinition foreignUuid(string $column) ✅
+     * @method ColumnDefinition ipAddress(string $column) ✅
+     * @method ColumnDefinition macAddress(string $column) ✅
+     * @method ColumnDefinition geometry(string $column) ✅
+     * @method ColumnDefinition point(string $column, int|null $srid = null) ✅
+     * @method ColumnDefinition lineString(string $column) ✅
+     * @method ColumnDefinition polygon(string $column) ✅
+     * @method ColumnDefinition geometryCollection(string $column) ✅
+     * @method ColumnDefinition multiPoint(string $column) ✅
+     * @method ColumnDefinition multiLineString(string $column) ✅
+     * @method ColumnDefinition multiPolygon(string $column) ✅
+     * @method ColumnDefinition multiPolygonZ(string $column) ✅
+     * @method ColumnDefinition computed(string $column, string $expression) ✅
      * @method void morphs(string $name, string|null $indexName = null) ❌
      * @method void nullableMorphs(string $name, string|null $indexName = null) ❌
      * @method void numericMorphs(string $name, string|null $indexName = null) ❌

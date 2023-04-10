@@ -31,7 +31,21 @@ sealed interface BlueprintMethodCall {
             if (!reference.isMemberOfAny(LaravelClasses.Blueprint)) return null
 
             return when (reference.name) {
-                "string" -> StringCall(reference, table)
+                "id", "foreignId", "uuid", "foreignUuid",
+                "increments", "integerIncrements", "tinyIncrements", "smallIncrements", "mediumIncrements", "bigIncrements",
+                "integer", "tinyInteger", "smallInteger", "mediumInteger", "bigInteger",
+                "unsignedInteger", "unsignedTinyInteger", "unsignedSmallInteger", "unsignedMediumInteger", "unsignedBigInteger",
+                "float", "double", "decimal", "unsignedFloat", "unsignedDouble", "unsignedDecimal",
+                "char", "string", "text", "mediumText", "longText",
+                "boolean", "enum", "set", "json", "jsonb",
+                "date", "dateTime", "dateTimeTz",
+                "time", "timeTz", "timestamp", "timestampTz",
+                "softDeletes", "softDeletesTz", "dropSoftDeletes", "dropSoftDeletesTz",
+                "year",
+                "binary", "ipAddress", "macAddress",
+                "geometry", "point", "lineString", "polygon", "geometryCollection",
+                "multiPoint", "multiLineString", "multiPolygon", "multiPolygonZ",
+                "computed", "after", -> StringCall(reference, table)
                 "dropColumn" -> DropColumnCall(reference, table)
                 else -> null
             }
