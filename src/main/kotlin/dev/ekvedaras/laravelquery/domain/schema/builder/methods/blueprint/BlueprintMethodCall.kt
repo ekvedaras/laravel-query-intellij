@@ -5,6 +5,7 @@ import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import dev.ekvedaras.laravelquery.domain.StringParameter
+import dev.ekvedaras.laravelquery.domain.schema.Migration
 import dev.ekvedaras.laravelquery.domain.schema.MigrationTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.HasBlueprintClosure
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
@@ -16,6 +17,7 @@ import dev.ekvedaras.laravelquery.support.transformInstanceOf
 sealed interface BlueprintMethodCall {
     val reference: MethodReference
     val table: MigrationTable
+    val migration: Migration get() = table.migration
 
     companion object {
         fun from(reference: MethodReference): BlueprintMethodCall? =

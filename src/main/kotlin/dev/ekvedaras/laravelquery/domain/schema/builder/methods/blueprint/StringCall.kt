@@ -4,7 +4,6 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.database.psi.DbColumn
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression
-import dev.ekvedaras.laravelquery.domain.ReferencesColumn
 import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter
 import dev.ekvedaras.laravelquery.domain.StringParameter.Companion.asStringParameter
@@ -25,6 +24,7 @@ class StringCall(override val reference: MethodReference, override val table: Mi
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> = returnWhen(
         parameter.equals(columnParameter),
-        table.asExistingTable().transform { columnParameter?.getCompletionOptions(it) }
+        migration.migratedColumns(forTable = table).map { it.asLookupElement(table) }
+            + (table.asExistingTable().transform { columnParameter?.getCompletionOptions(it) } ?: listOf())
     ) ?: listOf()
 }

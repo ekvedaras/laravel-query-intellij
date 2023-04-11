@@ -12,6 +12,7 @@ import icons.DatabaseIcons
 data class MigrationTable(val methodCall: MigratesTable) {
     val name = methodCall.tableParameter?.table?.name
     val project = methodCall.reference.project
+    val migration = methodCall.migration
     fun asExistingTable(): Table? = name.transform { Table.findFirst(it, project) }
 
     fun asLookupElement() = methodCall.tableParameter?.asLookupElement()

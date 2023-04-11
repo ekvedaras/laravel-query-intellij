@@ -20,6 +20,7 @@ class DropColumnCall(override val reference: MethodReference, override val table
         is ArrayCreationExpression -> firstParameter
             .nonHashEntriesOfType<StringLiteralExpression>()
             .map { StandaloneColumnParameter(it.asStringParameter()) }
+
         else -> listOf()
     }
 
@@ -31,12 +32,7 @@ class DropColumnCall(override val reference: MethodReference, override val table
         }
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> =
-        (table.methodCall
-            .migration
-            .tables
-            .filter { table.name == it.name }
-            .flatMap { it.columns.map { column -> column.asLookupElement(it) } }
-            ) + (table.asExistingTable().transform { existingTable ->
+        migration.migratedColumns(forTable = table).map { it.asLookupElement(table) } + (table.asExistingTable().transform { existingTable ->
             columnParameter
                 .find { parameter.equals(it) }
                 ?.getCompletionOptions(existingTable)

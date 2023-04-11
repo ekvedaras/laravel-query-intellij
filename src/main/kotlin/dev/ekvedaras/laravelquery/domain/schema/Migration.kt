@@ -5,6 +5,7 @@ import com.jetbrains.php.lang.psi.elements.GroupStatement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.Statement
+import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesNamespace
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
@@ -39,4 +40,7 @@ data class Migration(private val clazz: PhpClass) {
         upMethod?.firstChildOfType<GroupStatement>()?.childrenOfType<Statement>()?.forEach(scanStatements)
         downMethod?.firstChildOfType<GroupStatement>()?.childrenOfType<Statement>()?.forEach(scanStatements)
     }
+
+    fun migratedColumns(forTable: MigrationTable): List<StandaloneColumnParameter> =
+        tables.filter{ it.name == forTable.name }.flatMap { it.columns }
 }
