@@ -49,6 +49,7 @@ sealed interface BlueprintMethodCall {
                 "multiPoint", "multiLineString", "multiPolygon", "multiPolygonZ",
                 "computed", "after", -> StringCall(reference, table)
                 "dropColumn" -> DropColumnCall(reference, table)
+                "renameColumn" -> RenameColumnCall(reference, table)
                 else -> null
             }
         }

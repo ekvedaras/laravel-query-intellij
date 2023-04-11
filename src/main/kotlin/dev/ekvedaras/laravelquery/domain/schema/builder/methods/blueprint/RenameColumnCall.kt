@@ -11,16 +11,24 @@ import dev.ekvedaras.laravelquery.domain.schema.MigrationTable
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
-class StringCall(override val reference: MethodReference, override val table: MigrationTable) : BlueprintMethodCall, MigratesColumns {
-    override val columns = listOfNotNull(reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneColumnParameter> {
+class RenameColumnCall(override val reference: MethodReference, override val table: MigrationTable) : BlueprintMethodCall, MigratesColumns {
+    private val fromColumnParameter = reference.getParameter(0).transformInstanceOf<StringLiteralExpression, StandaloneColumnParameter> {
         StandaloneColumnParameter(it.asStringParameter())
-    })
+    }
+
+    private val toColumnParameter = reference.getParameter(1).transformInstanceOf<StringLiteralExpression, StandaloneColumnParameter> {
+        StandaloneColumnParameter(it.asStringParameter())
+    }
+
+    override val columns = listOfNotNull(fromColumnParameter, toColumnParameter)
 
     override fun findColumnReferencedIn(parameter: StringParameter): DbColumn? =
         table.asExistingTable().transform { existingTable ->
-            columns.find { parameter.equals(it) }.transform {
-                it.findColumnReference(existingTable)
-            }
+            if (parameter.equals(fromColumnParameter)) {
+                fromColumnParameter.findColumnReference(existingTable)
+            } else if (parameter.equals(toColumnParameter)) {
+                toColumnParameter.findColumnReference(existingTable)
+            } else null
         }
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> =

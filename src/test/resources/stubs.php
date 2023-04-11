@@ -255,7 +255,7 @@ namespace Illuminate\Database\Schema {
 
     /**
      * @method Fluent dropColumn(array|mixed $columns) ✅
-     * @method Fluent renameColumn(string $from, string $to) ❌
+     * @method Fluent renameColumn(string $from, string $to) ✅
      * @method Fluent dropPrimary(string|array|null $index = null) ❌
      * @method Fluent dropUnique(string|array $index) ❌
      * @method Fluent dropIndex(string|array $index) ❌

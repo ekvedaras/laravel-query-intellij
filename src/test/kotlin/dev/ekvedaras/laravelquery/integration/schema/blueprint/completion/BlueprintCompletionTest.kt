@@ -55,4 +55,35 @@ internal class BlueprintCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted().withNewColumn("new_column")
             .and().withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesInRenameColumnsMethodCallFromParameter() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inRenameColumnCallFromParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInRenameColumnsMethodCallToParameter() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inRenameColumnCallToParameter.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInRenameColumnsMethodCallFromParameterDownMethod() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inRenameColumnCallFromParameterDownMethod.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted().withNewColumn("old_email")
+            .and().withoutOtherTables().andTheirColumns()
+    }
 }

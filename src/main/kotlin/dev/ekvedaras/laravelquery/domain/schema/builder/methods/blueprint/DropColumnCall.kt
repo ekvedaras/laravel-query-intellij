@@ -33,8 +33,6 @@ class DropColumnCall(override val reference: MethodReference, override val table
 
     override fun completeFor(parameter: StringParameter): List<LookupElement> =
         migration.migratedColumns(forTable = table).map { it.asLookupElement(table) } + (table.asExistingTable().transform { existingTable ->
-            columnParameter
-                .find { parameter.equals(it) }
-                ?.getCompletionOptions(existingTable)
+            columnParameter.find { parameter.equals(it) }?.getCompletionOptions(existingTable)
         } ?: listOf())
 }
