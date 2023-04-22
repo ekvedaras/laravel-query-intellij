@@ -266,7 +266,7 @@ namespace Illuminate\Database\Schema {
      * @method void dropSoftDeletes(string $column = 'deleted_at') ✅
      * @method void dropSoftDeletesTz(string $column = 'deleted_at') ✅
      * @method void dropMorphs(string $name, string|null $indexName = null) ❌
-     * @method Fluent rename(string $to) ❌
+     * @method Fluent rename(string $to) ✅
      * @method Fluent primary(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
      * @method Fluent unique(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
      * @method Fluent index(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
@@ -296,7 +296,7 @@ namespace Illuminate\Database\Schema {
      * @method ColumnDefinition unsignedMediumInteger(string $column, bool $autoIncrement = false) ✅
      * @method ColumnDefinition unsignedBigInteger(string $column, bool $autoIncrement = false) ✅
      * @method ForeignIdColumnDefinition foreignId(string $column) ✅
-     * @method ForeignIdColumnDefinition foreignIdFor(Model|string $model, string|null $column = null) ❌
+     * @method ForeignIdColumnDefinition foreignIdFor(Model|string $model, string|null $column = null) ✅ ❌
      * @method ColumnDefinition float(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ✅
      * @method ColumnDefinition double(string $column, int|null $total = null, int|null $places = null, bool $unsigned = false) ✅
      * @method ColumnDefinition decimal(string $column, int $total = 8, int $places = 2, bool $unsigned = false) ✅
@@ -340,25 +340,21 @@ namespace Illuminate\Database\Schema {
      * @method void uuidMorphs(string $name, string|null $indexName = null) ❌
      * @method void nullableUuidMorphs(string $name, string|null $indexName = null) ❌
      * @method ColumnDefinition addColumn(string $type, string $name, array $parameters = []) ❌
-     * @method void after(string $column, Closure $callback) ❌
-     * @method $this removeColumn(string $name) ❌
+     * @method void after(string $column, Closure $callback) ✅ ❌
+     * @method $this removeColumn(string $name) ✅
      */
     class Blueprint {}
 
     /**
-     * @method $this after(string $column) Place the column "after" another column (MySQL) ❌
-     * @method $this always() Used as a modifier for generatedAs() (PostgreSQL) ❌
+     * @method $this after(string $column) Place the column "after" another column (MySQL) ✅
      * @method $this autoIncrement() Set INTEGER columns as auto-increment (primary key) ❌
-     * @method $this change() Change the column ❌
      * @method $this charset(string $charset) Specify a character set for the column (MySQL) ❌
      * @method $this collation(string $collation) Specify a collation for the column (MySQL/PostgreSQL/SQL Server) ❌
      * @method $this comment(string $comment) Add a comment to the column (MySQL) ❌
      * @method $this default(mixed $value) Specify a "default" value for the column ❌
-     * @method $this first() Place the column "first" in the table (MySQL) ❌
      * @method $this generatedAs(string|Expression $expression = null) Create a SQL compliant identity column (PostgreSQL) ❌
      * @method $this index(string $indexName = null) Add an index ❌
      * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column ❌
-     * @method $this persisted() Mark the computed generated column as persistent (SQL Server) ❌
      * @method $this primary() Add a primary index ❌
      * @method $this spatialIndex() Add a spatial index ❌
      * @method $this storedAs(string $expression) Create a stored generated column (MySQL/SQLite) ❌
@@ -378,7 +374,6 @@ namespace Illuminate\Support\Facades {
     class Schema extends Builder {}
 
     /**
-     * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null) ❌
      * @method static \Illuminate\Database\Query\Builder table(string $table, string $as = null) ✅
      * @method static \Illuminate\Database\Query\Builder query() ✅
      * @method static \Illuminate\Database\Query\Expression raw($value) ❌
@@ -392,7 +387,6 @@ namespace Illuminate\Support\Facades {
      * @method static int update(string $query, array $bindings = []) ❌
      * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true) ❌
      * @method static void registerDoctrineType(string $class, string $name, string $type) ❌
-     * @method static void setDefaultConnection(string $name) ❌
      */
     class DB {}
 }

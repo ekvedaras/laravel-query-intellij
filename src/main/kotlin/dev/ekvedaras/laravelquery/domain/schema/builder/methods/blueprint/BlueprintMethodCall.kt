@@ -47,9 +47,10 @@ sealed interface BlueprintMethodCall {
                 "binary", "ipAddress", "macAddress",
                 "geometry", "point", "lineString", "polygon", "geometryCollection",
                 "multiPoint", "multiLineString", "multiPolygon", "multiPolygonZ",
-                "computed", "after", -> StringCall(reference, table)
+                "computed", "after", "rename", "removeColumn" -> StringCall(reference, table)
                 "dropColumn" -> DropColumnCall(reference, table)
                 "renameColumn" -> RenameColumnCall(reference, table)
+                "foreignIdFor" -> ForeignIdForCall(reference, table)
                 else -> null
             }
         }

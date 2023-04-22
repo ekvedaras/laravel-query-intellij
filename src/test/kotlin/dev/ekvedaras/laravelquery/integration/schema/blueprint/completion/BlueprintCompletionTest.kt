@@ -86,4 +86,15 @@ internal class BlueprintCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted().withNewColumn("old_email")
             .and().withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesInForeignIdForMethodCall() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inForeignIdForCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted()
+            .and().withoutOtherTables().andTheirColumns()
+    }
 }
