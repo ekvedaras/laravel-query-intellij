@@ -51,6 +51,7 @@ sealed interface BlueprintMethodCall {
                 "dropColumn" -> DropColumnCall(reference, table)
                 "renameColumn" -> RenameColumnCall(reference, table)
                 "foreignIdFor" -> ForeignIdForCall(reference, table)
+                "addColumn" -> AddColumnCall(reference, table)
                 else -> null
             }
         }

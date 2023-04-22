@@ -97,4 +97,15 @@ internal class BlueprintCompletionTest : BaseTestCase() {
             .but().toHaveItsColumnsCompleted()
             .and().withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesInAddColumnMethodCall() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inAddColumnCall.php")
+        myFixture.completeBasic()
+
+        Namespaces.expect(myFixture).not().toBeCompleted()
+        Tables.users.expect(myFixture)
+            .not().toBeCompleted()
+            .but().toHaveItsColumnsCompleted()
+            .and().withoutOtherTables().andTheirColumns()
+    }
 }

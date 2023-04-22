@@ -339,7 +339,7 @@ namespace Illuminate\Database\Schema {
      * @method void nullableNumericMorphs(string $name, string|null $indexName = null) ❌
      * @method void uuidMorphs(string $name, string|null $indexName = null) ❌
      * @method void nullableUuidMorphs(string $name, string|null $indexName = null) ❌
-     * @method ColumnDefinition addColumn(string $type, string $name, array $parameters = []) ❌
+     * @method ColumnDefinition addColumn(string $type, string $name, array $parameters = []) ❌ ✅
      * @method void after(string $column, Closure $callback) ✅ ❌
      * @method $this removeColumn(string $name) ✅
      */
