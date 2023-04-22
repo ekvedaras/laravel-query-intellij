@@ -157,8 +157,8 @@ namespace Illuminate\Database\Eloquent {
      * @method Model|static create(array $attributes = []) ✅
      * @method Model|static forceCreate(array $attributes = []) ✅
      * @method int upsert(array $values, array|string $uniqueBy, array|null $update = null) ✅
-     * @method int increment(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
-     * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = []) ❌
+     * @method int increment(string|Expression $column, float|int $amount = 1, array $extra = []) ✅
+     * @method int decrement(string|Expression $column, float|int $amount = 1, array $extra = []) ✅
      * @method $this with(string|array $relations, string|Closure|null $callback = null) ✅
      * @method $this without(mixed $relations) ✅
      * @method $this withOnly(mixed $relations) ✅
@@ -179,9 +179,9 @@ namespace Illuminate\Database\Eloquent {
      * @method Builder newQueryForRestoration(array|int $ids) ✅
      * @method Builder|$this newEloquentBuilder(QueryBuilder $query) ✅
      * @method QueryBuilder newBaseQueryBuilder() ✅
-     * @method int increment(string $column, float|int $amount = 1, array $extra = []) ❌
-     * @method int decrement(string $column, float|int $amount = 1, array $extra = []) ❌
-     * @method int incrementOrDecrement(string $column, float|int $amount, array $extra, string $method) ❌
+     * @method int increment(string $column, float|int $amount = 1, array $extra = []) ✅
+     * @method int decrement(string $column, float|int $amount = 1, array $extra = []) ✅
+     * @method int incrementOrDecrement(string $column, float|int $amount, array $extra, string $method) ✅
      */
     class Model {
         use HasRelationships;

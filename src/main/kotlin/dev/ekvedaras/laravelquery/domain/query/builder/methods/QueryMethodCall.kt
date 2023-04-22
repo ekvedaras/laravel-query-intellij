@@ -62,7 +62,7 @@ sealed interface QueryMethodCall : QueryStatementElement {
                 "whereJsonLength", "orWhereJsonLength", "having", "orHaving", "havingBetween",
                 "orderBy", "orderByDesc", "latest", "oldest", "reorder",
                 "value", "implode", "min", "max", "sum", "avg", "average",
-                "increment", "decrement", "qualifyColumn" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
+                "increment", "decrement", "qualifyColumn", "incrementOrDecrement" -> WhereOneColumnAsFirstParameterIsSomeValueCall(reference, queryStatement)
                 "forPageBeforeId", "forPageAfterId" -> ForPageAroundIdCall(reference, queryStatement)
                 "get", "count" -> GetCall(reference, queryStatement)
                 "select", "groupBy", "addSelect", "whereNull", "orWhereNull", "whereNotNull", "orWhereNotNull", "sole", "getModels" -> SelectCall(reference, queryStatement)
