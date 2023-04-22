@@ -46,9 +46,7 @@ Laravel Query plugin needs either of those to work otherwise, it cannot understa
 
 ## Future plans
 
-* Improve schema builder support to read current migration file as well instead of just table from database
-* Add morph columns support for schema builder integration
-* Improve sorting
+`V5` as a complete rewrite to reduce cognitive load, improve readability and maintainability. It is coming soon. [Branch](https://github.com/ekvedaras/laravel-query-intellij/V5) already available for PRs and suggestions.
 
 ## Installation
 
