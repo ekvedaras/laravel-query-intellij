@@ -3,6 +3,7 @@ package dev.ekvedaras.laravelquery.domain.database
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
+import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.psi.DbTable
@@ -40,6 +41,13 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
             .parallelStream()
             .map { Column(entity = it as DasColumn, table = this) }
 
+    fun indexes(): Stream<out Index> =
+        entity
+            .getDasChildren(ObjectKind.INDEX)
+            .toList()
+            .parallelStream()
+            .map { Index(entity = it as DasIndex, table = this) }
+
     fun asLookupElement(
         triggerCompletionOnInsert: Boolean = false,
         withNamespacePrefix: Boolean = false,
@@ -62,4 +70,5 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
     fun asDbTable(): DbTable = namespace.dataSource.entity.findElement(entity) as DbTable
 
     fun findColumn(name: String) = columns().firstWhereOrNull { it.name == name }
+    fun findIndex(name: String) = indexes().firstWhereOrNull { it.name == name }
 }
