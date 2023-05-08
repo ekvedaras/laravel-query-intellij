@@ -26,5 +26,7 @@ internal enum class Indexes {
     companion object {
         fun expect(fixture: CodeInsightTestFixture) = IndexesExpectation(fixture)
         fun exceptFor(table: Tables) = values().filterNot { it.table() == table }
+        fun CodeInsightTestFixture.expect(index: Indexes) = index.expect(this)
+        fun CodeInsightTestFixture.expectIndexes() = Indexes.expect(this)
     }
 }

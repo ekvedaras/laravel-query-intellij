@@ -41,5 +41,7 @@ internal enum class Columns {
     companion object {
         fun expect(fixture: CodeInsightTestFixture) = ColumnsExpectation(fixture)
         fun exceptFor(table: Tables) = values().filterNot { it.table() == table }
+        fun CodeInsightTestFixture.expect(column: Columns) = column.expect(this)
+        fun CodeInsightTestFixture.expectColumns() = Columns.expect(this)
     }
 }

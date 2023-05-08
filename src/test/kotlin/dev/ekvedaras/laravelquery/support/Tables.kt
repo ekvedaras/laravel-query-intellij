@@ -73,6 +73,8 @@ internal enum class Tables {
         fun expect(fixture: CodeInsightTestFixture) = TablesExpectation(fixture)
         fun except(table: Tables) = values().filterNot { it == table }
         fun exceptFor(namespace: Namespaces) = values().filterNot { it.namespace() == namespace }
+        fun CodeInsightTestFixture.expect(table: Tables) = table.expect(this)
+        fun CodeInsightTestFixture.expectTables() = Tables.expect(this)
 
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
             *values().map { it.name }.toList().toTypedArray(), inFixture = fixture

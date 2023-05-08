@@ -38,6 +38,8 @@ internal enum class Namespaces {
     companion object {
         fun expect(fixture: CodeInsightTestFixture) = NamespacesExpectation(fixture)
         fun except(namespace: Namespaces) = values().filterNot { it == namespace }
+        fun CodeInsightTestFixture.expect(namespace: Namespaces) = namespace.expect(this)
+        fun CodeInsightTestFixture.expectNamespaces() = Namespaces.expect(this)
 
         fun assertAllSuggested(fixture: CodeInsightTestFixture) = BaseTestCase.assertLookupContains(
             *values().map { it.name }.toList().toTypedArray(), inFixture = fixture

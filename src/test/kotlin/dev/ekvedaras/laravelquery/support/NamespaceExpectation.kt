@@ -4,13 +4,13 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.applyIf
 import dev.ekvedaras.laravelquery.BaseTestCase
 
-internal data class NamespaceExpectation(val namespace: Namespaces, val fixture: CodeInsightTestFixture, val not: Boolean = false) : Expectation<NamespaceExpectation> {
-    private val contains = !not
-    private val doesNotContain = not
+internal data class NamespaceExpectation(val namespace: Namespaces, val fixture: CodeInsightTestFixture, val opposite: Boolean = false) : Expectation<NamespaceExpectation> {
+    private val contains = !opposite
+    private val doesNotContain = opposite
 
-    override fun not() = NamespaceExpectation(namespace, fixture, not = true)
-    override fun but() = NamespaceExpectation(namespace, fixture, not = false)
-    override fun and() = this
+    override val not get() = NamespaceExpectation(namespace, fixture, opposite = true)
+    override val but get() = NamespaceExpectation(namespace, fixture, opposite = false)
+    override val and get() = this
 
     fun toBeReferenced() = NamespaceReferenceExpectation(namespace, fixture)
 
@@ -30,7 +30,7 @@ internal data class NamespaceExpectation(val namespace: Namespaces, val fixture:
         )
     }
 
-    fun exceptOthers() = apply { not().asWellAsOthers() }
+    fun exceptOthers() = apply { not.asWellAsOthers() }
 
     fun withTables() = apply {
         BaseTestCase.assertLookup(
@@ -42,7 +42,7 @@ internal data class NamespaceExpectation(val namespace: Namespaces, val fixture:
 
     fun toHaveTablesCompleted() = withTables()
 
-    fun withoutTables() = apply { not().withTables() }
+    fun withoutTables() = apply { not.withTables() }
 
     fun onlyFromThisNamespace() = apply {
         BaseTestCase.assertLookup(
@@ -52,5 +52,5 @@ internal data class NamespaceExpectation(val namespace: Namespaces, val fixture:
         )
     }
 
-    fun withoutAnyColumns() = apply { Columns.expect(fixture).applyIf(!not) { not() }.toBeCompleted() }
+    fun withoutAnyColumns() = apply { Columns.expect(fixture).applyIf(!opposite) { not }.toBeCompleted() }
 }

@@ -3,12 +3,12 @@ package dev.ekvedaras.laravelquery.support
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.BaseTestCase
 
-internal data class TablesExpectation(val fixture: CodeInsightTestFixture, val not: Boolean = false) : Expectation<TablesExpectation> {
-    private val contains = !not
+internal data class TablesExpectation(val fixture: CodeInsightTestFixture, val opposite: Boolean = false) : Expectation<TablesExpectation> {
+    private val contains = !opposite
 
-    override fun not() = TablesExpectation(fixture, not = true)
-    override fun but() = TablesExpectation(fixture, not = false)
-    override fun and() = this
+    override val not get() = TablesExpectation(fixture, opposite = true)
+    override val but get() = TablesExpectation(fixture, opposite = false)
+    override val and get() = this
 
     fun toBeCompleted() = apply {
         BaseTestCase.assertLookup(
