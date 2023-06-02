@@ -5,9 +5,9 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import dev.ekvedaras.laravelquery.domain.database.Index
 
 internal enum class Indexes {
-    usersUniqueEmail {
+    usersTrashcan {
         override fun table() = Tables.users
-        override fun indexName(): String = "users_email_uindex"
+        override fun indexName(): String = "trashcan"
     },
 
     customersBillableIndex {

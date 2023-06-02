@@ -111,4 +111,38 @@ internal class BlueprintCompletionTest : BaseTestCase() {
             .but.toHaveItsColumnsCompleted()
             .and.withoutOtherTables().andTheirColumns()
     }
+
+    fun testItCompletesInIndexMethodCallColumnsParameter() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inIndexCallColumnsParameter.php")
+        myFixture.completeBasic()
+
+        myFixture.expect.namespaces.not.toBeCompleted()
+        myFixture.expect(Tables.users)
+            .not.toBeCompleted()
+            .but.toHaveItsColumnsCompleted()
+            .and.withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInIndexMethodCallColumnsParameterInArray() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inIndexCallColumnsParameterInArray.php")
+        myFixture.completeBasic()
+
+        myFixture.expect.namespaces.not.toBeCompleted()
+        myFixture.expect(Tables.users)
+            .not.toBeCompleted()
+            .but.toHaveItsColumnsCompleted()
+            .and.withoutOtherTables().andTheirColumns()
+    }
+
+    fun testItCompletesInIndexMethodCallIndexParameter() {
+        myFixture.configureByFile("integration/schema/blueprint/completion/inIndexCallIndexParameter.php")
+        myFixture.completeBasic()
+
+        myFixture.expect.namespaces.not.toBeCompleted()
+        myFixture.expect.columns.not.toBeCompleted()
+
+        myFixture.expect(Tables.users)
+            .not.toBeCompleted().asWellAsOthers()
+            .but.toHaveItsIndexesCompleted().withNewIndex("users_first_name_email_index")
+    }
 }

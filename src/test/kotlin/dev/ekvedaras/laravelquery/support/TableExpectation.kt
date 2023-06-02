@@ -44,7 +44,25 @@ internal data class TableExpectation(val table: Tables, val fixture: CodeInsight
         )
     }
 
+    fun withIndexes() = apply {
+        BaseTestCase.assertLookup(
+            contains,
+            *table.indexes().map { it.indexName() }.toTypedArray(),
+            inFixture = fixture,
+        )
+    }
+
+
+    fun withNewIndex(name: String) = apply {
+        BaseTestCase.assertLookup(
+            contains,
+            name,
+            inFixture = fixture,
+        )
+    }
+
     fun toHaveItsColumnsCompleted() = withColumns()
+    fun toHaveItsIndexesCompleted() = withIndexes()
 
     fun withNewColumn(name: String) = apply {
         BaseTestCase.assertLookup(

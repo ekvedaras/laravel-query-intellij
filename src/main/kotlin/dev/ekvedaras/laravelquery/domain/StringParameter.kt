@@ -24,6 +24,7 @@ import dev.ekvedaras.laravelquery.support.cleanup
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.BlueprintMethodCall
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.NamedIndexParameter
 
 data class StringParameter(val element: StringLiteralExpression) {
     val project = element.project
@@ -91,6 +92,7 @@ data class StringParameter(val element: StringLiteralExpression) {
         is StandaloneTableParameter -> other.stringParameter == this
         is ColumnParameter -> other.stringParameter == this
         is StandaloneColumnParameter -> other.stringParameter == this
+        is NamedIndexParameter -> other.stringParameter == this
         is AliasParameter -> other.stringParameter == this
         is RelationParameter -> other.stringParameter == this
         is RelationKeyParameter -> other.stringParameter == this

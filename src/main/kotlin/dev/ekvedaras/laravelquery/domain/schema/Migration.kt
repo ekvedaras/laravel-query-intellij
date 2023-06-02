@@ -9,10 +9,11 @@ import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesNamespace
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedIndex
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.NamedIndexParameter
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.firstChildOfType
 import dev.ekvedaras.laravelquery.support.isChildOfAny
-import dev.ekvedaras.laravelquery.support.tap
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 
 data class Migration(private val clazz: PhpClass) {
@@ -43,4 +44,7 @@ data class Migration(private val clazz: PhpClass) {
 
     fun migratedColumns(forTable: MigrationTable): List<StandaloneColumnParameter> =
         tables.filter{ it.name == forTable.name }.flatMap { it.columns }
+
+    fun migratedIndexes(forTable: MigrationTable): List<MigratedIndex> =
+        tables.filter{ it.name == forTable.name }.flatMap { it.indexes }
 }

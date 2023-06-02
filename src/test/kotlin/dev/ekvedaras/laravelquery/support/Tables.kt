@@ -24,6 +24,7 @@ internal enum class Tables {
 
     abstract fun namespace(): Namespaces
     fun columns() = Columns.values().filter { it.table() == this }
+    fun indexes() = Indexes.values().filter { it.table() == this }
     fun expect(fixture: CodeInsightTestFixture) = TableExpectation(this, fixture)
 
     fun find(project: Project): Table = namespace()

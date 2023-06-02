@@ -5,6 +5,8 @@ import dev.ekvedaras.laravelquery.domain.StandaloneColumnParameter
 import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.HasBlueprintClosure
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedIndex
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.NamedIndexParameter
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
 import icons.DatabaseIcons
@@ -24,6 +26,12 @@ data class MigrationTable(val methodCall: MigratesTable) {
     val columns: List<StandaloneColumnParameter>
         get() = when (methodCall) {
             is HasBlueprintClosure -> methodCall.closure?.columns
+            else -> null
+        } ?: listOf()
+
+    val indexes: List<MigratedIndex>
+        get() = when (methodCall) {
+            is HasBlueprintClosure -> methodCall.closure?.indexes
             else -> null
         } ?: listOf()
 }

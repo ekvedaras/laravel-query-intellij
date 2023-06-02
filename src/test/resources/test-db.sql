@@ -18,6 +18,9 @@ create table users
 create unique index users_email_uindex
 	on users (email);
 
+create index trashcan
+    on users (deleted_at);
+
 create table customers
 (
 	id bigint unsigned auto_increment

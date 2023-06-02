@@ -269,7 +269,7 @@ namespace Illuminate\Database\Schema {
      * @method Fluent rename(string $to) ✅
      * @method Fluent primary(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
      * @method Fluent unique(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
-     * @method Fluent index(string|array $columns, string|null $name = null, string|null $algorithm = null) ❌
+     * @method Fluent index(string|array $columns, string|null $name = null, string|null $algorithm = null) ✅
      * @method Fluent spatialIndex(string|array $columns, string|null $name = null) ❌
      * @method Fluent rawIndex(string $expression, string $name) ❌
      * @method ForeignKeyDefinition foreign(string|array $columns, string|null $name = null) ❌
