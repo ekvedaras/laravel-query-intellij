@@ -40,6 +40,8 @@
         <completion.contributor language="PHP"
                                 implementationClass="dev.ekvedaras.laravelquery.integration.schema.blueprint.completion.BlueprintCompletionContributor"
         />
+        <psi.referenceContributor language="PHP"
+                                  implementation="dev.ekvedaras.laravelquery.integration.schema.blueprint.reference.SchemaDatabaseElementsReferenceContributor"/>
 
 <!--        <completion.contributor language="PHP"-->
 <!--                                implementationClass="dev.ekvedaras.laravelquery.completion.IndexCompletionContributor"-->

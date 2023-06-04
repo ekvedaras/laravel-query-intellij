@@ -7,6 +7,7 @@ import dev.ekvedaras.laravelquery.domain.schema.MigrationTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.BlueprintMethodCall
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratesColumns
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratesIndexes
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratesTableKeys
 import dev.ekvedaras.laravelquery.support.firstChildOfType
 import dev.ekvedaras.laravelquery.support.transformInstanceOf
 import dev.ekvedaras.laravelquery.support.tryTransforming
@@ -29,4 +30,11 @@ data class BlueprintClosure(val closure: Function, val table: MigrationTable) {
         ?.mapNotNull { BlueprintMethodCall.from(it, table) }
         ?.filterIsInstance<MigratesIndexes>()
         ?.flatMap { it.indexes }
+
+    val tableKeys = tableVariable
+        ?.usageStatements()
+        ?.mapNotNull { it.firstChildOfType<MethodReference>() }
+        ?.mapNotNull { BlueprintMethodCall.from(it, table) }
+        ?.filterIsInstance<MigratesTableKeys>()
+        ?.flatMap { it.tableKeys }
 }

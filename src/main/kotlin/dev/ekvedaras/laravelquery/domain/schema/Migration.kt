@@ -10,6 +10,7 @@ import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesNamespac
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.SchemaBuilderMethodCall
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedIndex
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedTableKey
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.NamedIndexParameter
 import dev.ekvedaras.laravelquery.support.LaravelClasses
 import dev.ekvedaras.laravelquery.support.firstChildOfType
@@ -47,4 +48,10 @@ data class Migration(private val clazz: PhpClass) {
 
     fun migratedIndexes(forTable: MigrationTable): List<MigratedIndex> =
         tables.filter{ it.name == forTable.name }.flatMap { it.indexes }
+
+    fun migratedTableKeys(forTable: MigrationTable): List<MigratedTableKey> =
+        tables.filter{ it.name == forTable.name }.flatMap { it.tableKeys }
+
+    fun migratedTablePrimaryKeys(forTable: MigrationTable): List<MigratedTableKey> =
+        migratedTableKeys(forTable).filter { it.isPrimary }
 }

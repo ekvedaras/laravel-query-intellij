@@ -4,9 +4,7 @@ create database testProject2;
 use testProject1;
 create table users
 (
-	id integer
-		constraint users_pk
-			primary key autoincrement,
+	id integer autoincrement,
 	email varchar(40),
 	first_name varchar(20) not null,
 	last_name varchar(20) not null,
@@ -14,6 +12,8 @@ create table users
 	updated_at timestamp not null,
 	deleted_at timestamp
 );
+
+create primary key users_id_primary on users(id);
 
 create unique index users_email_uindex
 	on users (email);
@@ -24,6 +24,7 @@ create index trashcan
 create table customers
 (
 	id bigint unsigned auto_increment
+	    constraint customers_id_primary
 		primary key,
 	billable_id bigint unsigned not null,
 	billable_type varchar(255) not null,
@@ -40,6 +41,7 @@ use testProject2;
 create table failed_jobs
 (
 	id bigint unsigned auto_increment
+	    constraint failed_jobs_id_primary
 		primary key,
 	connection text not null,
 	queue text not null,
@@ -51,6 +53,7 @@ create table failed_jobs
 create table migrations
 (
 	id int unsigned auto_increment
+	    constraint migrations_id_primary
 		primary key,
 	migration varchar(255) not null,
 	batch int not null

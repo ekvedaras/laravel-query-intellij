@@ -6,6 +6,7 @@ import dev.ekvedaras.laravelquery.domain.database.Table
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.HasBlueprintClosure
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.MigratesTable
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedIndex
+import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.MigratedTableKey
 import dev.ekvedaras.laravelquery.domain.schema.builder.methods.blueprint.NamedIndexParameter
 import dev.ekvedaras.laravelquery.support.transform
 import dev.ekvedaras.laravelquery.v4.utils.LookupUtils.Companion.withInsertHandler
@@ -32,6 +33,12 @@ data class MigrationTable(val methodCall: MigratesTable) {
     val indexes: List<MigratedIndex>
         get() = when (methodCall) {
             is HasBlueprintClosure -> methodCall.closure?.indexes
+            else -> null
+        } ?: listOf()
+
+    val tableKeys: List<MigratedTableKey>
+        get() = when (methodCall) {
+            is HasBlueprintClosure -> methodCall.closure?.tableKeys
             else -> null
         } ?: listOf()
 }

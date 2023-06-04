@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.database.model.DasColumn
 import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasTable
+import com.intellij.database.model.DasTableKey
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.psi.DbTable
 import com.intellij.openapi.project.Project
@@ -48,6 +49,15 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
             .parallelStream()
             .map { Index(entity = it as DasIndex, table = this) }
 
+    fun tableKeys(): Stream<out TableKey> =
+        entity
+            .getDasChildren(ObjectKind.KEY)
+            .toList()
+            .parallelStream()
+            .map { TableKey(entity = it as DasTableKey, table = this) }
+
+    fun primaryKey(): TableKey? = tableKeys().firstWhereOrNull { it.entity.isPrimary }
+
     fun asLookupElement(
         triggerCompletionOnInsert: Boolean = false,
         withNamespacePrefix: Boolean = false,
@@ -71,4 +81,5 @@ data class Table(val entity: DasTable, val namespace: Namespace) {
 
     fun findColumn(name: String) = columns().firstWhereOrNull { it.name == name }
     fun findIndex(name: String) = indexes().firstWhereOrNull { it.name == name }
+    fun findTableKey(name: String) = tableKeys().firstWhereOrNull { it.name == name }
 }

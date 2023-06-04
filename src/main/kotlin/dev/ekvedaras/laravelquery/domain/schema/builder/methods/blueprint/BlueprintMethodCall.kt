@@ -53,6 +53,7 @@ sealed interface BlueprintMethodCall {
                 "foreignIdFor" -> ForeignIdForCall(reference, table)
                 "addColumn" -> AddColumnCall(reference, table)
                 "index" -> IndexCall(reference, table)
+                "primary" -> PrimaryCall(reference, table)
                 else -> null
             }
         }
