@@ -10,10 +10,9 @@ create table users
 	last_name varchar(20) not null,
 	created_at timestamp not null,
 	updated_at timestamp not null,
-	deleted_at timestamp
+	deleted_at timestamp,
+	constraint users_id_primary primary key (id)
 );
-
-create primary key users_id_primary on users(id);
 
 create unique index users_email_uindex
 	on users (email);

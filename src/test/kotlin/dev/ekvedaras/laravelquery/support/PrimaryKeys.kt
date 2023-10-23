@@ -3,22 +3,22 @@ package dev.ekvedaras.laravelquery.support
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 
 internal enum class PrimaryKeys : Keys {
-    usersId {
+    UsersId {
         override fun table() = Tables.users
         override fun keyName(): String = "users_id_primary"
     },
 
-    customersId {
+    CustomersId {
         override fun table() = Tables.customers
         override fun keyName(): String = "customers_id_primary"
     },
 
-    failedJobsId {
+    FailedJobsId {
         override fun table() = Tables.failed_jobs
         override fun keyName(): String = "failed_jobs_id_primary"
     },
 
-    migrationsId {
+    MigrationsId {
         override fun table() = Tables.migrations
         override fun keyName(): String = "migrations_id_primary"
     };

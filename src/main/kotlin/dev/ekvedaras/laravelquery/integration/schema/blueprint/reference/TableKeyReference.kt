@@ -9,7 +9,7 @@ import dev.ekvedaras.laravelquery.domain.StringParameter
 
 class TableKeyReference(private val stringParameter: StringParameter, rangeInElement: TextRange) : PsiReferenceBase<StringLiteralExpression>(stringParameter.element, rangeInElement) {
     override fun resolve(): DbTableKey? {
-        val methodCall = stringParameter.queryMethodCall ?: return null
+        val methodCall = stringParameter.blueprintMethodCall ?: return null
         if (methodCall !is ReferencesTableKey) return null
 
         return methodCall.findTableKeyReferencedIn(stringParameter)
