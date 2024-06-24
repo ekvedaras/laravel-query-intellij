@@ -4,26 +4,20 @@
 
 ## [Unreleased]
 
+## [4.0.3]
 ### Fixed
-
 - Use non-blocking read action. Should hopefully fix UI freeze. #114
 
 ## [4.0.2]
-
 ### Fixed
-
 - Invalid casting. #110
 
 ## [4.0.1]
-
 ### Fixed
-
 - Limit class child check to max depth of 20 to avoid stack overflow. #106
 
 ## [4.0.0]
-
 ### Changed
-
 - Increase minimum build to `222`
 - Use gradle `7.5.1`
 - Use intellij plugin `1.10.0`
