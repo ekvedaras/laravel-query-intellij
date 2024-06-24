@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Use non-blocking read action. Should hopefully fix UI freeze. #114
+
 ## [4.0.2]
 
 ### Fixed
