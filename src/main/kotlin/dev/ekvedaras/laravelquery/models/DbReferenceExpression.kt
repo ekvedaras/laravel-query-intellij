@@ -62,7 +62,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             ranges.add(TextRange.from(if (ranges.isNotEmpty()) ranges.last().endOffset + 1 else 1, part.length))
         }
 
-        if (!DumbService.isDumb(project) && ApplicationManager.getApplication().isReadAccessAllowed) {
+        if (!DumbService.isDumb(project)) {
             val expressionDisposable = Disposer.newDisposable()
             PsiManager.getInstance(project).addPsiTreeChangeListener(object : PsiTreeChangeAdapter() {
                 override fun childrenChanged(event: PsiTreeChangeEvent) {
@@ -72,7 +72,7 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             ReadAction.nonBlocking<Unit> {
                 TableAndAliasCollector(this).collect()
                 DbReferenceResolver(this).resolve()
-            }.inSmartMode(project).expireWith(expressionDisposable)
+            }.inSmartMode(project).expireWith(expressionDisposable).executeSynchronously()
         }
     }
 }
