@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
+## [4.0.4]
 ### Fixed
 - Add a bunch of `ProgressManager.checkCanceled()` checks. Should hopefully fix UI freeze. #114
 
