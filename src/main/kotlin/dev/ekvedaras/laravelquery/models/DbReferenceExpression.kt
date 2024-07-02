@@ -9,6 +9,7 @@ import com.intellij.database.model.DasTableKey
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
@@ -70,8 +71,12 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                 }
             }, expressionDisposable)
             ReadAction.nonBlocking<Unit> {
-                TableAndAliasCollector(this).collect()
-                DbReferenceResolver(this).resolve()
+                try {
+                    TableAndAliasCollector(this).collect()
+                    DbReferenceResolver(this).resolve()
+                } catch (_: ProcessCanceledException) {
+
+                }
             }.inSmartMode(project).expireWith(expressionDisposable).executeSynchronously()
         }
     }

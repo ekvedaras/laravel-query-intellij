@@ -6,6 +6,7 @@ import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.DasTableKey
+import com.intellij.openapi.progress.ProgressManager
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
@@ -49,6 +50,8 @@ private class ResolverForTableMethods(
     fun resolve() {
         resolveSchemes()
 
+        ProgressManager.checkCanceled()
+
         when (reference.parts.size) {
             1 -> resolveTables()
             else -> resolveSchemaTables()
@@ -72,7 +75,11 @@ private class ResolverForTableMethods(
      */
     private fun resolveTables() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.tablesInParallel().forEach { table ->
+                ProgressManager.checkCanceled()
+
                 if (table.nameWithoutPrefix(reference.project) == reference.parts.last()) {
                     tables.add(table)
                 } else if (reference.tablesAndAliases[reference.parts.last()]?.first == table.nameWithoutPrefix(reference.project)) {
@@ -88,9 +95,13 @@ private class ResolverForTableMethods(
      */
     private fun resolveSchemaTables() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.schemasInParallel()
                 .filter { schemas.contains(it) }
                 .forEach { schema ->
+                    ProgressManager.checkCanceled()
+
                     dataSource.tablesInParallel()
                         .filter { it.dasParent?.name == schema.name }
                         .filter { it.nameWithoutPrefix(reference.project) == reference.parts.last() }
@@ -122,11 +133,15 @@ private class ResolverForColumnMethods(
      */
     private fun withOnePart() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.schemasInParallel()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
 
             dataSource.tablesInParallel().forEach { dasTable ->
+                ProgressManager.checkCanceled()
+
                 if (dasTable.nameWithoutPrefix(reference.project) == reference.parts.first()) {
                     tables.add(dasTable)
                 } else if (reference.tablesAndAliases[reference.parts.first()]?.first == dasTable.nameWithoutPrefix(reference.project)) {
@@ -147,11 +162,15 @@ private class ResolverForColumnMethods(
      */
     private fun withTwoParts() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.schemasInParallel()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
 
             dataSource.tablesInParallel().forEach { table ->
+                ProgressManager.checkCanceled()
+
                 if (schemas.isEmpty() || schemas.contains(table.dasParent)) {
                     addTablesAndTheirColumns(table)
                 }
@@ -185,9 +204,13 @@ private class ResolverForColumnMethods(
      */
     private fun withThreeParts() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.schemasInParallel()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
+
+            ProgressManager.checkCanceled()
 
             dataSource.tablesInParallel()
                 .filter { schemas.contains(it.dasParent) }
@@ -218,11 +241,15 @@ private class ResolverForIndexMethods(
 ) {
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
+                ProgressManager.checkCanceled()
+
                 table.indexesInParallel()
                     .filter { it.name == reference.parts[0] }
                     .forEach { indexes.add(it) }
@@ -237,11 +264,15 @@ private class ResolverForKeyMethods(
 ) {
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
+                ProgressManager.checkCanceled()
+
                 table.keysInParallel()
                     .filter { it.name == reference.parts[0] }
                     .forEach { keys.add(it) }
@@ -256,11 +287,15 @@ private class ResolverForForeignKeyMethods(
 ) {
     fun resolve() {
         reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            ProgressManager.checkCanceled()
+
             dataSource.tablesInParallel().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
+                ProgressManager.checkCanceled()
+
                 table.foreignKeysInParallel()
                     .filter { it.name == reference.parts[0] }
                     .forEach { foreignKeys.add(it) }

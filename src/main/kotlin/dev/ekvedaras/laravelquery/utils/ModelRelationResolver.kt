@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.utils
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.jetbrains.php.lang.psi.elements.MethodReference
 import com.jetbrains.php.lang.psi.elements.PhpClass
@@ -28,12 +29,19 @@ class ModelRelationResolver(
                 it.isChildOf(LaravelClasses.Relation)
             }
         }
+
+        ProgressManager.checkCanceled()
+
         if (relationMethod != null && relationMethod.name != null) {
             resolveRelationTable(relationMethod.name ?: "", model)
             return
         }
 
+        ProgressManager.checkCanceled()
+
         tableAndAliasCollector.resolveTableName(model)
+
+        ProgressManager.checkCanceled()
 
         val deepParent =
             method.parent?.parent?.parent?.parent?.parent?.parent // TODO utilize parentOfType<>() ?
@@ -66,6 +74,8 @@ class ModelRelationResolver(
                 ParameterListImpl::class.java.name
             ) as? ParameterListImpl
             )?.getParameter(0) ?: return
+
+        ProgressManager.checkCanceled()
 
         when (firstParam) {
             is ClassConstantReferenceImpl -> {

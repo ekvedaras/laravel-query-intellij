@@ -1,5 +1,6 @@
 package dev.ekvedaras.laravelquery.utils
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.parentOfType
 import com.jetbrains.php.lang.psi.elements.MethodReference
@@ -35,15 +36,25 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         val method = MethodUtils.resolveMethodReference(reference.expression) ?: return
         val methods = Collections.synchronizedList(mutableListOf<MethodReference>())
 
+        ProgressManager.checkCanceled()
+
         collectMethodsAcrossVariableReferences(methods, method)
         collectMethodsInCurrentTree(methods, method)
 
+        ProgressManager.checkCanceled()
+
         relationResolver.resolveModelAndRelationTables(methods, method)
+
+        ProgressManager.checkCanceled()
+
         schemaTableResolver.resolve(methods, method)
 
         methods
             .filter { LaravelUtils.BuilderTableMethods.contains(it.name) }
-            .forEach { scanMethodReference(it) }
+            .forEach {
+                ProgressManager.checkCanceled()
+                scanMethodReference(it)
+            }
     }
 
     private fun collectMethodsAcrossVariableReferences(methods: MutableList<MethodReference>, method: MethodReference) {
@@ -55,7 +66,10 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             collectMethodsInVariableReference(declaration.reference as PsiReference, methods)
         }
 
+        ProgressManager.checkCanceled()
+
         variable.references.forEach {
+            ProgressManager.checkCanceled()
             collectMethodsInVariableReference(it, methods)
         }
     }
@@ -71,6 +85,8 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
             MethodUtils.findMethodsInTree(element.lastChild).forEach { methods.addUnique(Lifetime.Eternal, it) }
             return
         }
+
+        ProgressManager.checkCanceled()
 
         // $var->where()
         if (element is MethodReference) {
@@ -107,6 +123,8 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
                 methods.addUnique(Lifetime.Eternal, it)
             }
         }
+
+        ProgressManager.checkCanceled()
 
         // Mode::when(true, function (Builder $query) { $query->where(''); });
         if (method.isInsideModelQueryClosure(reference.project)) {

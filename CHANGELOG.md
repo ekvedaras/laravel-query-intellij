@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- Add a bunch of `ProgressManager.checkCanceled()` checks. Should hopefully fix UI freeze. #114
+
 ## [4.0.3]
 ### Fixed
 - Use non-blocking read action. Should hopefully fix UI freeze. #114
