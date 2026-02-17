@@ -1,0 +1,8 @@
+<ivy-module version="2.0">
+  <info organisation="bundledModule" module="com.intellij" revision="PS-222.3345.135" />
+  <configurations>
+    <conf name="default" visibility="public" />
+  </configurations>
+  <publications />
+  <dependencies />
+</ivy-module>

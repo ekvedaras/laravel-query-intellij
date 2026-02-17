@@ -6,11 +6,11 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     // Java support
     id("java")
-    kotlin("jvm") version "1.7.22"
+    kotlin("jvm") version "1.9.25"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.10.0"
+    id("org.jetbrains.intellij") version "1.17.4"
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.changelog") version "2.2.1"
 }
 
 group = properties("pluginGroup")
@@ -22,7 +22,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+// Set the JVM language level used to compile sources and generate files
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
@@ -89,12 +89,6 @@ tasks {
         enabled = false
     }
 
-//    signPlugin {
-//        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-//        privateKey.set(System.getenv("PRIVATE_KEY"))
-//        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-//    }
-
     publishPlugin {
         dependsOn("patchChangelog")
         token.set(System.getenv("PUBLISH_TOKEN"))
@@ -104,9 +98,10 @@ tasks {
         channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
+
 dependencies {
     implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
 }
 
 val compileKotlin: KotlinCompile by tasks
