@@ -1,0 +1,15 @@
+<ivy-module version="2.0">
+  <info organisation="bundledPlugin" module="com.intellij.database" revision="PS-222.3345.135" />
+  <configurations>
+    <conf name="default" visibility="public" />
+  </configurations>
+  <publications>
+    <artifact name="database-openapi" ext="jar" conf="default" url="plugins/DatabaseTools/lib" />
+    <artifact name="jdbc-console" ext="jar" conf="default" url="plugins/DatabaseTools/lib" />
+    <artifact name="aether-dependency-resolver" ext="jar" conf="default" url="plugins/DatabaseTools/lib" />
+    <artifact name="database-plugin" ext="jar" conf="default" url="plugins/DatabaseTools/lib" />
+  </publications>
+  <dependencies>
+    <dependency org="bundledPlugin" name="com.intellij.platform.images" rev="PS-222.3345.135" />
+  </dependencies>
+</ivy-module>
