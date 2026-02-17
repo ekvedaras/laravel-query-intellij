@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed
+- Handle case when IDE can't be in smart mode #122
+- Less parallel things to avoid forking too much #123
+
 ## [4.0.4]
 ### Fixed
 - Add a bunch of `ProgressManager.checkCanceled()` checks. Should hopefully fix UI freeze. #114
