@@ -8,14 +8,14 @@ import com.intellij.database.model.DasTable
 import com.intellij.database.model.DasTableKey
 import com.intellij.openapi.progress.ProgressManager
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columnsInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeysInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexesInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keysInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.columns
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSources
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.foreignKeys
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.indexes
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.keys
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemasInParallel
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.schemas
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tablesSequential
 import java.util.Collections
 
 class DbReferenceResolver(private val reference: DbReferenceExpression) {
@@ -63,8 +63,8 @@ private class ResolverForTableMethods(
      * 'schema.table'
      */
     private fun resolveSchemes() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
-            dataSource.schemasInParallel()
+        reference.project.dbDataSources().forEach { dataSource ->
+            dataSource.schemas()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
         }
@@ -74,10 +74,10 @@ private class ResolverForTableMethods(
      * 'table'
      */
     private fun resolveTables() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.tablesInParallel().forEach { table ->
+            dataSource.tablesSequential().forEach { table ->
                 ProgressManager.checkCanceled()
 
                 if (table.nameWithoutPrefix(reference.project) == reference.parts.last()) {
@@ -94,15 +94,15 @@ private class ResolverForTableMethods(
      * 'schema.table'
      */
     private fun resolveSchemaTables() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.schemasInParallel()
+            dataSource.schemas()
                 .filter { schemas.contains(it) }
                 .forEach { schema ->
                     ProgressManager.checkCanceled()
 
-                    dataSource.tablesInParallel()
+                    dataSource.tablesSequential()
                         .filter { it.dasParent?.name == schema.name }
                         .filter { it.nameWithoutPrefix(reference.project) == reference.parts.last() }
                         .forEach { tables.add(it) }
@@ -132,14 +132,14 @@ private class ResolverForColumnMethods(
      * 'alias'
      */
     private fun withOnePart() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.schemasInParallel()
+            dataSource.schemas()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
 
-            dataSource.tablesInParallel().forEach { dasTable ->
+            dataSource.tablesSequential().forEach { dasTable ->
                 ProgressManager.checkCanceled()
 
                 if (dasTable.nameWithoutPrefix(reference.project) == reference.parts.first()) {
@@ -148,7 +148,7 @@ private class ResolverForColumnMethods(
                     tables.add(dasTable)
                 }
 
-                dasTable.columnsInParallel()
+                dasTable.columns()
                     .filter { it.name == reference.parts.first() }
                     .forEach { columns.add(it) }
             }
@@ -161,14 +161,14 @@ private class ResolverForColumnMethods(
      * 'alias.column'
      */
     private fun withTwoParts() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.schemasInParallel()
+            dataSource.schemas()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
 
-            dataSource.tablesInParallel().forEach { table ->
+            dataSource.tablesSequential().forEach { table ->
                 ProgressManager.checkCanceled()
 
                 if (schemas.isEmpty() || schemas.contains(table.dasParent)) {
@@ -182,7 +182,7 @@ private class ResolverForColumnMethods(
         if (table.nameWithoutPrefix(reference.project) == reference.parts.first() || table.nameWithoutPrefix(reference.project) == reference.parts.last()) {
             tables.add(table)
 
-            table.columnsInParallel()
+            table.columns()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
         } else if (schemas.isEmpty() &&
@@ -193,7 +193,7 @@ private class ResolverForColumnMethods(
         ) {
             tables.add(table)
 
-            table.columnsInParallel()
+            table.columns()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
         }
@@ -203,16 +203,16 @@ private class ResolverForColumnMethods(
      * schema.table.column
      */
     private fun withThreeParts() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.schemasInParallel()
+            dataSource.schemas()
                 .filter { it.name == reference.parts.first() }
                 .forEach { schemas.add(it) }
 
             ProgressManager.checkCanceled()
 
-            dataSource.tablesInParallel()
+            dataSource.tablesSequential()
                 .filter { schemas.contains(it.dasParent) }
                 .forEach { addTableAndItsColumns(it) }
         }
@@ -222,13 +222,13 @@ private class ResolverForColumnMethods(
         if (table.nameWithoutPrefix(reference.project) == reference.parts[1]) {
             tables.add(table)
 
-            table.columnsInParallel()
+            table.columns()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
         } else if (reference.tablesAndAliases[reference.parts[1]]?.first == table.nameWithoutPrefix(reference.project)) {
             tables.add(table)
 
-            table.columnsInParallel()
+            table.columns()
                 .filter { it.name == reference.parts.last() }
                 .forEach { columns.add(it) }
         }
@@ -240,17 +240,17 @@ private class ResolverForIndexMethods(
     private val indexes: MutableList<DasIndex>,
 ) {
     fun resolve() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.tablesInParallel().filter {
+            dataSource.tablesSequential().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 ProgressManager.checkCanceled()
 
-                table.indexesInParallel()
+                table.indexes()
                     .filter { it.name == reference.parts[0] }
                     .forEach { indexes.add(it) }
             }
@@ -263,17 +263,17 @@ private class ResolverForKeyMethods(
     private val keys: MutableList<DasTableKey>,
 ) {
     fun resolve() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.tablesInParallel().filter {
+            dataSource.tablesSequential().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 ProgressManager.checkCanceled()
 
-                table.keysInParallel()
+                table.keys()
                     .filter { it.name == reference.parts[0] }
                     .forEach { keys.add(it) }
             }
@@ -286,17 +286,17 @@ private class ResolverForForeignKeyMethods(
     private val foreignKeys: MutableList<DasForeignKey>,
 ) {
     fun resolve() {
-        reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+        reference.project.dbDataSources().forEach { dataSource ->
             ProgressManager.checkCanceled()
 
-            dataSource.tablesInParallel().filter {
+            dataSource.tablesSequential().filter {
                 reference.tablesAndAliases.containsKey(it.nameWithoutPrefix(reference.project))
             }.filter {
                 (reference.tablesAndAliases[it.nameWithoutPrefix(reference.project)]?.second ?: it.dasParent?.name) == it.dasParent?.name
             }.forEach { table ->
                 ProgressManager.checkCanceled()
 
-                table.foreignKeysInParallel()
+                table.foreignKeys()
                     .filter { it.name == reference.parts[0] }
                     .forEach { foreignKeys.add(it) }
             }

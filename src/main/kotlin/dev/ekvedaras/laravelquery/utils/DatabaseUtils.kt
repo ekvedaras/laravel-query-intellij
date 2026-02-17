@@ -26,8 +26,18 @@ class DatabaseUtils private constructor() {
                 LaravelQuerySettings.getInstance(this).interestedIn(it)
             }
 
+        fun Project.dbDataSources(): Stream<out DbDataSource> =
+            DbUtil.getDataSources(this).toList().stream().filter {
+                LaravelQuerySettings.getInstance(this).interestedIn(it)
+            }
+
         fun DbDataSource.schemasInParallel(): Stream<out DasNamespace> =
             DasUtil.getSchemas(this).toList().parallelStream().filter {
+                LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
+            }.filter { !SchemasToSkip.contains(it.name) }
+
+        fun DbDataSource.schemas(): Stream<out DasNamespace> =
+            DasUtil.getSchemas(this).toList().stream().filter {
                 LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
             }.filter { !SchemasToSkip.contains(it.name) }
 
@@ -45,8 +55,21 @@ class DatabaseUtils private constructor() {
                 !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name)
             }.filter { it.isPrefixed(this.project) }
 
+        fun DbDataSource.tablesSequential(): Stream<out DasTable> =
+            DasUtil.getTables(this).toList().stream().filter {
+                LaravelQuerySettings.getInstance(this.project).interestedIn(it, this)
+            }.filter {
+                !it.isSystem && !SchemasToSkip.contains(it.dasParent?.name)
+            }.filter { it.isPrefixed(this.project) }
+
         fun DasNamespace.tablesInParallel(project: Project): Stream<out DasTable> =
             this.getDasChildren(ObjectKind.TABLE).toList().parallelStream()
+                .map { it as DasTable }
+                .filter { !it.isSystem }
+                .filter { it.isPrefixed(project) }
+
+        fun DasNamespace.tables(project: Project): Stream<out DasTable> =
+            this.getDasChildren(ObjectKind.TABLE).toList().stream()
                 .map { it as DasTable }
                 .filter { !it.isSystem }
                 .filter { it.isPrefixed(project) }
@@ -54,14 +77,26 @@ class DatabaseUtils private constructor() {
         fun DasTable.columnsInParallel(): Stream<out DasColumn> =
             this.getDasChildren(ObjectKind.COLUMN).toList().parallelStream().map { it as DasColumn }
 
+        fun DasTable.columns(): Stream<out DasColumn> =
+            this.getDasChildren(ObjectKind.COLUMN).toList().stream().map { it as DasColumn }
+
         fun DasTable.indexesInParallel(): Stream<out DasIndex> =
             this.getDasChildren(ObjectKind.INDEX).toList().parallelStream().map { it as DasIndex }
+
+        fun DasTable.indexes(): Stream<out DasIndex> =
+            this.getDasChildren(ObjectKind.INDEX).toList().stream().map { it as DasIndex }
 
         fun DasTable.keysInParallel(): Stream<out DasTableKey> =
             this.getDasChildren(ObjectKind.KEY).toList().parallelStream().map { it as DasTableKey }
 
+        fun DasTable.keys(): Stream<out DasTableKey> =
+            this.getDasChildren(ObjectKind.KEY).toList().stream().map { it as DasTableKey }
+
         fun DasTable.foreignKeysInParallel(): Stream<out DasForeignKey> =
             this.getDasChildren(ObjectKind.FOREIGN_KEY).toList().parallelStream().map { it as DasForeignKey }
+
+        fun DasTable.foreignKeys(): Stream<out DasForeignKey> =
+            this.getDasChildren(ObjectKind.FOREIGN_KEY).toList().stream().map { it as DasForeignKey }
 
         private fun DasTable.isPrefixed(project: Project): Boolean =
             this.name.startsWith(LaravelQuerySettings.getInstance(project).tablePrefix)

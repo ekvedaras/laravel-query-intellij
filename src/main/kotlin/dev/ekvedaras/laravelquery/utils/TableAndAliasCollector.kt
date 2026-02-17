@@ -17,7 +17,7 @@ import com.jetbrains.rd.util.addUnique
 import com.jetbrains.rd.util.lifetime.Lifetime
 import dev.ekvedaras.laravelquery.models.DbReferenceExpression
 import dev.ekvedaras.laravelquery.utils.ClassUtils.Companion.isChildOf
-import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSourcesInParallel
+import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.dbDataSources
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.nameWithoutPrefix
 import dev.ekvedaras.laravelquery.utils.DatabaseUtils.Companion.tables
 import dev.ekvedaras.laravelquery.utils.LaravelUtils.Companion.isInteresting
@@ -202,7 +202,7 @@ class TableAndAliasCollector(private val reference: DbReferenceExpression) {
         }
 
         if (referencedSchema == null) {
-            reference.project.dbDataSourcesInParallel().forEach { dataSource ->
+            reference.project.dbDataSources().forEach { dataSource ->
                 dataSource.tables().firstOrNull { it.nameWithoutPrefix(reference.project) == referencedTable }?.let {
                     referencedSchema = it.dasParent?.name
                 }

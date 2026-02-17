@@ -6,9 +6,8 @@ import com.intellij.database.model.DasIndex
 import com.intellij.database.model.DasNamespace
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.DasTableKey
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -21,8 +20,6 @@ import com.intellij.psi.PsiTreeChangeEvent
 import dev.ekvedaras.laravelquery.utils.DbReferenceResolver
 import dev.ekvedaras.laravelquery.utils.PsiUtils.Companion.unquoteAndCleanup
 import dev.ekvedaras.laravelquery.utils.TableAndAliasCollector
-import kotlin.math.exp
-import org.apache.commons.lang.StringUtils.substringBefore
 
 class DbReferenceExpression(val expression: PsiElement, val type: Type) {
     companion object {
@@ -33,6 +30,9 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
             Key,
             ForeignKey,
         }
+        
+        private val LOG = Logger.getInstance(DbReferenceExpression::class.java)
+        private const val TIMEOUT_SECONDS = 5L
     }
 
     val project: Project = expression.project
@@ -70,14 +70,30 @@ class DbReferenceExpression(val expression: PsiElement, val type: Type) {
                     expressionDisposable.dispose()
                 }
             }, expressionDisposable)
-            ReadAction.nonBlocking<Unit> {
-                try {
-                    TableAndAliasCollector(this).collect()
-                    DbReferenceResolver(this).resolve()
-                } catch (_: ProcessCanceledException) {
-
+            
+            try {
+                ReadAction.nonBlocking<Unit> {
+                    try {
+                        TableAndAliasCollector(this).collect()
+                        DbReferenceResolver(this).resolve()
+                    } catch (_: ProcessCanceledException) {
+                        // Process canceled, skip resolution
+                    }
                 }
-            }.inSmartMode(project).expireWith(expressionDisposable).executeSynchronously()
+                .inSmartMode(project)
+                .expireWith(expressionDisposable)
+                .executeSynchronously()
+            } catch (e: IllegalStateException) {
+                // Handle inSmartMode constraint failure (issue #120)
+                if (e.message?.contains("inSmartMode") == true) {
+                    LOG.debug("Cannot satisfy inSmartMode constraint, skipping DB reference resolution")
+                } else {
+                    LOG.warn("Unexpected error during DB reference resolution", e)
+                }
+            } catch (_: ProcessCanceledException) {
+                // Process was canceled, skip resolution
+                LOG.debug("Process canceled during DB reference resolution")
+            }
         }
     }
 }
