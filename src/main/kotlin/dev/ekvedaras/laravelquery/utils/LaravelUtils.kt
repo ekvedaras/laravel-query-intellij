@@ -418,7 +418,7 @@ class LaravelUtils private constructor() {
                 clazz.isChildOf(LaravelClasses.TestCase)
             }
 
-        fun MethodReference.isDatabaseAssertion(project: Project): Boolean =
+        fun MethodReference.isDatabaseAssertion(@Suppress("UNUSED_PARAMETER") project: Project): Boolean =
             TestCaseDatabaseAssertionMethods.contains(this.name)
 
         fun MethodReference.shouldCompleteSchemas(project: Project): Boolean =

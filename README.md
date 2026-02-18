@@ -7,11 +7,9 @@
 <img src="https://raw.githubusercontent.com/ekvedaras/laravel-query-intellij/main/src/main/resources/META-INF/pluginIcon.svg" width="192" height="192"/>
 
 <!-- Plugin description -->
-## Laravel + DataGrip = ♥️
+This plugin provides database integration for Laravel query builder. It works with DataGrip to provide autocompletion for database schemas, tables, views, and columns.
 
 <img src="https://user-images.githubusercontent.com/3586184/110513603-b4522000-8106-11eb-9678-985bf286bf4f.gif" alt="Demo" width="350" height="353"/>
-
-This plugin provides database integration for Laravel query builder.
 
 ## Features
 
@@ -37,7 +35,7 @@ You also need either [Laravel Idea](https://laravel-idea.com) plugin (paid) or [
 php artisan ide-helper:generate
 php artisan ide-helper:meta
 php artisan ide-helper:models
-php artisan ide-helper:eloquent
+php artisan artisan ide-helper:eloquent
 ```
 which will generate some helper files so your IDE could see Eloquent methods.
 

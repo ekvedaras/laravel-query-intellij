@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Fixed
+- Handle warnings and fix description for publishing
 - Handle case when IDE can't be in smart mode #122
 - Less parallel things to avoid forking too much #123
 

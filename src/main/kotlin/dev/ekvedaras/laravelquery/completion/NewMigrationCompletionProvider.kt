@@ -83,9 +83,9 @@ class NewMigrationCompletionProvider : CompletionProvider<CompletionParameters>(
         }
 
         val columns = table?.getDasChildren(ObjectKind.COLUMN)?.map { it.name } ?: listOf<String>()
-        val indexes = table?.getDasChildren(ObjectKind.INDEX)?.map { it.name } ?: listOf<String>()
-        val keys = table?.getDasChildren(ObjectKind.KEY)?.map { it.name } ?: listOf<String>()
-        val foreignKeys = table?.getDasChildren(ObjectKind.FOREIGN_KEY)?.map { it.name } ?: listOf<String>()
+//        val indexes = table?.getDasChildren(ObjectKind.INDEX)?.map { it.name } ?: listOf<String>()
+//        val keys = table?.getDasChildren(ObjectKind.KEY)?.map { it.name } ?: listOf<String>()
+//        val foreignKeys = table?.getDasChildren(ObjectKind.FOREIGN_KEY)?.map { it.name } ?: listOf<String>()
 
         if (ApplicationManager.getApplication().isReadAccessAllowed) {
             ApplicationManager.getApplication().runReadAction {
