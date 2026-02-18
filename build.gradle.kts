@@ -100,7 +100,6 @@ tasks {
 }
 
 dependencies {
-    implementation("com.github.cesarferreira:kotlin-pluralizer:1.0.0")
     implementation(kotlin("stdlib"))
 }
 

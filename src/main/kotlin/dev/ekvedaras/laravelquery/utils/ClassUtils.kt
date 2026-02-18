@@ -1,12 +1,27 @@
 package dev.ekvedaras.laravelquery.utils
 
-import com.cesarferreira.pluralize.pluralize
 import com.intellij.openapi.project.Project
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.Field
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassAliasImpl
 import com.jetbrains.php.lang.psi.elements.impl.PhpClassImpl
+
+private fun String.pluralize(): String {
+    val lower = this.lowercase()
+    // Words that typically take 'es'
+    if (lower.endsWith("ch") || lower.endsWith("sh") || lower.endsWith("s") || lower.endsWith("x") || lower.endsWith("z")) {
+        return this + "es"
+    }
+    // Consonant + y -> ies
+    if (lower.endsWith("y") && length > 1) {
+        val beforeY = lower[lower.length - 2]
+        if (beforeY !in charArrayOf('a', 'e', 'i', 'o', 'u')) {
+            return this.dropLast(1) + "ies"
+        }
+    }
+    return this + "s"
+}
 
 class ClassUtils private constructor() {
     companion object {

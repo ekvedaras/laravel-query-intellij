@@ -7,7 +7,6 @@
 ## 4.0.5 - 2026-02-18
 
 ### Fixed
-
 - Handle case when IDE can't be in smart mode #122
 - Less parallel things to avoid forking too much #123
 - Handle warnings and fix description for publishing
